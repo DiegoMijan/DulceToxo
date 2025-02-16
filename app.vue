@@ -1,6 +1,12 @@
+<script setup lang="ts">
+import AppHeader from './components/AppHeader.vue';
+
+const mew = ref()
+
+
+
+
+</script>
 <template>
-  <div>
-    <NuxtRouteAnnouncer />
-    <NuxtWelcome />
-  </div>
+  <AppHeader/>
 </template>

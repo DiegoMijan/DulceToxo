@@ -1,1 +1,33 @@
 @import "tailwindcss";
+
+@theme {
+--color-french-lilac-50: #fbf7fc;
+--color-french-lilac-100: #f8eef9;
+--color-french-lilac-200: #eedcf2;
+--color-french-lilac-300: #e0bbe4;
+--color-french-lilac-400: #d29bd7;
+--color-french-lilac-500: #bb73c2;
+--color-french-lilac-600: #a054a5;
+--color-french-lilac-700: #854388;
+--color-french-lilac-800: #6e396f;
+--color-french-lilac-900: #5c325d;
+--color-french-lilac-950: #3a183a;
+
+--color-yellow-50: #fbffe7;
+--color-yellow-100: #f4ffc1;
+--color-yellow-200: #eeff86;
+--color-yellow-300: #ecff41;
+--color-yellow-400: #f2ff0d;
+--color-yellow-500: #ffff00;
+--color-yellow-600: #d1bf00;
+--color-yellow-700: #a68b02;
+--color-yellow-800: #896c0a;
+--color-yellow-900: #74580f;
+--color-yellow-950: #443004;
+}
+
+
+body {
+    background: linear-gradient(135deg, var(--color-french-lilac-300), #333333);
+    height: 100vh;
+}
