@@ -26,6 +26,26 @@
 --color-yellow-950: #443004;
 }
 
+::-webkit-scrollbar {
+    width: 10px; 
+    height: 10px; /* Alto en barras horizontales */
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Color de fondo del track */
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-french-lilac-500); /* Color del thumb */
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a362a8; /* Color cuando se pasa el mouse */
+  }
+
 
 body {
     background: linear-gradient(135deg, var(--color-french-lilac-300), #333333);

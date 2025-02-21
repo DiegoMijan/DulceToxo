@@ -14,12 +14,13 @@ onUnmounted(() => {
 })
 </script>
 <template>
-    <header class="fixed top-0 left-0 right-0 flex px-8 py-2 items-center transition-all duration-300" :class="[
+    <header class="fixed top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center transition-all duration-300" :class="[
       isScrolled 
         ? 'bg-french-lilac-950/80 backdrop-blur-sm' 
         : 'bg-french-lilac-950 header-border-width border-gradient-to-r'
     ]">
         <img class="cursor-pointer" src="/public/img/logo_toxo.webp" alt="Logo Dulce Toxo"  style="height: 50px;" >
+        <ThemeToggle/>
     </header>
 </template>
 

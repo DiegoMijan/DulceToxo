@@ -2,6 +2,14 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  app: {
+    head: {
+      title: 'Dulce Toxo',
+    }
+  },
+  icon: {
+    componentName: 'NuxtIcon'
+  },
   compatibilityDate: '2024-11-01',
   ssr:false,
   devtools: { enabled: true },
@@ -13,7 +21,7 @@ export default defineNuxtConfig({
     ],
   },
   colorMode: {
-    preference: 'system',
+    preference: 'dark',
     fallback: 'dark',
     storage: 'localStorage',
     storageKey: 'nuxt-color-mode'

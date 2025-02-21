@@ -1,12 +1,6 @@
-<script setup lang="ts">
-import AppHeader from './components/AppHeader.vue';
-
-const mew = ref()
-
-
-
-
-</script>
 <template>
+  <div id="app">
   <AppHeader/>
+  <NuxtPage />
+  </div>
 </template>
