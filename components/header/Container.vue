@@ -16,11 +16,11 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="sticky top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center transition-all duration-300"
+    class="sticky top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center"
     :class="[
       isScrolled
-        ? 'bg-french-lilac-950/80 backdrop-blur-sm'
-        : 'bg-french-lilac-950 header-border-width border-gradient-to-r',
+        ? ' bg-french-lilac-950/80 backdrop-blur'
+        : ' bg-french-lilac-950 dark:bg-red-600 header-border-width border-gradient-to-r',
     ]"
   >
     <img

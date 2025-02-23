@@ -47,7 +47,20 @@
   }
 
 
+html {
+  height: 100%;  
+}
+
 body {
-    background: linear-gradient(135deg, var(--color-french-lilac-300), #333333);
-    height: 100vh;
+  height: 100vh;
+}
+
+.light-mode {
+  body {
+    background: linear-gradient(135deg, var(--color-french-lilac-500), var(--color-yellow-600));
+  }
+}
+
+.dark-mode  body {
+  background: linear-gradient(135deg, var(--color-french-lilac-300), var(--color-yellow-50));
 }
