@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+
+
+@custom-variant dark (&:where(.dark-mode, .dark-mode *));
+
 @theme {
 --color-french-lilac-50: #fbf7fc;
 --color-french-lilac-100: #f8eef9;
@@ -61,6 +65,8 @@ body {
   }
 }
 
-.dark-mode  body {
-  background: linear-gradient(135deg, var(--color-french-lilac-300), var(--color-yellow-50));
+.dark-mode {
+  body {
+    background: linear-gradient(135deg, var(--color-french-lilac-800), var(--color-yellow-400));
+  }
 }

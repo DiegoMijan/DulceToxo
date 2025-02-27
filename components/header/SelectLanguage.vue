@@ -31,7 +31,7 @@ onMounted(() => {
 <template>
   <NuxtIcon
     name="clarity:language-solid"
-    class="cursor-pointer text-2xl"
+    class="cursor-pointer text-2xl text-white"
     @mouseover="toggle"
   />
   <Menu
