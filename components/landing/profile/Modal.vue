@@ -47,9 +47,9 @@ const age = calculateYears(birthDate)
           class="rounded-full overflow-hidden relative mx-auto"
           width="150"
         >
-        <p class="max-w-[60ch]">
+        <p class="max-w-[60ch] content">
           Hola, mi nombre es Lucia Chas Álvarez. Tengo {{ age }} años y soy ingeniera software. Aunque si estás aquí, no es por la informática 😂😂, sino por una de mis grandes pasiones, como es la repostería.
-          En <i class="font-bold dark:text-french-lilac-400! text-french-lilac-200">Dulce Toxo</i> podrás encontrar una amplia variedad de postres artesanales y dulces como:<br>
+          En <i class="font-bold sub-title dark:text-french-lilac-400! text-french-lilac-950">Dulce Toxo</i> podrás encontrar una amplia variedad de postres artesanales y dulces como:<br>
           🧁 Cupcakes <br>
           🍪 Cookies<br>
           🍰 Tartas de queso<br>

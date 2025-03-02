@@ -70,3 +70,15 @@ body {
     background: linear-gradient(135deg, var(--color-french-lilac-800), var(--color-yellow-400));
   }
 }
+
+.title {
+  font-family: 'Playfair Display';
+}
+
+.sub-title {
+  font-family: 'Merriweather';
+}
+
+.content {
+  font-family: 'Lato';
+}
