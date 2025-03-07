@@ -9,7 +9,7 @@ export default withNuxt(
       'no-unused-vars': ['error', { vars: 'all', args: 'none', ignoreRestSiblings: true }],
       'unused-imports/no-unused-imports': 'error',
       'vue/no-multiple-template-root': 'off',
-      'max-len': ['error', { code: 120 }],
+      'max-len': ['error', { code: 130 }],
     },
     plugins: {
       'unused-imports': unusedImports,

@@ -16,7 +16,7 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="sticky top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center"
+    class="sticky top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center z-[1]"
     :class="[
       isScrolled
         ? ' dark:bg-french-lilac-950/80! bg-french-lilac-700/80 backdrop-blur'

@@ -19,7 +19,7 @@ const age = calculateYears(birthDate)
 
 <template>
   <div
-    class="fixed inset-0 flex items-center justify-center"
+    class="fixed inset-0 flex items-center justify-center z-10"
     style="background-color: rgba(0, 0, 0, 0.5);"
     data-blendy-to="profile"
   >

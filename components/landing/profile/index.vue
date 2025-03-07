@@ -21,7 +21,7 @@ onMounted(() => {
     />
   </Teleport>
   <button
-    class="button"
+    class="button [border-image:linear-gradient(to_right,#83C59B,#FCF09A,red,purple,#71CAEE)_1]!"
     data-blendy-from="profile"
     @click="() => {
       showModal = true

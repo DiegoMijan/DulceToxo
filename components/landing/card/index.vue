@@ -9,7 +9,7 @@ interface Props {
 const { description, icon, title, darkIcon } = defineProps<Props>()
 const colorMode = useColorMode()
 
-const name = computed(() => {
+const calculatedIcon = computed(() => {
   if (darkIcon && colorMode.value === 'dark') {
     return darkIcon
   }
@@ -19,7 +19,7 @@ const name = computed(() => {
 
 <template>
   <Card
-    class="cursor-pointer"
+    class="cursor-pointer card-container"
     :pt="{
       content: {
         class: 'content',
@@ -28,7 +28,11 @@ const name = computed(() => {
   >
     <template #header>
       <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
-        <NuxtIcon :name />{{ title }}
+        <slot
+          name="icon"
+          :calculated-icon
+        />
+        <span>{{ title }}</span>
       </h3>
     </template>
     <p>{{ description }}</p>

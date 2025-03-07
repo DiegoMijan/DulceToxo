@@ -67,7 +67,7 @@ body {
 
 .dark-mode {
   body {
-    background: linear-gradient(135deg, var(--color-french-lilac-800), var(--color-yellow-400));
+    background-color:  var(--darkreader-bg--p-card-background);
   }
 }
 
@@ -81,4 +81,11 @@ body {
 
 .content {
   font-family: 'Lato';
+}
+
+.card-container {
+  box-shadow: 0 0 0.75rem var(--color-french-lilac-900)!important;
+  &:hover {
+    box-shadow: 0 0 0.75rem var(--color-yellow-200)!important;
+  }
 }
