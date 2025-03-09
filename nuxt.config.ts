@@ -81,21 +81,28 @@ export default defineNuxtConfig({
     ],
   },
   i18n: {
+    compilation: {
+      strictMessage: false,
+    },
     lazy: true,
     locales: [
       {
         code: 'gl',
         language: 'gl-ES',
         name: 'Galego',
+        file: 'gl.json'
+
       }, {
         code: 'es',
         language: 'es-ES',
         name: 'Español',
+         file: 'es.json'
       },
       {
         code: 'en',
         language: 'en-GB',
         name: 'English',
+         file: 'en.json'
       },
     ],
     defaultLocale: 'gl',

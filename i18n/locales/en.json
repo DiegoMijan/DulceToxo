@@ -1,0 +1,41 @@
+{
+    "header": {
+        "theme":"Change page theme"
+    },
+    "aboutMeDialog": {
+        "title": "About me",
+        "greeting": "Hello, my name is Lucia Chas Álvarez. I am {age} years old and I am a software engineer.",
+        "introduction": "Although if you're here, it's not because of IT 😂😂, but because of one of my greatest passions, which is baking.",
+        "business": "At <i class=\"font-bold sub-title dark:text-french-lilac-400! text-french-lilac-950\">Dulce Toxo</i>, you will find a wide variety of handmade desserts and sweets such as:",
+        "cupcakes": "🧁 Cupcakes",
+        "cookies": "🍪 Cookies",
+        "cheesecakes": "🍰 Cheesecakes",
+        "more": "And more!"
+    },
+    "landing": {
+        "cupcakes": {
+            "title": "Cupcakes",
+            "description": "Little works of art in cake form. Fluffy, colorful, and topped with delicious frostings that make them irresistible. A bite of happiness!"
+        },
+        "cookies": {
+            "title": "Cookies",
+            "description": "Little delights that are crunchy on the outside and soft on the inside. From classic chocolate chip to the most innovative ones, perfect for any sweet moment!"
+        },
+        "cheesecakes": {
+            "title": "Cheesecakes",
+            "description": "Smooth, creamy, and full of flavor. From the classic New York style to the most surprising variations, every bite is pure temptation."
+        },
+        "spongeCake": {
+            "title": "Sponge Cakes",
+            "description": "Fluffy and homemade, perfect to enjoy with coffee or tea. Traditional or with a special twist, they’re always a hit."
+        },
+        "brownies": {
+            "title": "Brownies",
+            "description": "Deliciously dense and moist, with a perfect balance between crunchy and soft. Ideal for chocolate lovers."
+        },
+        "coldCakes": {
+            "title": "Cold Cakes",
+            "description": "Refreshing and creamy, perfect for any occasion. With irresistible combinations of flavors and textures that will make you fall in love."
+        }
+    }
+}

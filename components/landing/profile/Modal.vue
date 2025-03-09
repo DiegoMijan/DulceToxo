@@ -26,7 +26,7 @@ const age = calculateYears(birthDate)
     <div class="dark:bg-gray-900! bg-french-lilac-400 rounded-lg shadow-lg p-6 w-full max-w-md">
       <div class="flex justify-between items-center border-b pb-3">
         <h2 class="text-xl font-semibold  font-[Playfair_Display] ">
-          Sobre mi
+          {{ $t('aboutMeDialog.title') }}
         </h2>
         <button
           class="text-gray-500 hover:text-gray-700 cursor-pointer"
@@ -48,15 +48,13 @@ const age = calculateYears(birthDate)
           width="150"
         >
         <p class="max-w-[60ch] content">
-          Hola, mi nombre es Lucia Chas Álvarez. Tengo {{ age }} años y soy ingeniera software.
-          Aunque si estás aquí, no es por la informática 😂😂, sino por una de mis grandes pasiones,
-          como es la repostería.
-          En <i class="font-bold sub-title dark:text-french-lilac-400! text-french-lilac-950">Dulce Toxo</i>
-          podrás encontrar una amplia variedad de postres artesanales y dulces como:<br>
-          🧁 Cupcakes <br>
-          🍪 Cookies<br>
-          🍰 Tartas de queso<br>
-          Y más!
+          {{ $t('aboutMeDialog.greeting',{age}) }}
+          {{ $t('aboutMeDialog.introduction') }}<br>
+          <span v-html="$t('aboutMeDialog.business')"></span><br>
+          {{ $t('aboutMeDialog.cupcakes') }} <br>
+          {{ $t('aboutMeDialog.cookies') }}<br>
+          {{ $t('aboutMeDialog.cheesecakes') }}<br>
+          {{ $t('aboutMeDialog.more') }}
         </p>
       </div>
     </div>

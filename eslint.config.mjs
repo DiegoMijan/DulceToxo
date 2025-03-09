@@ -3,6 +3,7 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt(
   {
+
     rules: {
       'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
       'semi': ['error', 'never'],
