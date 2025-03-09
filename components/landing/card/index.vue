@@ -16,57 +16,25 @@ const calculatedIcon = computed(() => {
   return icon
 })
 
-const cardRef = ref<{ $el: HTMLElement } | null>(null)
+const cardRef = ref<HTMLElement | null>(null)
 const transformStyle = ref('rotateX(0deg) rotateY(0deg) scale(1)')
-let animationFrameId: number | null = 0
 
-const handleMouseMove = (e: MouseEvent) => {
-  if (animationFrameId !== null) {
-    cancelAnimationFrame(animationFrameId)
+const { elementX, elementY, isOutside } = useMouseInElement(cardRef)
+const { width, height } = useElementBounding(cardRef)
+
+watchEffect(() => {
+  if (isOutside.value) {
+    transformStyle.value = 'rotateX(0deg) rotateY(0deg) scale(1)'
+    return
   }
-  animationFrameId = requestAnimationFrame(() => {
-    const card = cardRef.value?.$el
-    if (!card) return
 
-    const rect = card.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+  const centerX = width.value / 2
+  const centerY = height.value / 2
 
-    const centerX = rect.width / 2
-    const centerY = rect.height / 2
+  const rotateX = -(elementY.value - centerY) / 10
+  const rotateY = (elementX.value - centerX) / 10
 
-    const rotateX = -(y - centerY) / 10
-    const rotateY = (x - centerX) / 10
-
-    transformStyle.value = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`
-  })
-}
-
-const resetTransform = () => {
-  if (animationFrameId !== null) {
-    cancelAnimationFrame(animationFrameId)
-    animationFrameId = null
-  }
-  transformStyle.value = 'rotateX(0deg) rotateY(0deg) scale(1)'
-}
-
-onMounted(() => {
-  const el = cardRef.value?.$el
-  if (el) {
-    el.addEventListener('mousemove', handleMouseMove)
-    el.addEventListener('mouseleave', resetTransform)
-  }
-})
-
-onUnmounted(() => {
-  const el = cardRef.value?.$el
-  if (el) {
-    el.removeEventListener('mousemove', handleMouseMove)
-    el.removeEventListener('mouseleave', resetTransform)
-  }
-  if (animationFrameId !== null) {
-    cancelAnimationFrame(animationFrameId)
-  }
+  transformStyle.value = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`
 })
 </script>
 
@@ -101,6 +69,6 @@ onUnmounted(() => {
 .card-container {
   transform-style: preserve-3d;
   will-change: transform;
-  transition: transform 0.35s ease; /* más suave */
+  transition: transform 0.35s ease;
 }
 </style>
