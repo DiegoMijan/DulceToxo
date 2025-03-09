@@ -90,19 +90,19 @@ export default defineNuxtConfig({
         code: 'gl',
         language: 'gl-ES',
         name: 'Galego',
-        file: 'gl.json'
+        file: 'gl.json',
 
       }, {
         code: 'es',
         language: 'es-ES',
         name: 'Español',
-         file: 'es.json'
+        file: 'es.json',
       },
       {
         code: 'en',
         language: 'en-GB',
         name: 'English',
-         file: 'en.json'
+        file: 'en.json',
       },
     ],
     defaultLocale: 'gl',
