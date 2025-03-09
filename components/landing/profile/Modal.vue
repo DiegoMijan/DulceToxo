@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <script lang="ts" setup>
 defineEmits(['close'])
 
@@ -48,9 +49,9 @@ const age = calculateYears(birthDate)
           width="150"
         >
         <p class="max-w-[60ch] content">
-          {{ $t('aboutMeDialog.greeting',{age}) }}
+          {{ $t('aboutMeDialog.greeting', { age }) }}
           {{ $t('aboutMeDialog.introduction') }}<br>
-          <span v-html="$t('aboutMeDialog.business')"></span><br>
+          <span v-html="$t('aboutMeDialog.business')" /><br>
           {{ $t('aboutMeDialog.cupcakes') }} <br>
           {{ $t('aboutMeDialog.cookies') }}<br>
           {{ $t('aboutMeDialog.cheesecakes') }}<br>
