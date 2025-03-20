@@ -23,8 +23,8 @@
     "@primevue/nuxt-module": "^4.2.5",
     "@tailwindcss/vite": "^4.0.5",
     "@tresjs/nuxt": "^3.0.7",
-    "@vueuse/core": "^12.5.0",
-    "@vueuse/nuxt": "^12.5.0",
+    "@vueuse/core": "^13.0.0",
+    "@vueuse/nuxt": "^13.0.0",
     "blendy": "^0.0.1",
     "eslint": "^9.0.0",
     "magic-regexp": "^0.8.0",
@@ -36,6 +36,13 @@
     "three": ">=0.133",
     "vue": "latest",
     "vue-router": "latest"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "@parcel/watcher",
+      "esbuild"
+    ]
   },
   "packageManager": "pnpm@10.6.1",
   "devDependencies": {
