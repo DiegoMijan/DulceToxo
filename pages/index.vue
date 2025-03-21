@@ -21,7 +21,7 @@ const cards = ref([
     darkIcon: 'emojione:shortcake',
   },
   {
-    key: 'spongeCake',
+    key: 'spongeCakes',
     icon: 'logos:cakephp-icon',
     darkIcon: 'streamline-emojis:birthday-cake-3',
   },

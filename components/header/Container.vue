@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NuxtImg } from '#components'
+
 const isScrolled = ref(false)
 
 const checkScroll = () => {
@@ -23,12 +25,12 @@ onUnmounted(() => {
         : ' bg-french-lilac-700 dark:bg-french-lilac-950! header-border-width border-gradient-to-r',
     ]"
   >
-    <img
+    <NuxtImg
       class="cursor-pointer"
-      src="/public/img/logo_toxo.webp"
+      src="/img/logo_toxo.webp"
       alt="Logo Dulce Toxo"
       style="height: 50px;"
-    >
+    />
     <div class="ml-auto flex gap-3">
       <HeaderThemeToggle />
       <HeaderSelectLanguage />

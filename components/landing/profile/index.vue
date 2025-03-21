@@ -28,12 +28,12 @@ onMounted(() => {
       blendy?.toggle('profile')
     }"
   >
-    <img
+    <NuxtImg
 
-      src="/public/img/lucia.jpg"
+      src="/img/lucia.jpg"
       alt="Lucia"
       class="rounded-full overflow-hidden relative mx-auto cursor-pointer button"
       width="150"
-    >
+    />
   </button>
 </template>

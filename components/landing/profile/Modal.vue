@@ -41,13 +41,13 @@ const age = calculateYears(birthDate)
       <div
         class="mt-4 font-[Lato]"
       >
-        <img
+        <NuxtImg
 
-          src="/public/img/lucia.jpg"
+          src="/img/lucia.jpg"
           alt="Lucia"
           class="rounded-full overflow-hidden relative mx-auto"
           width="150"
-        >
+        />
         <p class="max-w-[60ch] content">
           {{ $t('aboutMeDialog.greeting', { age }) }}
           {{ $t('aboutMeDialog.introduction') }}<br>
