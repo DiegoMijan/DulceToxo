@@ -34,10 +34,13 @@ onMounted(() => {
 
 <template>
   <NuxtIcon
+    tabindex="0"
     name="clarity:language-solid"
-    class="cursor-pointer text-2xl text-white transition-transform duration-200 hover:scale-110"
+    class="cursor-pointer text-2xl text-white transition-transform duration-200 hover:scale-110 focus:dark:bg-french-lilac-500!
+     focus:bg-amber-300!"
     aria-controls="language-menu"
     :aria-label="$t('header.language')"
+    aria-hidden="false"
     @mouseover="toggle"
   />
   <Menu

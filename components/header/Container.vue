@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import { NuxtImg } from '#components'
-
 const isScrolled = ref(false)
+const appElementRef = ref<HTMLElement | null>(null)
 
-const checkScroll = () => {
-  isScrolled.value = window.scrollY > 0
-}
+const { y } = useScroll(appElementRef)
 
 onMounted(() => {
-  window.addEventListener('scroll', checkScroll)
+  appElementRef.value = document.getElementById('app')
 })
 
-onUnmounted(() => {
-  window.removeEventListener('scroll', checkScroll)
+watch(y, () => {
+  isScrolled.value = y.value > 0
 })
 </script>
 
@@ -22,7 +19,7 @@ onUnmounted(() => {
     class="sticky top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center z-[25]"
     :class="[
       isScrolled
-        ? ' dark:bg-french-lilac-950/80! bg-french-lilac-700/80 backdrop-blur'
+        ? 'dark:bg-french-lilac-950/80! backdrop-blur-sm'
         : ' bg-french-lilac-700 dark:bg-french-lilac-950! header-border-width border-gradient-to-r',
     ]"
   >

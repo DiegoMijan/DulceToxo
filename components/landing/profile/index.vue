@@ -23,18 +23,20 @@ onMounted(() => {
       }"
     />
   </Teleport>
-  <button
-    class="button"
-    data-blendy-from="profile"
-    @click="() => {
-      showModal = true
-      emit('toggleModal', true)
-      blendy?.toggle('profile')
-    }"
-  >
-    <LandingProfileImage
-      show-gradient
-      class="button cursor-pointer"
-    />
-  </button>
+  <div class="flex justify-center">
+    <button
+      class="button w-fit"
+      data-blendy-from="profile"
+      @click="() => {
+        showModal = true
+        emit('toggleModal', true)
+        blendy?.toggle('profile')
+      }"
+    >
+      <LandingProfileImage
+        show-gradient
+        class="button cursor-pointer"
+      />
+    </button>
+  </div>
 </template>

@@ -9,7 +9,7 @@ const { size = '150px', showGradient = false } = defineProps<{
   <div
     :class="[
       'mx-auto rounded-full mb-3!',
-      showGradient ? 'p-[3px] relative overflow-hidden gradient-border' : '',
+      showGradient ? 'p-[4px] relative overflow-hidden gradient-border' : '',
     ]"
     :style="{
       width: size,
