@@ -20,7 +20,7 @@ const age = calculateYears(birthDate)
 
 <template>
   <div
-    class="fixed inset-0 flex items-center justify-center z-10"
+    class="fixed inset-0 flex items-center justify-center z-50"
     style="background-color: rgba(0, 0, 0, 0.5);"
     data-blendy-to="profile"
   >
@@ -41,13 +41,7 @@ const age = calculateYears(birthDate)
       <div
         class="mt-4 font-[Lato]"
       >
-        <NuxtImg
-
-          src="/img/lucia.jpg"
-          alt="Lucia"
-          class="rounded-full overflow-hidden relative mx-auto"
-          width="150"
-        />
+        <LandingProfileImage show-gradient />
         <p class="max-w-[60ch] content">
           {{ $t('aboutMeDialog.greeting', { age }) }}
           {{ $t('aboutMeDialog.introduction') }}<br>

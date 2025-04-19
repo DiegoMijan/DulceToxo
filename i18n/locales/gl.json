@@ -1,6 +1,13 @@
 {
     "header": {
-        "theme":"Cambiar tema da páxina"
+        "theme": "Cambiar tema da páxina",
+        "language": "Cambiar idioma",
+        "languageMenu": "Menú de selección de idioma"
+    },
+    "languages": {
+        "es": "Castelán",
+        "en": "Inglés",
+        "gl": "Galego"
     },
     "aboutMeDialog": {
         "title": "Sobre min",

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { createBlendy, type Blendy } from 'blendy'
 
+const emit = defineEmits(['toggleModal'])
+
 const blendy = ref<Blendy | null>(null)
 const showModal = ref(false)
 
@@ -16,24 +18,23 @@ onMounted(() => {
       @close="() => {
         blendy?.untoggle('profile', () => {
           showModal = false
+          emit('toggleModal', false)
         })
       }"
     />
   </Teleport>
   <button
-    class="button [border-image:linear-gradient(to_right,#83C59B,#FCF09A,red,purple,#71CAEE)_1]!"
+    class="button"
     data-blendy-from="profile"
     @click="() => {
       showModal = true
+      emit('toggleModal', true)
       blendy?.toggle('profile')
     }"
   >
-    <NuxtImg
-
-      src="/img/lucia.jpg"
-      alt="Lucia"
-      class="rounded-full overflow-hidden relative mx-auto cursor-pointer button"
-      width="150"
+    <LandingProfileImage
+      show-gradient
+      class="button cursor-pointer"
     />
   </button>
 </template>

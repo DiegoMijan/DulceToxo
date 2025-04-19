@@ -4,9 +4,10 @@ interface Props {
   title: string
   description: string
   darkIcon?: string
+  isModalOpen?: boolean
 }
 
-const { description, icon, title, darkIcon } = defineProps<Props>()
+const { description, icon, title, darkIcon, isModalOpen } = defineProps<Props>()
 const colorMode = useColorMode()
 
 const calculatedIcon = computed(() => {
@@ -23,7 +24,7 @@ const { elementX, elementY, isOutside } = useMouseInElement(cardRef)
 const { width, height } = useElementBounding(cardRef)
 
 watchEffect(() => {
-  if (isOutside.value) {
+  if (isOutside.value || isModalOpen) {
     transformStyle.value = 'rotateX(0deg) rotateY(0deg) scale(1)'
     return
   }

@@ -18,7 +18,8 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="sticky top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center z-[1]"
+    role="banner"
+    class="sticky top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center z-[25]"
     :class="[
       isScrolled
         ? ' dark:bg-french-lilac-950/80! bg-french-lilac-700/80 backdrop-blur'
@@ -31,10 +32,13 @@ onUnmounted(() => {
       alt="Logo Dulce Toxo"
       style="height: 50px;"
     />
-    <div class="ml-auto flex gap-3">
+    <nav
+      role="toolbar"
+      class="ml-auto flex gap-3"
+    >
       <HeaderThemeToggle />
       <HeaderSelectLanguage />
-    </div>
+    </nav>
   </header>
 </template>
 

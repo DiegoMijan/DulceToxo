@@ -4,6 +4,8 @@ import darBrownie from '@/public/img/dark_brownie.webp'
 
 const { t } = useI18n()
 
+const isModalOpen = ref(false)
+
 const cards = ref([
   {
     key: 'cupcakes',
@@ -49,7 +51,7 @@ const translateCards = computed(() => cards.value.map(card => ({
 <template>
   <main class="flex justify-center py-8">
     <div class="max-w-[100ch] flex flex-col gap-7">
-      <LazyLandingProfile />
+      <LazyLandingProfile @toggle-modal="isModalOpen = $event as boolean" />
       <div class="grid md:grid-cols-2 gap-10 sm:grid-cols-1 lg:px-0 px-4">
         <LandingCard
           v-for="{ description, icon, title, darkIcon, isImage } in translateCards"
@@ -58,6 +60,7 @@ const translateCards = computed(() => cards.value.map(card => ({
           :icon
           :dark-icon
           :title
+          :is-modal-open="isModalOpen"
         >
           <template #icon="{ calculatedIcon }">
             <NuxtIcon

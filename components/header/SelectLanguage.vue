@@ -7,9 +7,9 @@ import en from '@/public/img/gb.svg'
 
 const { locales, setLocale, locale } = useI18n()
 
-type Manu = InstanceType<typeof Menu>
+type MenuType = InstanceType<typeof Menu>
 
-const menu = useTemplateRef<Manu>('menu')
+const menu = useTemplateRef<MenuType>('menu')
 const items = ref<MenuItem[]>([
 ])
 
@@ -18,11 +18,15 @@ const toggle = (event: Event) => {
 }
 
 onMounted(() => {
-  locales.value.forEach(({ code, name }) => {
-    const img = code === 'es' ? es : code === 'en' ? en : gl
-    items.value.push({ key: code, label: name, img, command: () => {
-      setLocale(code)
-    },
+  locales.value.forEach(({ code: key, name: label }) => {
+    const img = key === 'es' ? es : key === 'en' ? en : gl
+    items.value.push({
+      key,
+      label,
+      img,
+      command: () => {
+        setLocale(key)
+      },
     })
   })
 })
@@ -31,7 +35,9 @@ onMounted(() => {
 <template>
   <NuxtIcon
     name="clarity:language-solid"
-    class="cursor-pointer text-2xl text-white"
+    class="cursor-pointer text-2xl text-white transition-transform duration-200 hover:scale-110"
+    aria-controls="language-menu"
+    :aria-label="$t('header.language')"
     @mouseover="toggle"
   />
   <Menu
@@ -39,6 +45,7 @@ onMounted(() => {
     ref="menu"
     :model="items"
     :popup="true"
+    :aria-label="$t('header.languageMenu')"
   >
     <template #itemicon="{ item }">
       <div
@@ -47,9 +54,15 @@ onMounted(() => {
       />
       <img
         :src="item.img"
-        alt="language"
+        :alt="$t(`languages.${item.key}`)"
         class="h-4 rounded"
       >
     </template>
   </Menu>
 </template>
+
+<style scoped>
+.transition-transform {
+  transition: transform 0.2s ease-in-out;
+}
+</style>

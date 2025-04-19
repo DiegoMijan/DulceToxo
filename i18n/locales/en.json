@@ -1,6 +1,13 @@
 {
     "header": {
-        "theme":"Change page theme"
+        "theme": "Change page theme",
+        "language": "Change language",
+        "languageMenu": "Language selection menu"
+    },
+    "languages": {
+        "es": "Spanish",
+        "en": "English",
+        "gl": "Galician"
     },
     "aboutMeDialog": {
         "title": "About me",
@@ -27,7 +34,7 @@
         },
         "spongeCakes": {
             "title": "Sponge Cakes",
-            "description": "Fluffy and homemade, perfect to enjoy with coffee or tea. Traditional or with a special twist, they’re always a hit."
+            "description": "Fluffy and homemade, perfect to enjoy with coffee or tea. Traditional or with a special twist, they're always a hit."
         },
         "brownies": {
             "title": "Brownies",
