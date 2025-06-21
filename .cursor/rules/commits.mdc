@@ -1,0 +1,6 @@
+---
+description: commits
+globs: 
+alwaysApply: false
+---
+Cuando me pidas que escriba un mensaje de commit, utiliza el estándar de Conventional Commits. Por ejemplo: feat: ..., fix: ..., docs: ..., refactor: ..., chore: ....

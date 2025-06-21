@@ -12,41 +12,34 @@
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.8.2",
-    "@nuxt/eslint": "^1.2.0",
-    "@nuxt/fonts": "^0.11.0",
-    "@nuxt/icon": "^1.10.3",
-    "@nuxt/image": "^1.9.0",
+    "@nuxt/eslint": "^1.4.1",
+    "@nuxt/fonts": "^0.11.4",
+    "@nuxt/icon": "^1.14.0",
+    "@nuxt/image": "^1.10.0",
     "@nuxtjs/color-mode": "^3.5.2",
-    "@nuxtjs/i18n": "^9.2.0",
+    "@nuxtjs/i18n": "^9.5.5",
     "@pinia/nuxt": "latest",
-    "@primeuix/themes": "^1.0.0-rc.1",
-    "@primevue/nuxt-module": "^4.2.5",
-    "@tailwindcss/vite": "^4.0.5",
-    "@tresjs/nuxt": "^3.0.7",
-    "@vueuse/core": "^13.0.0",
-    "@vueuse/nuxt": "^13.0.0",
+    "@primeuix/themes": "^1.1.2",
+    "@primevue/nuxt-module": "^4.3.5",
+    "@tailwindcss/vite": "^4.1.10",
+    "@tresjs/nuxt": "^4.0.0",
+    "@vueuse/core": "^13.4.0",
+    "@vueuse/nuxt": "^13.4.0",
     "blendy": "^0.0.1",
-    "eslint": "^9.0.0",
-    "magic-regexp": "^0.9.0",
-    "nuxt": "^3.15.4",
+    "eslint": "^9.29.0",
+    "magic-regexp": "^0.10.0",
+    "nuxt": "^3.17.5",
     "pinia": "latest",
     "primeicons": "^7.0.0",
-    "primevue": "^4.2.5",
-    "tailwindcss": "^4.0.5",
-    "three": ">=0.133",
+    "primevue": "^4.3.5",
+    "tailwindcss": "^4.1.10",
+    "three": ">=0.177.0",
     "vue": "latest",
     "vue-router": "latest"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp",
-      "@parcel/watcher",
-      "esbuild"
-    ]
-  },
-  "packageManager": "pnpm@10.6.1",
+  
   "devDependencies": {
     "eslint-plugin-unused-imports": "^4.1.4",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.3"
   }
 }

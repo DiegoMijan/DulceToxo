@@ -1,0 +1,11 @@
+---
+description: 
+globs: *.vue,*.ts
+alwaysApply: false
+---
+### **Internacionalización (i18n)**
+
+- **Traducir Todo el Texto de Usuario**: Todo el texto visible para el usuario debe gestionarse a través del sistema de internacionalización (ej., usando `$t('key')`).
+
+
+- **Prohibido el texto hardcodeado**: Todo el texto visible para el usuario (etiquetas, títulos, botones, etc.) debe ser añadido a través del sistema de i18n ($t('clave')). Nunca insertes texto directamente en la plantilla HTML. Si me pides añadir un texto, buscaré la clave de traducción adecuada en los ficheros en.json, es.json y gl.json o te pediré que creemos una nueva.

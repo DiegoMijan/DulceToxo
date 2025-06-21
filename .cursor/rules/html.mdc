@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## **HTML y Accesibilidad (A11y)**
+
+- **Accesibilidad Semántica**: Implementa características de accesibilidad en los elementos. Por ejemplo, los elementos interactivos deben tener `tabindex="0"`, un `aria-label`, y manejadores para `@click` y `@keydown`.
+- **Roles ARIA**: Al crear componentes interactivos a partir de elementos no semánticos (como un `div`), añade un `role` apropiado (ej., `role="button"`) para informar a las tecnologías de asistencia.
+

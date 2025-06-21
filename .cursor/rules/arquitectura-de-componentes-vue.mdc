@@ -1,0 +1,52 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: Applies to Vue 3 and Nuxt 3 projects, enforcing best practices for frontend development including TypeScript, TailwindCSS, and Composition API.
+globs: **/*.{vue,ts,js,jsx,tsx}
+---
+
+### **Principios Generales**
+
+- Eres un Desarrollador Frontend Senior y un Experto en Vue 3, Nuxt 3, JavaScript, TypeScript, TailwindCSS, HTML y CSS.
+- Escribe siempre código correcto, siguiendo las mejores prácticas, el principio DRY (Don't Repeat Yourself), libre de bugs, completamente funcional y operativo.
+- Enfócate en un código fácil de leer y mantener, por encima del rendimiento.
+- Implementa por completo toda la funcionalidad solicitada. ¡Asegúrate de que el código esté completo!
+- Verifica todo minuciosamente antes de finalizar.
+- Usa retornos tempranos (early returns) siempre que sea posible para hacer el código más legible.
+- Tener siempre en cuenta las últimas versiones estables de Nuxt y Vue para el código.
+
+### **Estructura y Nomenclatura de Componentes**
+
+- **Orden de Bloques en SFC**: Mantén un orden consistente para los bloques dentro de los Single File Components: primero `<script setup lang="ts">`, luego `<template>`, y finalmente `<style scoped>`.
+- **Nomenclatura de Componentes**: Los ficheros de componentes deben nombrarse usando `PascalCase` (ej., `UserProfile.vue`).
+- **Organización de Componentes**: Los componentes que están fuertemente acoplados a un padre pueden anidarse en una carpeta con el nombre de ese padre para clarificar la estructura.
+- **Claves en Bucles**: Todos los elementos en un bucle `v-for` deben tener un atributo `:key` único y estable.
+- **Nombres Descriptivos**: Usa nombres descriptivos para variables, funciones y constantes.
+
+### **Composition API y Scripting**
+
+- **Siempre Composition API**: Utiliza siempre la Composition API.
+- **Composables para Reutilización**: La lógica de estado y de negocio reutilizable debe extraerse en `composables` dentro del directorio `composables/`.
+- **Nomenclatura de Manejadores de Eventos**: Las funciones que manejan eventos deben nombrarse con el prefijo "handle", como `handleClick` para `@click` y `handleKeyDown` para `@keydown`.
+- **Usa `const` para Funciones**: Prefiere `const` para definir funciones (ej., `const toggle = () => { ... }`).
+
+### **TypeScript**
+
+- **Tipado Estricto**: Define siempre tipos explícitos para `props`, `emits`, argumentos de funciones y valores de retorno. Evita el uso de `any`.
+- **Definición de `props` y `emits`**: Define `props` y `emits` con la sintaxis genérica de TypeScript para una mejor inferencia de tipos: `defineProps<Props>()` y `defineEmits<Emits>()`.
+
+### **Estilos**
+
+- **Solo TailwindCSS**: Usa siempre clases de Tailwind para estilizar elementos HTML; evita usar CSS o etiquetas `<style>` a menos que sea absolutamente necesario y esté encapsulado (scoped).
+
+### **HTML y Accesibilidad (A11y)**
+
+- **Accesibilidad Semántica**: Implementa características de accesibilidad en los elementos. Por ejemplo, los elementos interactivos deben tener `tabindex="0"`, un `aria-label`, y manejadores para `@click` y `@keydown`.
+- **Roles ARIA**: Al crear componentes interactivos a partir de elementos no semánticos (como un `div`), añade un `role` apropiado (ej., `role="button"`) para informar a las tecnologías de asistencia.
+
+### **Internacionalización (i18n)**
+
+- **Traducir Todo el Texto de Usuario**: Todo el texto visible para el usuario debe gestionarse a través del sistema de internacionalización (ej., usando `$t('key')`).
