@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import type Menu from 'primevue/menu'
-import type { MenuItem } from 'primevue/menuitem'
-import gl from '@/public/img/es-ga.svg'
-import es from '@/public/img/es.svg'
-import en from '@/public/img/gb.svg'
+import type Menu from "primevue/menu"
+import type { MenuItem } from "primevue/menuitem"
+import es from "@/public/img/es.svg"
+import gl from "@/public/img/es-ga.svg"
+import en from "@/public/img/gb.svg"
 
 const { locales, setLocale, locale } = useI18n()
 
 type MenuType = InstanceType<typeof Menu>
 
-const menu = useTemplateRef<MenuType>('menu')
-const items = ref<MenuItem[]>([
-])
+const menu = useTemplateRef<MenuType>("menu")
+const items = ref<MenuItem[]>([])
 
 const toggle = (event: Event) => {
   menu.value?.toggle(event)
@@ -19,7 +18,7 @@ const toggle = (event: Event) => {
 
 onMounted(() => {
   locales.value.forEach(({ code: key, name: label }) => {
-    const img = key === 'es' ? es : key === 'en' ? en : gl
+    const img = key === "es" ? es : key === "en" ? en : gl
     items.value.push({
       key,
       label,

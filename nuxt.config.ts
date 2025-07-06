@@ -1,44 +1,42 @@
-import tailwindcss from '@tailwindcss/vite'
-import Aura from '@primeuix/themes/aura'
+import Aura from "@primeuix/themes/aura";
+import tailwindcss from "@tailwindcss/vite";
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: [
-    '@vueuse/nuxt',
-    '@pinia/nuxt',
-    '@formkit/auto-animate/nuxt',
-    'magic-regexp/nuxt',
-    '@nuxtjs/i18n',
-    '@nuxt/image',
-    '@nuxt/icon',
-    '@nuxt/fonts',
-    '@nuxtjs/color-mode',
-    '@nuxt/eslint',
-    '@primevue/nuxt-module',
-    '@tresjs/nuxt',
+    "@vueuse/nuxt",
+    "@pinia/nuxt",
+    "@formkit/auto-animate/nuxt",
+    "magic-regexp/nuxt",
+    "@nuxtjs/i18n",
+    "@nuxt/image",
+    "@nuxt/icon",
+    "@nuxt/fonts",
+    "@nuxtjs/color-mode",
+    "@nuxt/eslint",
+    "@primevue/nuxt-module",
+    "@tresjs/nuxt",
   ],
   ssr: false,
   devtools: { enabled: true },
   app: {
     head: {
-      title: 'Dulce Toxo 🧁',
+      title: "Dulce Toxo 🧁",
     },
   },
-  css: ['~/assets/css/main.css', 'primeicons/primeicons.css'],
+  css: ["~/assets/css/main.css", "primeicons/primeicons.css"],
   colorMode: {
-    preference: 'dark',
-    fallback: 'dark',
-    storage: 'localStorage',
-    storageKey: 'nuxt-color-mode',
+    preference: "dark",
+    fallback: "dark",
+    storage: "localStorage",
+    storageKey: "nuxt-color-mode",
   },
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: "2024-11-01",
   vite: {
-    plugins: [
-      tailwindcss(),
-    ],
+    plugins: [tailwindcss()],
   },
   eslint: {
     config: {
-      stylistic: true,
+      stylistic: false,
     },
   },
   /*
@@ -51,32 +49,32 @@ export default defineNuxtConfig({
   fonts: {
     families: [
       {
-        name: 'Playfair Display',
-        provider: 'google',
+        name: "Playfair Display",
+        provider: "google",
         weights: [400, 500, 600, 700],
-        styles: ['normal', 'italic'],
+        styles: ["normal", "italic"],
       },
       {
-        name: 'Lato',
-        provider: 'google',
+        name: "Lato",
+        provider: "google",
         weights: [300, 400, 700],
-        styles: ['normal', 'italic'],
+        styles: ["normal", "italic"],
       },
       {
-        name: 'Pacifico',
-        provider: 'google',
+        name: "Pacifico",
+        provider: "google",
       },
       {
-        name: 'Merriweather',
-        provider: 'google',
+        name: "Merriweather",
+        provider: "google",
         weights: [300, 400, 700],
-        styles: ['normal', 'italic'],
+        styles: ["normal", "italic"],
       },
       {
-        name: 'Roboto',
-        provider: 'google',
+        name: "Roboto",
+        provider: "google",
         weights: [300, 400, 500, 700],
-        styles: ['normal', 'italic'],
+        styles: ["normal", "italic"],
       },
     ],
   },
@@ -90,48 +88,47 @@ export default defineNuxtConfig({
     lazy: true,
     locales: [
       {
-        code: 'gl',
-        language: 'gl-ES',
-        name: 'Galego',
-        file: 'gl.json',
-
-      }, {
-        code: 'es',
-        language: 'es-ES',
-        name: 'Español',
-        file: 'es.json',
+        code: "gl",
+        language: "gl-ES",
+        name: "Galego",
+        file: "gl.json",
       },
       {
-        code: 'en',
-        language: 'en-GB',
-        name: 'English',
-        file: 'en.json',
+        code: "es",
+        language: "es-ES",
+        name: "Español",
+        file: "es.json",
+      },
+      {
+        code: "en",
+        language: "en-GB",
+        name: "English",
+        file: "en.json",
       },
     ],
-    defaultLocale: 'gl',
+    defaultLocale: "gl",
     detectBrowserLanguage: {
       useCookie: true,
-      cookieKey: 'i18n_redirected',
-      redirectOn: 'root', // recommended
-      fallbackLocale: 'gl',
+      cookieKey: "i18n_redirected",
+      redirectOn: "root", // recommended
+      fallbackLocale: "gl",
     },
   },
   icon: {
-    componentName: 'NuxtIcon',
+    componentName: "NuxtIcon",
   },
   primevue: {
     components: {
-      exclude: ['Form', 'FormField'],
+      exclude: ["Form", "FormField"],
     },
     options: {
       ripple: true,
       theme: {
         preset: Aura,
         options: {
-          darkModeSelector: '.dark-mode',
+          darkModeSelector: ".dark-mode",
         },
       },
     },
   },
-
-})
+});
