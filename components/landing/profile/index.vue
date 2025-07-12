@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { createBlendy, type Blendy } from 'blendy'
+import { createBlendy, type Blendy } from "blendy"
 
-const emit = defineEmits(['toggleModal'])
+const emit = defineEmits(["toggleModal"])
 
 const blendy = ref<Blendy | null>(null)
 const showModal = ref(false)

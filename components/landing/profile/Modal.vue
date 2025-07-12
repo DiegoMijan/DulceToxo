@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/no-v-html -->
 <script lang="ts" setup>
-defineEmits(['close'])
+defineEmits(["close"])
 
 const calculateYears = (birthDate: Date): number => {
   const today = new Date()

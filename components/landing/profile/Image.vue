@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const { size = '150px', showGradient = false } = defineProps<{
+const { size = "150px", showGradient = false } = defineProps<{
   size?: string
   showGradient?: boolean
 }>()

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import brownie from '@/public/img/brownie.webp'
-import darBrownie from '@/public/img/dark_brownie.webp'
+import brownie from "@/public/img/brownie.webp"
+import darBrownie from "@/public/img/dark_brownie.webp"
 
 const { t } = useI18n()
 
@@ -8,44 +8,45 @@ const isModalOpen = ref(false)
 
 const cards = ref([
   {
-    key: 'cupcakes',
-    darkIcon: 'twemoji:cupcake',
-    icon: 'fluent-emoji:cupcake',
+    key: "cupcakes",
+    darkIcon: "twemoji:cupcake",
+    icon: "fluent-emoji:cupcake",
   },
   {
-    key: 'cookies',
-    darkIcon: 'unjs:cookie-es',
-    icon: 'twemoji:cookie',
+    key: "cookies",
+    darkIcon: "unjs:cookie-es",
+    icon: "twemoji:cookie",
   },
   {
-    key: 'cheesecakes',
-    icon: 'noto:shortcake',
-    darkIcon: 'emojione:shortcake',
+    key: "cheesecakes",
+    icon: "noto:shortcake",
+    darkIcon: "emojione:shortcake",
   },
   {
-    key: 'spongeCakes',
-    icon: 'logos:cakephp-icon',
-    darkIcon: 'streamline-emojis:birthday-cake-3',
+    key: "spongeCakes",
+    icon: "logos:cakephp-icon",
+    darkIcon: "streamline-emojis:birthday-cake-3",
   },
   {
-    key: 'brownies',
+    key: "brownies",
     icon: brownie,
     darkIcon: darBrownie,
     isImage: true,
   },
   {
-    key: 'coldCakes',
-    icon: 'emojione-v1:shortcake',
-    darkIcon: 'streamline-emojis:shortcake-1',
+    key: "coldCakes",
+    icon: "emojione-v1:shortcake",
+    darkIcon: "streamline-emojis:shortcake-1",
   },
-
 ])
 
-const translateCards = computed(() => cards.value.map(card => ({
-  ...card,
-  title: t(`landing.${card.key}.title`),
-  description: t(`landing.${card.key}.description`),
-})))
+const translateCards = computed(() =>
+  cards.value.map((card) => ({
+    ...card,
+    title: t(`landing.${card.key}.title`),
+    description: t(`landing.${card.key}.description`),
+  })),
+)
 </script>
 
 <template>

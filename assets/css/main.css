@@ -1,66 +1,62 @@
 @import "tailwindcss";
 
-
-
 @custom-variant dark (&:where(.dark-mode, .dark-mode *));
 
 @theme {
---color-french-lilac-50: #fbf7fc;
---color-french-lilac-100: #f8eef9;
---color-french-lilac-200: #eedcf2;
---color-french-lilac-300: #e0bbe4;
---color-french-lilac-400: #d29bd7;
---color-french-lilac-500: #bb73c2;
---color-french-lilac-600: #a054a5;
---color-french-lilac-700: #854388;
---color-french-lilac-800: #6e396f;
---color-french-lilac-900: #5c325d;
---color-french-lilac-950: #3a183a;
+  --color-french-lilac-50: #fbf7fc;
+  --color-french-lilac-100: #f8eef9;
+  --color-french-lilac-200: #eedcf2;
+  --color-french-lilac-300: #e0bbe4;
+  --color-french-lilac-400: #d29bd7;
+  --color-french-lilac-500: #bb73c2;
+  --color-french-lilac-600: #a054a5;
+  --color-french-lilac-700: #854388;
+  --color-french-lilac-800: #6e396f;
+  --color-french-lilac-900: #5c325d;
+  --color-french-lilac-950: #3a183a;
 
---color-yellow-50: #fbffe7;
---color-yellow-100: #f4ffc1;
---color-yellow-200: #eeff86;
---color-yellow-300: #ecff41;
---color-yellow-400: #f2ff0d;
---color-yellow-500: #ffff00;
---color-yellow-600: #d1bf00;
---color-yellow-700: #a68b02;
---color-yellow-800: #896c0a;
---color-yellow-900: #74580f;
---color-yellow-950: #443004;
+  --color-yellow-50: #fbffe7;
+  --color-yellow-100: #f4ffc1;
+  --color-yellow-200: #eeff86;
+  --color-yellow-300: #ecff41;
+  --color-yellow-400: #f2ff0d;
+  --color-yellow-500: #ffff00;
+  --color-yellow-600: #d1bf00;
+  --color-yellow-700: #a68b02;
+  --color-yellow-800: #896c0a;
+  --color-yellow-900: #74580f;
+  --color-yellow-950: #443004;
 }
 
 ::-webkit-scrollbar {
-    width: 10px; 
-    height: 10px; /* Alto en barras horizontales */
-    border-radius: 10px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: #f0f0f0; /* Color de fondo del track */
-    border-radius: 10px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-french-lilac-500); /* Color del thumb */
-    border-radius: 10px;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: #a362a8; /* Color cuando se pasa el mouse */
-  }
-
-
-html {
-  height: 100%;  
+  width: 10px;
+  height: 10px; /* Alto en barras horizontales */
+  border-radius: 10px;
 }
 
-body, #app {
+::-webkit-scrollbar-track {
+  background: #f0f0f0; /* Color de fondo del track */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-french-lilac-500); /* Color del thumb */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a362a8; /* Color cuando se pasa el mouse */
+}
+
+html {
+  height: 100%;
+}
+
+body,
+#app {
   height: 100vh;
   overflow-y: auto;
 }
-
-
 
 .light-mode {
   body {
@@ -70,25 +66,25 @@ body, #app {
 
 .dark-mode {
   body {
-    background-color:  var(--darkreader-bg--p-card-background);
+    background-color: var(--darkreader-bg--p-card-background);
   }
 }
 
 .title {
-  font-family: 'Playfair Display';
+  font-family: "Playfair Display";
 }
 
 .sub-title {
-  font-family: 'Merriweather';
+  font-family: "Merriweather";
 }
 
 .content {
-  font-family: 'Lato';
+  font-family: "Lato";
 }
 
 .card-container {
-  box-shadow: 0 0 0.75rem var(--color-french-lilac-900)!important;
+  box-shadow: 0 0 0.75rem var(--color-french-lilac-900) !important;
   &:hover {
-    box-shadow: 0 0 0.75rem var(--color-yellow-200)!important;
+    box-shadow: 0 0 0.75rem var(--color-yellow-200) !important;
   }
 }

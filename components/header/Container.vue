@@ -5,7 +5,7 @@ const appElementRef = ref<HTMLElement | null>(null)
 const { y } = useScroll(appElementRef)
 
 onMounted(() => {
-  appElementRef.value = document.getElementById('app')
+  appElementRef.value = document.getElementById("app")
 })
 
 watch(y, () => {

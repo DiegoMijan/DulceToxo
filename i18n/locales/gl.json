@@ -1,49 +1,48 @@
 {
-    "header": {
-        "theme": "Cambiar tema da páxina",
-        "language": "Cambiar idioma",
-        "languageMenu": "Menú de selección de idioma"
+  "header": {
+    "theme": "Cambiar tema da páxina",
+    "language": "Cambiar idioma",
+    "languageMenu": "Menú de selección de idioma"
+  },
+  "languages": {
+    "es": "Castelán",
+    "en": "Inglés",
+    "gl": "Galego"
+  },
+  "aboutMeDialog": {
+    "title": "Sobre min",
+    "greeting": "Ola, o meu nome é Lucia Chas Álvarez. Teño {age} anos e son enxeñeira de software.",
+    "introduction": "Aínda que se estás aquí, non é pola informática 😂😂, senón por unha das miñas grandes paixóns, como é a repostaría.",
+    "business": "En <i class=\"font-bold sub-title dark:text-french-lilac-400! text-french-lilac-950\">Dulce Toxo</i> poderás atopar unha ampla variedade de sobremesas artesanais e doces como:",
+    "cupcakes": "🧁 Cupcakes",
+    "cookies": "🍪 Cookies",
+    "cheesecakes": "🍰 Tortas de queixo",
+    "more": "E máis!"
+  },
+  "landing": {
+    "cupcakes": {
+      "title": "Cupcakes",
+      "description": "Pequenas obras de arte en forma de bolo. Esponxosas, coloridas e con deliciosas coberturas que as fan irresistibles. Un bocado de felicidade!"
     },
-    "languages": {
-        "es": "Castelán",
-        "en": "Inglés",
-        "gl": "Galego"
+    "cookies": {
+      "title": "Cookies",
+      "description": "Pequenas delicias que son crocantes por fóra e tenras por dentro. Desde as clásicas chips de choco ata as máis innovadoras, perfectas para calquera momento doce!"
     },
-    "aboutMeDialog": {
-        "title": "Sobre min",
-        "greeting": "Ola, o meu nome é Lucia Chas Álvarez. Teño {age} anos e son enxeñeira de software.",
-        "introduction": "Aínda que se estás aquí, non é pola informática 😂😂, senón por unha das miñas grandes paixóns, como é a repostaría.",
-        "business": "En <i class=\"font-bold sub-title dark:text-french-lilac-400! text-french-lilac-950\">Dulce Toxo</i> poderás atopar unha ampla variedade de sobremesas artesanais e doces como:",
-        "cupcakes": "🧁 Cupcakes",
-        "cookies": "🍪 Cookies",
-        "cheesecakes": "🍰 Tortas de queixo",
-        "more": "E máis!"
+    "cheesecakes": {
+      "title": "Tortas de queixo",
+      "description": "Suave, cremoso e cheo de sabor. Desde a clásica neoiorquina ata as versións máis sorprendentes, cada bocado é pura tentación."
     },
-    "landing": {
-        "cupcakes": {
-            "title": "Cupcakes",
-            "description": "Pequenas obras de arte en forma de bolo. Esponxosas, coloridas e con deliciosas coberturas que as fan irresistibles. Un bocado de felicidade!"
-        },
-        "cookies": {
-            "title": "Cookies",
-            "description": "Pequenas delicias que son crocantes por fóra e tenras por dentro. Desde as clásicas chips de choco ata as máis innovadoras, perfectas para calquera momento doce!"
-        },
-        "cheesecakes": {
-            "title": "Tortas de queixo",
-            "description": "Suave, cremoso e cheo de sabor. Desde a clásica neoiorquina ata as versións máis sorprendentes, cada bocado é pura tentación."
-        },
-        "spongeCakes": {
-            "title": "Bolos",
-            "description": "Esponxoso e caseiro, perfecto para acompañar con café ou té. Tradicionais ou cun toque especial, sempre son un éxito."
-        },
-        "brownies": {
-            "title": "Brownies",
-            "description": "Deliciosamente denso e húmido, cun perfecto equilibrio entre crocante e suave. Ideal para os amantes do chocolate."
-        },
-        "coldCakes": {
-            "title": "Tortas frías",
-            "description": "Refrescante e cremosa, perfecta para calquera ocasión. Con combinacións irresistibles de sabores e texturas que te namorarán."
-        }   
+    "spongeCakes": {
+      "title": "Bolos",
+      "description": "Esponxoso e caseiro, perfecto para acompañar con café ou té. Tradicionais ou cun toque especial, sempre son un éxito."
+    },
+    "brownies": {
+      "title": "Brownies",
+      "description": "Deliciosamente denso e húmido, cun perfecto equilibrio entre crocante e suave. Ideal para os amantes do chocolate."
+    },
+    "coldCakes": {
+      "title": "Tortas frías",
+      "description": "Refrescante e cremosa, perfecta para calquera ocasión. Con combinacións irresistibles de sabores e texturas que te namorarán."
     }
-
+  }
 }

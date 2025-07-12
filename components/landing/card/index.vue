@@ -11,21 +11,21 @@ const { description, icon, title, darkIcon, isModalOpen } = defineProps<Props>()
 const colorMode = useColorMode()
 
 const calculatedIcon = computed(() => {
-  if (darkIcon && colorMode.value === 'dark') {
+  if (darkIcon && colorMode.value === "dark") {
     return darkIcon
   }
   return icon
 })
 
 const cardRef = ref<HTMLElement | null>(null)
-const transformStyle = ref('rotateX(0deg) rotateY(0deg) scale(1)')
+const transformStyle = ref("rotateX(0deg) rotateY(0deg) scale(1)")
 
 const { elementX, elementY, isOutside } = useMouseInElement(cardRef)
 const { width, height } = useElementBounding(cardRef)
 
 watchEffect(() => {
   if (isOutside.value || isModalOpen) {
-    transformStyle.value = 'rotateX(0deg) rotateY(0deg) scale(1)'
+    transformStyle.value = "rotateX(0deg) rotateY(0deg) scale(1)"
     return
   }
 
