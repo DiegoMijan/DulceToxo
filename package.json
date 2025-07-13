@@ -27,6 +27,7 @@
     "@tresjs/nuxt": "^4.0.0",
     "@vueuse/core": "^13.5.0",
     "@vueuse/nuxt": "^13.5.0",
+    "better-auth": "^1.2.12",
     "blendy": "^0.0.1",
     "eslint": "^9.31.0",
     "magic-regexp": "^0.10.0",
