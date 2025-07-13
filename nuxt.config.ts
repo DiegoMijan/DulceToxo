@@ -16,6 +16,9 @@ export default defineNuxtConfig({
     "@primevue/nuxt-module",
     "@tresjs/nuxt",
   ],
+  image: {
+    inject: true,
+  },
   ssr: false,
   devtools: { enabled: true },
   app: {

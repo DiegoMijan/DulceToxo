@@ -28,6 +28,7 @@ watch(y, () => {
       src="/img/logo_toxo.webp"
       alt="Logo Dulce Toxo"
       style="height: 50px;"
+      @click="navigateTo('/')"
     />
     <nav
       role="toolbar"

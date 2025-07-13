@@ -39,6 +39,14 @@
     "vue": "latest",
     "vue-router": "latest"
   },
+  "comentario": "Para que funcione NuxtImage hay que hacer esto tanto en bun como en pnpm",
+  "bun": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "@parcel/watcher",
+      "esbuild"
+    ]
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.1.1",
     "eslint-plugin-unused-imports": "^4.1.4",

@@ -2,6 +2,15 @@
 import brownie from "@/public/img/brownie.webp"
 import darBrownie from "@/public/img/dark_brownie.webp"
 
+const cardKeys: Record<string, string> = {
+  cupcakes: "cupcakes",
+  cookies: "cookies",
+  cheesecakes: "cheesecakes",
+  spongeCakes: "spongeCakes",
+  brownies: "brownies",
+  coldCakes: "coldCakes",
+} as const
+
 const { t } = useI18n()
 
 const isModalOpen = ref(false)
@@ -13,28 +22,28 @@ const cards = ref([
     icon: "fluent-emoji:cupcake",
   },
   {
-    key: "cookies",
+    key: cardKeys.cookies,
     darkIcon: "unjs:cookie-es",
     icon: "twemoji:cookie",
   },
   {
-    key: "cheesecakes",
+    key: cardKeys.cheesecakes,
     icon: "noto:shortcake",
     darkIcon: "emojione:shortcake",
   },
   {
-    key: "spongeCakes",
+    key: cardKeys.spongeCakes,
     icon: "logos:cakephp-icon",
     darkIcon: "streamline-emojis:birthday-cake-3",
   },
   {
-    key: "brownies",
+    key: cardKeys.brownies,
     icon: brownie,
     darkIcon: darBrownie,
     isImage: true,
   },
   {
-    key: "coldCakes",
+    key: cardKeys.coldCakes,
     icon: "emojione-v1:shortcake",
     darkIcon: "streamline-emojis:shortcake-1",
   },
@@ -55,8 +64,8 @@ const translateCards = computed(() =>
       <LazyLandingProfile @toggle-modal="isModalOpen = $event as boolean" />
       <div class="grid md:grid-cols-2 gap-10 sm:grid-cols-1 lg:px-0 px-4">
         <LandingCard
-          v-for="{ description, icon, title, darkIcon, isImage } in translateCards"
-          :key="icon"
+          v-for="{ description, icon, title, darkIcon, isImage, key } in translateCards"
+          :key
           :description
           :icon
           :dark-icon
@@ -71,7 +80,7 @@ const translateCards = computed(() =>
             <img
               v-else
               :src="calculatedIcon"
-              alt="Header image"
+              :alt="key"
               height="24"
               width="24"
             >
