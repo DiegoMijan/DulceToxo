@@ -82,13 +82,9 @@ export default defineNuxtConfig({
     ],
   },
   i18n: {
-    bundle: {
-      optimizeTranslationDirective: false,
-    },
     compilation: {
       strictMessage: false,
     },
-    lazy: true,
     locales: [
       {
         code: "gl",

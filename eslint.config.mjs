@@ -1,5 +1,5 @@
+import withNuxt from ".nuxt/eslint.config.mjs"
 import unusedImports from "eslint-plugin-unused-imports"
-import withNuxt from "./.nuxt/eslint.config.mjs"
 
 export default withNuxt({
   rules: {

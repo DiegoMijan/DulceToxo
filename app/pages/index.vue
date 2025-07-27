@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import brownie from "@/public/img/brownie.webp"
-import darBrownie from "@/public/img/dark_brownie.webp"
+import brownie from "@/../public/img/brownie.webp"
+import darBrownie from "@/../public/img/dark_brownie.webp"
 
 const cardKeys: Record<string, string> = {
   cupcakes: "cupcakes",

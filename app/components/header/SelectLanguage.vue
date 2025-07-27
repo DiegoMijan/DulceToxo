@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type Menu from "primevue/menu"
 import type { MenuItem } from "primevue/menuitem"
-import es from "@/public/img/es.svg"
-import gl from "@/public/img/es-ga.svg"
-import en from "@/public/img/gb.svg"
+import es from "@/../public/img/es.svg"
+import gl from "@/../public/img/es-ga.svg"
+import en from "@/../public/img/gb.svg"
 
 const { locales, setLocale, locale } = useI18n()
 
