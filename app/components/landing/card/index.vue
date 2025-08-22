@@ -52,11 +52,11 @@ watchEffect(() => {
   >
     <template #header>
       <NuxtLink :to="`/${title.toLowerCase()}`">
-      <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
-        <slot
-          name="icon"
-          :calculated-icon
-        />
+        <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
+          <slot
+            name="icon"
+            :calculated-icon
+          />
           <span>{{ title }}</span>
         </h3>
       </NuxtLink>

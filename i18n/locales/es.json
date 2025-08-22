@@ -44,5 +44,50 @@
       "title": "Tartas frías",
       "description": "Refrescantes y cremosas, perfectas para cualquier ocasión. Con combinaciones irresistibles de sabores y texturas que te enamorarán."
     }
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar Sesión",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "button": "Iniciar Sesión",
+      "noAccount": "¿No tienes una cuenta?",
+      "signUpLink": "Regístrate aquí",
+      "forgotPassword": "¿Olvidaste tu contraseña?"
+    },
+    "register": {
+      "title": "Registrarse",
+      "name": "Nombre",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "button": "Registrarse",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "signInLink": "Inicia sesión aquí"
+    },
+    "profile": {
+      "title": "Perfil",
+      "signOut": "Cerrar Sesión",
+      "changePassword": "Cambiar Contraseña",
+      "currentPassword": "Contraseña Actual",
+      "newPassword": "Nueva Contraseña",
+      "confirmNewPassword": "Confirmar Nueva Contraseña",
+      "updatePassword": "Actualizar Contraseña"
+    },
+    "errors": {
+      "invalidCredentials": "Correo o contraseña incorrectos",
+      "emailRequired": "El correo electrónico es obligatorio",
+      "passwordRequired": "La contraseña es obligatoria",
+      "nameRequired": "El nombre es obligatorio",
+      "passwordsDontMatch": "Las contraseñas no coinciden",
+      "weakPassword": "La contraseña debe tener al menos 8 caracteres",
+      "invalidEmail": "Por favor, introduce un correo electrónico válido"
+    },
+    "success": {
+      "signInSuccess": "Sesión iniciada correctamente",
+      "signUpSuccess": "Cuenta creada correctamente",
+      "passwordChanged": "Contraseña cambiada correctamente",
+      "signOutSuccess": "Sesión cerrada correctamente"
+    }
   }
 }

@@ -44,5 +44,50 @@
       "title": "Tortas frías",
       "description": "Refrescante e cremosa, perfecta para calquera ocasión. Con combinacións irresistibles de sabores e texturas que te namorarán."
     }
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar Sesión",
+      "email": "Correo Electrónico",
+      "password": "Contrasinal",
+      "button": "Iniciar Sesión",
+      "noAccount": "Non tes unha conta?",
+      "signUpLink": "Rexístrate aquí",
+      "forgotPassword": "Esqueciche o contrasinal?"
+    },
+    "register": {
+      "title": "Rexistrarse",
+      "name": "Nome",
+      "email": "Correo Electrónico",
+      "password": "Contrasinal",
+      "confirmPassword": "Confirmar Contrasinal",
+      "button": "Rexistrarse",
+      "hasAccount": "Xa tes unha conta?",
+      "signInLink": "Inicia sesión aquí"
+    },
+    "profile": {
+      "title": "Perfil",
+      "signOut": "Pechar Sesión",
+      "changePassword": "Cambiar Contrasinal",
+      "currentPassword": "Contrasinal Actual",
+      "newPassword": "Novo Contrasinal",
+      "confirmNewPassword": "Confirmar Novo Contrasinal",
+      "updatePassword": "Actualizar Contrasinal"
+    },
+    "errors": {
+      "invalidCredentials": "Correo ou contrasinal incorrectos",
+      "emailRequired": "O correo electrónico é obrigatorio",
+      "passwordRequired": "O contrasinal é obrigatorio",
+      "nameRequired": "O nome é obrigatorio",
+      "passwordsDontMatch": "Os contrasinais non coinciden",
+      "weakPassword": "O contrasinal debe ter polo menos 8 caracteres",
+      "invalidEmail": "Por favor, introduce un correo electrónico válido"
+    },
+    "success": {
+      "signInSuccess": "Sesión iniciada correctamente",
+      "signUpSuccess": "Conta creada correctamente",
+      "passwordChanged": "Contrasinal cambiado correctamente",
+      "signOutSuccess": "Sesión pechada correctamente"
+    }
   }
 }

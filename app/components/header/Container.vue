@@ -32,8 +32,9 @@ watch(y, () => {
     />
     <nav
       role="toolbar"
-      class="ml-auto flex gap-3"
+      class="ml-auto flex gap-3 items-center"
     >
+      <HeaderAuthSection />
       <HeaderThemeToggle />
       <HeaderSelectLanguage />
     </nav>

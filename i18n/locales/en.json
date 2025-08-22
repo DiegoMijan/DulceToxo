@@ -44,5 +44,50 @@
       "title": "Cold Cakes",
       "description": "Refreshing and creamy, perfect for any occasion. With irresistible combinations of flavors and textures that will make you fall in love."
     }
+  },
+  "auth": {
+    "login": {
+      "title": "Sign In",
+      "email": "Email",
+      "password": "Password",
+      "button": "Sign In",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up here",
+      "forgotPassword": "Forgot your password?"
+    },
+    "register": {
+      "title": "Sign Up",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "button": "Sign Up",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in here"
+    },
+    "profile": {
+      "title": "Profile",
+      "signOut": "Sign Out",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
+      "updatePassword": "Update Password"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailRequired": "Email is required",
+      "passwordRequired": "Password is required",
+      "nameRequired": "Name is required",
+      "passwordsDontMatch": "Passwords don't match",
+      "weakPassword": "Password must be at least 8 characters long",
+      "invalidEmail": "Please enter a valid email address"
+    },
+    "success": {
+      "signInSuccess": "Successfully signed in",
+      "signUpSuccess": "Account created successfully",
+      "passwordChanged": "Password changed successfully",
+      "signOutSuccess": "Successfully signed out"
+    }
   }
 }
