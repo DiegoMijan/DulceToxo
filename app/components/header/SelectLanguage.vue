@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import type Menu from "primevue/menu"
 import type { MenuItem } from "primevue/menuitem"
+import enPrimevue from "@/../i18n/primevue/en.json"
+import esPrimevue from "@/../i18n/primevue/es.json"
+import glPrimevue from "@/../i18n/primevue/gl.json"
 import es from "@/../public/img/es.svg"
 import gl from "@/../public/img/es-ga.svg"
 import en from "@/../public/img/gb.svg"
 
-const { locales, setLocale, locale } = useI18n()
-
 type MenuType = InstanceType<typeof Menu>
+
+const { locales, setLocale, locale } = useI18n()
+const primeVue = usePrimeVue()
 
 const menu = useTemplateRef<MenuType>("menu")
 const items = ref<MenuItem[]>([])
@@ -16,7 +20,15 @@ const toggle = (event: Event) => {
   menu.value?.toggle(event)
 }
 
+const primeVueLocales = {
+  es: esPrimevue,
+  gl: glPrimevue,
+  en: enPrimevue,
+}
+
 onMounted(() => {
+  setPrimeVueLocale(locale.value)
+
   locales.value.forEach(({ code: key, name: label }) => {
     const img = key === "es" ? es : key === "en" ? en : gl
     items.value.push({
@@ -24,11 +36,18 @@ onMounted(() => {
       label,
       img,
       command: () => {
+        setPrimeVueLocale(key)
         setLocale(key)
       },
     })
   })
 })
+
+const setPrimeVueLocale = (key: "gl" | "es" | "en") => {
+  primeVue.config.locale = {
+    ...primeVueLocales[key],
+  }
+}
 </script>
 
 <template>

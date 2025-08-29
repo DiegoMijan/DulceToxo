@@ -37,10 +37,15 @@ watchEffect(() => {
 
   transformStyle.value = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`
 })
+
+const goToCategory = () => {
+  navigateTo(`/${title.toLowerCase()}`)
+}
 </script>
 
 <template>
   <Card
+    @click="goToCategory"
     ref="cardRef"
     class="cursor-pointer card-container"
     :style="{ transform: transformStyle }"
@@ -51,15 +56,13 @@ watchEffect(() => {
     }"
   >
     <template #header>
-      <NuxtLink :to="`/${title.toLowerCase()}`">
-        <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
-          <slot
-            name="icon"
-            :calculated-icon
-          />
-          <span>{{ title }}</span>
-        </h3>
-      </NuxtLink>
+      <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
+        <slot
+          name="icon"
+          :calculated-icon
+        />
+        <span>{{ title }}</span>
+      </h3>
     </template>
     <p>{{ description }}</p>
     <template #content>

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { valibotResolver } from "@primevue/forms/resolvers/valibot"
+import * as v from "valibot"
+import { FormField } from "#components"
+
 definePageMeta({
   middleware: "guest",
 })
@@ -7,31 +11,40 @@ const { t } = useI18n()
 const { signIn } = useAuth()
 const router = useRouter()
 const route = useRoute()
-
-const form = reactive({
+const { reactiveForm: form } = useForm<{ email: string; password: string }>({
   email: "",
   password: "",
 })
 
-const isLoading = ref(false)
 const error = ref("")
 
-const handleSubmit = async () => {
-  error.value = ""
+const isLoading = ref(false)
+const resolver = ref(
+  valibotResolver(
+    v.object({
+      email: v.pipe(
+        v.string(),
+        v.minLength(1, t("auth.register.error.emailRequired")),
+        v.email(t("auth.register.error.invalidEmail")),
+      ),
+      password: v.pipe(
+        v.string(),
+        v.minLength(1, t("auth.register.error.passwordRequired")),
+        v.regex(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
+          t("auth.register.error.passwordRequirements"),
+        ),
+      ),
+    }),
+  ),
+)
 
-  if (!form.email) {
-    error.value = t("auth.errors.emailRequired")
-    return
-  }
-
-  if (!form.password) {
-    error.value = t("auth.errors.passwordRequired")
-    return
-  }
-
+const onSubmit = async ({ valid }: { valid: boolean }) => {
+  console.log(form.value)
+  if (!valid) return
   try {
     isLoading.value = true
-    await signIn(form.email, form.password)
+    await signIn(form.value.email, form.value.password)
 
     const redirectTo = (route.query.redirect as string) || "/dashboard"
     await router.push(redirectTo)
@@ -40,6 +53,10 @@ const handleSubmit = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const visibility = (isOk: boolean) => {
+  return !isOk ? "invisible" : ""
 }
 </script>
 
@@ -52,71 +69,35 @@ const handleSubmit = async () => {
         </h2>
       </div>
       
-      <form 
-        class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg"
-        @submit.prevent="handleSubmit"
-      >
-        <div v-if="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg">
-          {{ error }}
-        </div>
-
-        <div class="space-y-4">
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ $t('auth.login.email') }}
-            </label>
-            <input
-              id="email"
-              v-model="form.email"
-              type="email"
-              autocomplete="email"
-              required
-              class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-french-lilac-500 focus:border-transparent"
-              :placeholder="$t('auth.login.email')"
-            />
-          </div>
-
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ $t('auth.login.password') }}
-            </label>
-            <input
-              id="password"
-              v-model="form.password"
-              type="password"
-              autocomplete="current-password"
-              required
-              class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-french-lilac-500 focus:border-transparent"
-              :placeholder="$t('auth.login.password')"
-            />
-          </div>
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            :disabled="isLoading"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-french-lilac-600 hover:bg-french-lilac-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-french-lilac-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <span v-if="isLoading" class="mr-2">
-              <NuxtIcon name="mdi:loading" class="animate-spin h-4 w-4" />
-            </span>
-            {{ $t('auth.login.button') }}
-          </button>
-        </div>
-
-        <div class="text-center space-y-2">
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ $t('auth.login.noAccount') }}
-            <NuxtLink 
-              to="/auth/register" 
-              class="font-medium text-french-lilac-600 hover:text-french-lilac-500 dark:text-french-lilac-400"
-            >
-              {{ $t('auth.login.signUpLink') }}
-            </NuxtLink>
-          </p>
-        </div>
-      </form>
+      <Form v-slot="$form" @submit="onSubmit" :resolver="resolver" :initial-values="form" class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+        <FormField fieldName="email" :form="$form">
+          <template #field>
+            <InputText name="email" type="text" :placeholder="$t('auth.login.email')" />
+          </template>
+        </FormField>
+        <FormField fieldName="password" :form="$form">
+          <template #field>
+            <Password name="password" type="password" :placeholder="$t('auth.login.password')" toggleMask  :pt="{
+              pcInputText: {
+                root: 'w-full'
+              }
+            }">
+            <template #footer>
+              <Divider />
+              <ul class="pl-2 my-0 leading-normal text-sm">
+                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500"  :class="visibility(/[a-z]/.test($form.password.value))" />{{ $t('auth.login.passwordRequirements.lowercase') }}</li>
+                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility(/[A-Z]/.test($form.password.value))" />{{ $t('auth.login.passwordRequirements.uppercase') }}</li>
+                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility(/\d/.test($form.password.value))" />{{ $t('auth.login.passwordRequirements.numeric') }}</li>
+                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility($form.password.value.length >= 8)" />{{ $t('auth.login.passwordRequirements.minimumCharacters') }}</li>
+              </ul>
+            </template>
+            </Password>
+          </template>
+        </FormField>
+        <Button type="submit" :disabled="isLoading" class="w-full">
+          {{ $t('auth.login.button') }}
+        </Button>
+      </Form>
     </div>
   </div>
 </template>

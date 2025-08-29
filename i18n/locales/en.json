@@ -53,7 +53,13 @@
       "button": "Sign In",
       "noAccount": "Don't have an account?",
       "signUpLink": "Sign up here",
-      "forgotPassword": "Forgot your password?"
+      "forgotPassword": "Forgot your password?",
+      "passwordRequirements": {
+        "lowercase": "At least one lowercase",
+        "uppercase": "At least one uppercase",
+        "numeric": "At least one numeric",
+        "minimumCharacters": "Minimum 8 characters"
+      }
     },
     "register": {
       "title": "Sign Up",
@@ -63,7 +69,15 @@
       "confirmPassword": "Confirm Password",
       "button": "Sign Up",
       "hasAccount": "Already have an account?",
-      "signInLink": "Sign in here"
+      "signInLink": "Sign in here",
+      "error": {
+        "emailRequired": "Email is required",
+        "passwordRequired": "Password is required",
+        "passwordsDontMatch": "Passwords don't match",
+        "weakPassword": "Password must be at least 8 characters long",
+        "invalidEmail": "Please enter a valid email address",
+        "passwordRequirements": "Password does not meet security requirements"
+      }
     },
     "profile": {
       "title": "Profile",

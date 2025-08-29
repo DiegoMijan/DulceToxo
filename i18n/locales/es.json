@@ -53,7 +53,13 @@
       "button": "Iniciar Sesión",
       "noAccount": "¿No tienes una cuenta?",
       "signUpLink": "Regístrate aquí",
-      "forgotPassword": "¿Olvidaste tu contraseña?"
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "passwordRequirements": {
+        "lowercase": "Al menos una letra minúscula",
+        "uppercase": "Al menos una letra mayúscula",
+        "numeric": "Al menos un número",
+        "minimumCharacters": "Al menos 8 caracteres"
+      }
     },
     "register": {
       "title": "Registrarse",
@@ -63,7 +69,15 @@
       "confirmPassword": "Confirmar Contraseña",
       "button": "Registrarse",
       "hasAccount": "¿Ya tienes una cuenta?",
-      "signInLink": "Inicia sesión aquí"
+      "signInLink": "Inicia sesión aquí",
+      "error": {
+        "emailRequired": "El correo electrónico es obligatorio",
+        "passwordRequired": "La contraseña es obligatoria",
+        "passwordsDontMatch": "Las contraseñas no coinciden",
+        "weakPassword": "La contraseña debe tener al menos 8 caracteres",
+        "invalidEmail": "Por favor, introduce un correo electrónico válido",
+        "passwordRequirements": "La contraseña no cumple con los requisitos de seguridad"
+      }
     },
     "profile": {
       "title": "Perfil",

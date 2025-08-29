@@ -53,7 +53,13 @@
       "button": "Iniciar Sesión",
       "noAccount": "Non tes unha conta?",
       "signUpLink": "Rexístrate aquí",
-      "forgotPassword": "Esqueciche o contrasinal?"
+      "forgotPassword": "Esqueciche o contrasinal?",
+      "passwordRequirements": {
+        "lowercase": "Polo menos unha letra minúscula",
+        "uppercase": "Polo menos unha letra maiúscula",
+        "numeric": "Polo menos un número",
+        "minimumCharacters": "Polo menos 8 caracteres"
+      }
     },
     "register": {
       "title": "Rexistrarse",
@@ -63,7 +69,15 @@
       "confirmPassword": "Confirmar Contrasinal",
       "button": "Rexistrarse",
       "hasAccount": "Xa tes unha conta?",
-      "signInLink": "Inicia sesión aquí"
+      "signInLink": "Inicia sesión aquí",
+      "error": {
+        "emailRequired": "O correo electrónico é obrigatorio",
+        "passwordRequired": "O contrasinal é obrigatorio",
+        "passwordsDontMatch": "Os contrasinais non coinciden",
+        "weakPassword": "O contrasinal debe ter polo menos 8 caracteres",
+        "invalidEmail": "Por favor, introduce un correo electrónico válido",
+        "passwordRequirements": "O contrasinal non cumpre coas requisitos de seguirdade"
+      }
     },
     "profile": {
       "title": "Perfil",
