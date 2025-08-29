@@ -76,7 +76,7 @@
         "passwordsDontMatch": "Os contrasinais non coinciden",
         "weakPassword": "O contrasinal debe ter polo menos 8 caracteres",
         "invalidEmail": "Por favor, introduce un correo electrónico válido",
-        "passwordRequirements": "O contrasinal non cumpre coas requisitos de seguirdade"
+        "passwordRequirements": "O contrasinal non cumpre cos requisitos de seguridade"
       }
     },
     "profile": {
