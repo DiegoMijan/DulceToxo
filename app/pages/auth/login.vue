@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FormSubmitEvent } from "@primevue/forms/form"
 import { valibotResolver } from "@primevue/forms/resolvers/valibot"
 import * as v from "valibot"
 import { FormField, LoginCupCake, Password } from "#components"
@@ -58,12 +59,12 @@ onMounted(() => {
   unmasked.value = true
 })
 
-const onSubmit = async ({ valid }: { valid: boolean }) => {
-  console.log(form.value)
+const onSubmit = async (event: FormSubmitEvent) => {
+  const { valid, values } = event as FormSubmitEvent<{ email: string; password: string }>
   if (!valid) return
   try {
     isLoading.value = true
-    await signIn(form.value.email, form.value.password)
+    await signIn(values.email, values.password)
 
     const redirectTo = (route.query.redirect as string) || "/dashboard"
     await router.push(redirectTo)
@@ -106,10 +107,10 @@ const visibility = (isOk: boolean) => {
             <template #footer>
               <Divider />
               <ul class="pl-2 my-0 leading-normal text-sm">
-                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500"  :class="visibility(/[a-z]/.test($form.password.value))" />{{ $t('auth.login.passwordRequirements.lowercase') }}</li>
-                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility(/[A-Z]/.test($form.password.value))" />{{ $t('auth.login.passwordRequirements.uppercase') }}</li>
-                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility(/\d/.test($form.password.value))" />{{ $t('auth.login.passwordRequirements.numeric') }}</li>
-                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility($form.password.value.length >= 8)" />{{ $t('auth.login.passwordRequirements.minimumCharacters') }}</li>
+                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500"  :class="visibility(/[a-z]/.test($form?.password?.value))" />{{ $t('auth.login.passwordRequirements.lowercase') }}</li>
+                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility(/[A-Z]/.test($form?.password?.value))" />{{ $t('auth.login.passwordRequirements.uppercase') }}</li>
+                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility(/\d/.test($form?.password?.value))" />{{ $t('auth.login.passwordRequirements.numeric') }}</li>
+                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility($form?.password?.value?.length >= 8)" />{{ $t('auth.login.passwordRequirements.minimumCharacters') }}</li>
               </ul>
             </template>
             </Password>
