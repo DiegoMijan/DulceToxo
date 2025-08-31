@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { valibotResolver } from "@primevue/forms/resolvers/valibot"
 import * as v from "valibot"
-import { FormField } from "#components"
+import { FormField, LoginCupCake, Password } from "#components"
 
 definePageMeta({
   middleware: "guest",
@@ -16,6 +16,8 @@ const { reactiveForm: form } = useForm<{ email: string; password: string }>({
   password: "",
 })
 
+const passwordField = useTemplateRef<InstanceType<typeof Password>>("passwordField")
+const cupcakeRef = useTemplateRef<InstanceType<typeof LoginCupCake>>("cupcakeRef")
 const error = ref("")
 
 const isLoading = ref(false)
@@ -38,6 +40,23 @@ const resolver = ref(
     }),
   ),
 )
+
+const unmasked = computed({
+  get() {
+    return (passwordField.value as unknown as { unmasked: boolean })?.unmasked ?? true
+  },
+  set(newValue) {
+    ;(passwordField.value as unknown as { unmasked: boolean }).unmasked = newValue
+  },
+})
+
+watch(unmasked, () => {
+  cupcakeRef.value?.toggleEyes()
+})
+
+onMounted(() => {
+  unmasked.value = true
+})
 
 const onSubmit = async ({ valid }: { valid: boolean }) => {
   console.log(form.value)
@@ -63,8 +82,10 @@ const visibility = (isOk: boolean) => {
 <template>
   <div class="flex items-center justify-center bg-gradient-to-br from-french-lilac-50 to-french-lilac-100 dark:from-gray-900 dark:to-gray-800 px-4 flex-1">
     <div class="max-w-md w-full space-y-8">
+      <LoginCupCake ref="cupcakeRef"  />
+      
       <div class="text-center">
-        <h2 class="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
+        <h2 class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
           {{ $t('auth.login.title') }}
         </h2>
       </div>
@@ -77,7 +98,7 @@ const visibility = (isOk: boolean) => {
         </FormField>
         <FormField fieldName="password" :form="$form">
           <template #field>
-            <Password name="password" type="password" :placeholder="$t('auth.login.password')" toggleMask  :pt="{
+            <Password ref="passwordField"  name="password" type="password" :placeholder="$t('auth.login.password')" toggleMask  :pt="{
               pcInputText: {
                 root: 'w-full'
               }

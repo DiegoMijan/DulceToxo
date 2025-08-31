@@ -117,9 +117,6 @@ export default defineNuxtConfig({
     componentName: "NuxtIcon",
   },
   primevue: {
-    components: {
-      exclude: ["Form", "FormField"],
-    },
     options: {
       ripple: true,
       theme: {
