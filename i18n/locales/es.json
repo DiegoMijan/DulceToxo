@@ -73,6 +73,8 @@
       "error": {
         "emailRequired": "El correo electrónico es obligatorio",
         "passwordRequired": "La contraseña es obligatoria",
+        "nameRequired": "El nombre es obligatorio",
+        "confirmPasswordRequired": "La confirmación de la contraseña es obligatoria",
         "passwordsDontMatch": "Las contraseñas no coinciden",
         "weakPassword": "La contraseña debe tener al menos 8 caracteres",
         "invalidEmail": "Por favor, introduce un correo electrónico válido",

@@ -1,16 +1,23 @@
 <script setup lang="ts">
-import type { MiddlewareKey } from "#build/types/middleware"
-import { useAuth } from "~/composables/useAuth"
+import type Form from "@primevue/forms/form"
+import type { FormSubmitEvent } from "@primevue/forms/form"
+import { valibotResolver } from "@primevue/forms/resolvers/valibot"
+import { FormField, FormPassword } from "#components"
 
 definePageMeta({
-  middleware: "guest" as MiddlewareKey,
+  middleware: "guest",
 })
 
 const { t } = useI18n()
 const { signUp } = useAuth()
 const router = useRouter()
-
-const form = reactive({
+const formRef = useTemplateRef<InstanceType<typeof Form>>("formRef")
+const { reactiveForm: form } = useForm<{
+  name: string
+  email: string
+  password: string
+  confirmPassword: string
+}>({
   name: "",
   email: "",
   password: "",
@@ -19,54 +26,46 @@ const form = reactive({
 
 const isLoading = ref(false)
 const error = ref("")
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
 
-const validateForm = () => {
-  if (!form.name.trim()) {
-    return t("auth.errors.nameRequired")
-  }
+const resolver = ref(
+  valibotResolver(
+    v.object({
+      name: v.pipe(v.string(), v.minLength(1, t("auth.register.error.nameRequired"))),
+      email: v.pipe(
+        v.string(),
+        v.minLength(1, t("auth.register.error.emailRequired")),
+        v.email(t("auth.register.error.invalidEmail")),
+      ),
+      password: v.pipe(
+        v.string(),
+        v.minLength(1, t("auth.register.error.passwordRequired")),
+        v.regex(passwordRegex, t("auth.register.error.passwordRequirements")),
+      ),
+      confirmPassword: v.pipe(
+        v.string(),
+        v.minLength(1, t("auth.register.error.confirmPasswordRequired")),
+        v.regex(passwordRegex, t("auth.register.error.passwordRequirements")),
+        v.check((check) => validatePassword(check), t("auth.register.error.passwordsDontMatch")),
+      ),
+    }),
+  ),
+)
 
-  if (!form.email) {
-    return t("auth.errors.emailRequired")
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(form.email)) {
-    return t("auth.errors.invalidEmail")
-  }
-
-  if (!form.password) {
-    return t("auth.errors.passwordRequired")
-  }
-
-  if (form.password.length < 8) {
-    return t("auth.errors.weakPassword")
-  }
-
-  if (form.password !== form.confirmPassword) {
-    return t("auth.errors.passwordsDontMatch")
-  }
-
-  return null
+const validatePassword = (check: string) => {
+  const passwordValue = formRef.value as unknown as { states: { password: { value: string } } }
+  return passwordValue.states && passwordValue.states.password.value === check
 }
 
-const handleSubmit = async () => {
-  error.value = ""
-
-  const validationError = validateForm()
-  if (validationError) {
-    error.value = validationError
-    return
-  }
-
-  try {
-    isLoading.value = true
-    await signUp(form.email, form.password, form.name)
-    await router.push("/dashboard")
-  } catch (err: any) {
-    error.value = err.message || t("auth.errors.invalidCredentials")
-  } finally {
-    isLoading.value = false
-  }
+const onSubmit = async (event: FormSubmitEvent) => {
+  console.log(event)
+  const { valid, values } = event as FormSubmitEvent<{
+    name: string
+    email: string
+    password: string
+    confirmPassword: string
+  }>
+  if (!valid) return
 }
 </script>
 
@@ -79,88 +78,36 @@ const handleSubmit = async () => {
         </h2>
       </div>
       
-      <form 
-        class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg"
-        @submit.prevent="handleSubmit"
-      >
+      <Form v-slot="$form" @submit="onSubmit" :resolver="resolver" :initial-values="form" class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg" ref="formRef">
         <div v-if="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg">
           {{ error }}
         </div>
-
         <div class="space-y-4">
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ $t('auth.register.name') }}
-            </label>
-            <input
-              id="name"
-              v-model="form.name"
-              type="text"
-              autocomplete="name"
-              required
-              class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-french-lilac-500 focus:border-transparent"
-              :placeholder="$t('auth.register.name')"
-            />
-          </div>
-
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ $t('auth.register.email') }}
-            </label>
-            <input
-              id="email"
-              v-model="form.email"
-              type="email"
-              autocomplete="email"
-              required
-              class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-french-lilac-500 focus:border-transparent"
-              :placeholder="$t('auth.register.email')"
-            />
-          </div>
-
-          <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ $t('auth.register.password') }}
-            </label>
-            <input
-              id="password"
-              v-model="form.password"
-              type="password"
-              autocomplete="new-password"
-              required
-              class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-french-lilac-500 focus:border-transparent"
-              :placeholder="$t('auth.register.password')"
-            />
-          </div>
-
-          <div>
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {{ $t('auth.register.confirmPassword') }}
-            </label>
-            <input
-              id="confirmPassword"
-              v-model="form.confirmPassword"
-              type="password"
-              autocomplete="new-password"
-              required
-              class="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-french-lilac-500 focus:border-transparent"
-              :placeholder="$t('auth.register.confirmPassword')"
-            />
-          </div>
+          <FormField fieldName="name" :form="$form">
+            <template #field>
+              <InputText name="name" type="text" :placeholder="$t('auth.register.name')" />
+            </template>
+          </FormField>
+          <FormField fieldName="email" :form="$form">
+            <template #field>
+              <InputText name="email" type="text" :placeholder="$t('auth.register.email')" />
+            </template>
+          </FormField>
+          <FormField fieldName="password" :form="$form">
+            <template #field>
+              <FormPassword name="password" type="password" :placeholder="$t('auth.register.password')" :form="$form" />
+            </template>
+          </FormField>
+          <FormField fieldName="confirmPassword" :form="$form">
+            <template #field>
+              <FormPassword name="confirmPassword" type="password" :placeholder="$t('auth.register.confirmPassword')" :form="$form" />
+            </template>
+          </FormField>
         </div>
 
-        <div>
-          <button
-            type="submit"
-            :disabled="isLoading"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-french-lilac-600 hover:bg-french-lilac-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-french-lilac-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <span v-if="isLoading" class="mr-2">
-              <NuxtIcon name="mdi:loading" class="animate-spin h-4 w-4" />
-            </span>
-            {{ $t('auth.register.button') }}
-          </button>
-        </div>
+        <Button type="submit" :disabled="isLoading" class="w-full">
+          {{ $t('auth.register.button') }}
+        </Button>
 
         <div class="text-center space-y-2">
           <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -173,7 +120,7 @@ const handleSubmit = async () => {
             </NuxtLink>
           </p>
         </div>
-      </form>
+      </Form>
     </div>
   </div>
 </template>

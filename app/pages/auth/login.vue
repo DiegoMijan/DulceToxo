@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@primevue/forms/form"
 import { valibotResolver } from "@primevue/forms/resolvers/valibot"
-import * as v from "valibot"
-import { FormField, LoginCupCake, Password } from "#components"
+import { FormField, FormPassword, LoginCupCake } from "#components"
 
 definePageMeta({
   middleware: "guest",
@@ -17,7 +16,7 @@ const { reactiveForm: form } = useForm<{ email: string; password: string }>({
   password: "",
 })
 
-const passwordField = useTemplateRef<InstanceType<typeof Password>>("passwordField")
+const formPasswordRef = useTemplateRef<InstanceType<typeof FormPassword>>("formPasswordRef")
 const cupcakeRef = useTemplateRef<InstanceType<typeof LoginCupCake>>("cupcakeRef")
 const error = ref("")
 
@@ -44,10 +43,13 @@ const resolver = ref(
 
 const unmasked = computed({
   get() {
-    return (passwordField.value as unknown as { unmasked: boolean })?.unmasked ?? true
+    return (
+      (formPasswordRef.value?.passwordField as unknown as { unmasked: boolean })?.unmasked ?? true
+    )
   },
   set(newValue) {
-    ;(passwordField.value as unknown as { unmasked: boolean }).unmasked = newValue
+    if (!formPasswordRef.value) return
+    ;(formPasswordRef.value.passwordField as unknown as { unmasked: boolean }).unmasked = newValue
   },
 })
 
@@ -74,10 +76,6 @@ const onSubmit = async (event: FormSubmitEvent) => {
     isLoading.value = false
   }
 }
-
-const visibility = (isOk: boolean) => {
-  return !isOk ? "invisible" : ""
-}
 </script>
 
 <template>
@@ -99,21 +97,7 @@ const visibility = (isOk: boolean) => {
         </FormField>
         <FormField fieldName="password" :form="$form">
           <template #field>
-            <Password ref="passwordField"  name="password" type="password" :placeholder="$t('auth.login.password')" toggleMask  :pt="{
-              pcInputText: {
-                root: 'w-full'
-              }
-            }">
-            <template #footer>
-              <Divider />
-              <ul class="pl-2 my-0 leading-normal text-sm">
-                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500"  :class="visibility(/[a-z]/.test($form?.password?.value))" />{{ $t('auth.login.passwordRequirements.lowercase') }}</li>
-                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility(/[A-Z]/.test($form?.password?.value))" />{{ $t('auth.login.passwordRequirements.uppercase') }}</li>
-                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility(/\d/.test($form?.password?.value))" />{{ $t('auth.login.passwordRequirements.numeric') }}</li>
-                <li class="flex items-center gap-1"><NuxtIcon name="cuida:check-outline" class="text-xl text-green-500" :class="visibility($form?.password?.value?.length >= 8)" />{{ $t('auth.login.passwordRequirements.minimumCharacters') }}</li>
-              </ul>
-            </template>
-            </Password>
+            <FormPassword ref="formPasswordRef" name="password" type="password" :placeholder="$t('auth.login.password')" :form="$form" />
           </template>
         </FormField>
         <Button type="submit" :disabled="isLoading" class="w-full">

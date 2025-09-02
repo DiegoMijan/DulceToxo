@@ -2,6 +2,14 @@ import Aura from "@primeuix/themes/aura"
 import tailwindcss from "@tailwindcss/vite"
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  imports: {
+    presets: [
+      {
+        from: "valibot",
+        imports: [{ name: "*", as: "v" }],
+      },
+    ],
+  },
   modules: [
     "@vueuse/nuxt",
     "@pinia/nuxt",

@@ -73,6 +73,8 @@
       "error": {
         "emailRequired": "O correo electrónico é obrigatorio",
         "passwordRequired": "O contrasinal é obrigatorio",
+        "nameRequired": "O nome é obrigatorio",
+        "confirmPasswordRequired": "A confirmación do contrasinal é obrigatoria",
         "passwordsDontMatch": "Os contrasinais non coinciden",
         "weakPassword": "O contrasinal debe ter polo menos 8 caracteres",
         "invalidEmail": "Por favor, introduce un correo electrónico válido",
