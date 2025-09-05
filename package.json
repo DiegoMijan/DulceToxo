@@ -9,8 +9,11 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint . --ext .js,.vue,.ts",
+    "lint:fix": "eslint . --ext .js,.vue,.ts --fix",
     "format": "biome format --write .",
-    "format:check": "biome format ."
+    "format:check": "biome format .",
+    "format:vue-templates": "eslint . --ext .vue --fix --rule 'vue/html-indent: error' --rule 'vue/html-quotes: error' --rule 'vue/html-self-closing: error' --rule 'vue/max-attributes-per-line: error'",
+    "format:all": "npm run format && npm run format:vue-templates"
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.9.0",

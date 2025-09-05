@@ -11,7 +11,7 @@ onMounted(() => {
 watch(y, () => {
   isScrolled.value = y.value > 0
 })
-</script>
+</script> 
 
 <template>
   <header
