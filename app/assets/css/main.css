@@ -70,6 +70,15 @@ body,
   body {
     background-color: var(--darkreader-bg--p-card-background);
   }
+
+  .p-select-option:hover {
+    background-color: #a362a8 !important;
+  }
+
+  .p-select-option-selected {
+    background-color: var(--color-yellow-600);
+    color: blueviolet;
+  }
 }
 
 .title {
