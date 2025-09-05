@@ -78,8 +78,8 @@ export const useAuth = () => {
       saveUserToStorage(mockUser)
 
       return { user: mockUser }
-    } catch (err: any) {
-      error.value = err.message
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : "Unknown error"
       throw err
     } finally {
       isLoading.value = false
@@ -112,8 +112,8 @@ export const useAuth = () => {
       saveUserToStorage(mockUser)
 
       return { user: mockUser }
-    } catch (err: any) {
-      error.value = err.message
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : "Unknown error"
       throw err
     } finally {
       isLoading.value = false
@@ -132,8 +132,8 @@ export const useAuth = () => {
       removeUserFromStorage()
 
       await navigateTo("/")
-    } catch (err: any) {
-      error.value = err.message
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : "Unknown error"
       throw err
     } finally {
       isLoading.value = false
@@ -156,8 +156,8 @@ export const useAuth = () => {
 
       // In a real app, this would update the password on the server
       return { success: true }
-    } catch (err: any) {
-      error.value = err.message
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : "Unknown error"
       throw err
     } finally {
       isLoading.value = false

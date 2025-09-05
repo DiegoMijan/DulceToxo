@@ -1,5 +1,3 @@
-
-
 <script setup lang="ts">
 import { onMounted, onUnmounted, reactive, ref } from "vue"
 
@@ -294,7 +292,10 @@ defineExpose({
 </script>
 <template>
   <div class="cupcake-container mt-[-160px]">
-    <div class="container" ref="containerRef">
+    <div
+      ref="containerRef"
+      class="container"
+    >
       <svg
         id="cupcake-svg"
         ref="cupcakeSvgRef"
@@ -305,34 +306,106 @@ defineExpose({
       >
         <defs>
           <!-- Gradientes mejorados -->
-          <radialGradient id="baseGradient" cx="50%" cy="20%">
-            <stop offset="0%" stop-color="#D2B48C" />
-            <stop offset="50%" stop-color="#8B4513" />
-            <stop offset="100%" stop-color="#654321" />
+          <radialGradient
+            id="baseGradient"
+            cx="50%"
+            cy="20%"
+          >
+            <stop
+              offset="0%"
+              stop-color="#D2B48C"
+            />
+            <stop
+              offset="50%"
+              stop-color="#8B4513"
+            />
+            <stop
+              offset="100%"
+              stop-color="#654321"
+            />
           </radialGradient>
-          <radialGradient id="frostingGradient" cx="40%" cy="30%">
-            <stop offset="0%" stop-color="#FF91A4" />
-            <stop offset="50%" stop-color="#FF69B4" />
-            <stop offset="100%" stop-color="#E91E63" />
+          <radialGradient
+            id="frostingGradient"
+            cx="40%"
+            cy="30%"
+          >
+            <stop
+              offset="0%"
+              stop-color="#FF91A4"
+            />
+            <stop
+              offset="50%"
+              stop-color="#FF69B4"
+            />
+            <stop
+              offset="100%"
+              stop-color="#E91E63"
+            />
           </radialGradient>
-          <radialGradient id="cherryGradient" cx="30%" cy="30%">
-            <stop offset="0%" stop-color="#FF4444" />
-            <stop offset="100%" stop-color="#CC0000" />
+          <radialGradient
+            id="cherryGradient"
+            cx="30%"
+            cy="30%"
+          >
+            <stop
+              offset="0%"
+              stop-color="#FF4444"
+            />
+            <stop
+              offset="100%"
+              stop-color="#CC0000"
+            />
           </radialGradient>
-          <linearGradient id="wrapperGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#FFF" />
-            <stop offset="20%" stop-color="#F5F5F5" />
-            <stop offset="100%" stop-color="#E0E0E0" />
+          <linearGradient
+            id="wrapperGradient"
+            x1="0%"
+            y1="0%"
+            x2="0%"
+            y2="100%"
+          >
+            <stop
+              offset="0%"
+              stop-color="#FFF"
+            />
+            <stop
+              offset="20%"
+              stop-color="#F5F5F5"
+            />
+            <stop
+              offset="100%"
+              stop-color="#E0E0E0"
+            />
           </linearGradient>
           <!-- Patrón de rayas para el wrapper -->
-          <pattern id="stripes" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-            <rect width="4" height="8" fill="#FFB6C1" />
-            <rect x="4" width="4" height="8" fill="#FF69B4" />
+          <pattern
+            id="stripes"
+            patternUnits="userSpaceOnUse"
+            width="8"
+            height="8"
+            patternTransform="rotate(45)"
+          >
+            <rect
+              width="4"
+              height="8"
+              fill="#FFB6C1"
+            />
+            <rect
+              x="4"
+              width="4"
+              height="8"
+              fill="#FF69B4"
+            />
           </pattern>
         </defs>
 
         <!-- Sombra mejorada -->
-        <ellipse cx="175" cy="430" rx="100" ry="18" fill="rgba(0,0,0,0.3)" />
+        <ellipse
+          cx="175"
+          cy="430"
+          rx="100"
+          ry="18"
+          fill="rgba(0,0,0,0.3)"
+        />
 
         <!-- Base del cupcake (wrapper) con patrón -->
         <path
@@ -343,25 +416,107 @@ defineExpose({
         />
 
         <!-- Patrón decorativo en el wrapper -->
-        <rect x="95" y="240" width="160" height="140" fill="url(#stripes)" opacity="0.3" />
+        <rect
+          x="95"
+          y="240"
+          width="160"
+          height="140"
+          fill="url(#stripes)"
+          opacity="0.3"
+        />
 
         <!-- Líneas decorativas mejoradas -->
-        <line x1="105" y1="250" x2="245" y2="250" stroke="#2C3E50" stroke-width="3" opacity="0.7" />
-        <line x1="110" y1="270" x2="240" y2="270" stroke="#2C3E50" stroke-width="3" opacity="0.7" />
-        <line x1="115" y1="290" x2="235" y2="290" stroke="#2C3E50" stroke-width="3" opacity="0.7" />
-        <line x1="120" y1="310" x2="230" y2="310" stroke="#2C3E50" stroke-width="3" opacity="0.7" />
+        <line
+          x1="105"
+          y1="250"
+          x2="245"
+          y2="250"
+          stroke="#2C3E50"
+          stroke-width="3"
+          opacity="0.7"
+        />
+        <line
+          x1="110"
+          y1="270"
+          x2="240"
+          y2="270"
+          stroke="#2C3E50"
+          stroke-width="3"
+          opacity="0.7"
+        />
+        <line
+          x1="115"
+          y1="290"
+          x2="235"
+          y2="290"
+          stroke="#2C3E50"
+          stroke-width="3"
+          opacity="0.7"
+        />
+        <line
+          x1="120"
+          y1="310"
+          x2="230"
+          y2="310"
+          stroke="#2C3E50"
+          stroke-width="3"
+          opacity="0.7"
+        />
 
         <!-- Frosting base -->
-        <ellipse cx="175" cy="210" rx="95" ry="50" fill="url(#frostingGradient)" stroke="#8B008B" stroke-width="5" />
+        <ellipse
+          cx="175"
+          cy="210"
+          rx="95"
+          ry="50"
+          fill="url(#frostingGradient)"
+          stroke="#8B008B"
+          stroke-width="5"
+        />
 
         <!-- Remolinos de frosting más detallados -->
-        <circle cx="140" cy="170" r="30" fill="url(#frostingGradient)" stroke="#8B008B" stroke-width="4" />
-        <circle cx="210" cy="175" r="28" fill="url(#frostingGradient)" stroke="#8B008B" stroke-width="4" />
-        <circle cx="175" cy="145" r="35" fill="url(#frostingGradient)" stroke="#8B008B" stroke-width="4" />
+        <circle
+          cx="140"
+          cy="170"
+          r="30"
+          fill="url(#frostingGradient)"
+          stroke="#8B008B"
+          stroke-width="4"
+        />
+        <circle
+          cx="210"
+          cy="175"
+          r="28"
+          fill="url(#frostingGradient)"
+          stroke="#8B008B"
+          stroke-width="4"
+        />
+        <circle
+          cx="175"
+          cy="145"
+          r="35"
+          fill="url(#frostingGradient)"
+          stroke="#8B008B"
+          stroke-width="4"
+        />
 
         <!-- Remolinos pequeños adicionales -->
-        <circle cx="125" cy="195" r="18" fill="url(#frostingGradient)" stroke="#8B008B" stroke-width="3" />
-        <circle cx="225" cy="200" r="16" fill="url(#frostingGradient)" stroke="#8B008B" stroke-width="3" />
+        <circle
+          cx="125"
+          cy="195"
+          r="18"
+          fill="url(#frostingGradient)"
+          stroke="#8B008B"
+          stroke-width="3"
+        />
+        <circle
+          cx="225"
+          cy="200"
+          r="16"
+          fill="url(#frostingGradient)"
+          stroke="#8B008B"
+          stroke-width="3"
+        />
 
         <!-- Cara mejorada -->
         <!-- Ojos base más grandes -->
@@ -403,32 +558,122 @@ defineExpose({
         />
 
         <!-- Pupilas que seguirán el ratón -->
-        <circle ref="leftPupilRef" :cx="leftPupilPos.x" :cy="leftPupilPos.y" r="15" fill="#2C3E50" />
-        <circle ref="rightPupilRef" :cx="rightPupilPos.x" :cy="rightPupilPos.y" r="15" fill="#2C3E50" />
+        <circle
+          ref="leftPupilRef"
+          :cx="leftPupilPos.x"
+          :cy="leftPupilPos.y"
+          r="15"
+          fill="#2C3E50"
+        />
+        <circle
+          ref="rightPupilRef"
+          :cx="rightPupilPos.x"
+          :cy="rightPupilPos.y"
+          r="15"
+          fill="#2C3E50"
+        />
 
         <!-- Brillo en los ojos más detallado -->
-        <circle ref="leftShine1Ref" :cx="leftShine1Pos.x" :cy="leftShine1Pos.y" r="6" fill="white" />
-        <circle ref="leftShine2Ref" :cx="leftShine2Pos.x" :cy="leftShine2Pos.y" r="3" fill="white" opacity="0.7" />
-        <circle ref="rightShine1Ref" :cx="rightShine1Pos.x" :cy="rightShine1Pos.y" r="6" fill="white" />
-        <circle ref="rightShine2Ref" :cx="rightShine2Pos.x" :cy="rightShine2Pos.y" r="3" fill="white" opacity="0.7" />
+        <circle
+          ref="leftShine1Ref"
+          :cx="leftShine1Pos.x"
+          :cy="leftShine1Pos.y"
+          r="6"
+          fill="white"
+        />
+        <circle
+          ref="leftShine2Ref"
+          :cx="leftShine2Pos.x"
+          :cy="leftShine2Pos.y"
+          r="3"
+          fill="white"
+          opacity="0.7"
+        />
+        <circle
+          ref="rightShine1Ref"
+          :cx="rightShine1Pos.x"
+          :cy="rightShine1Pos.y"
+          r="6"
+          fill="white"
+        />
+        <circle
+          ref="rightShine2Ref"
+          :cx="rightShine2Pos.x"
+          :cy="rightShine2Pos.y"
+          r="3"
+          fill="white"
+          opacity="0.7"
+        />
 
         <!-- Boca sonriente mejorada -->
-        <path d="M155 205 Q175 225 195 205" fill="none" stroke="#2C3E50" stroke-width="6" stroke-linecap="round" />
+        <path
+          d="M155 205 Q175 225 195 205"
+          fill="none"
+          stroke="#2C3E50"
+          stroke-width="6"
+          stroke-linecap="round"
+        />
 
         <!-- Lengua -->
-        <ellipse cx="175" cy="215" rx="12" ry="8" fill="#FF69B4" stroke="#E91E63" stroke-width="2" />
+        <ellipse
+          cx="175"
+          cy="215"
+          rx="12"
+          ry="8"
+          fill="#FF69B4"
+          stroke="#E91E63"
+          stroke-width="2"
+        />
 
         <!-- Mejillas rosadas mejoradas -->
-        <circle cx="115" cy="195" r="15" fill="#FFB6C1" opacity="0.8" />
-        <circle cx="235" cy="195" r="15" fill="#FFB6C1" opacity="0.8" />
+        <circle
+          cx="115"
+          cy="195"
+          r="15"
+          fill="#FFB6C1"
+          opacity="0.8"
+        />
+        <circle
+          cx="235"
+          cy="195"
+          r="15"
+          fill="#FFB6C1"
+          opacity="0.8"
+        />
 
         <!-- Cerezas múltiples -->
-        <circle cx="165" cy="110" r="14" fill="url(#cherryGradient)" stroke="#8B0000" stroke-width="4" />
-        <circle cx="185" cy="115" r="12" fill="url(#cherryGradient)" stroke="#8B0000" stroke-width="3" />
+        <circle
+          cx="165"
+          cy="110"
+          r="14"
+          fill="url(#cherryGradient)"
+          stroke="#8B0000"
+          stroke-width="4"
+        />
+        <circle
+          cx="185"
+          cy="115"
+          r="12"
+          fill="url(#cherryGradient)"
+          stroke="#8B0000"
+          stroke-width="3"
+        />
 
         <!-- Tallos de las cerezas -->
-        <path d="M165 96 Q160 80 155 75" fill="none" stroke="#228B22" stroke-width="4" stroke-linecap="round" />
-        <path d="M185 103 Q188 88 190 82" fill="none" stroke="#228B22" stroke-width="3" stroke-linecap="round" />
+        <path
+          d="M165 96 Q160 80 155 75"
+          fill="none"
+          stroke="#228B22"
+          stroke-width="4"
+          stroke-linecap="round"
+        />
+        <path
+          d="M185 103 Q188 88 190 82"
+          fill="none"
+          stroke="#228B22"
+          stroke-width="3"
+          stroke-linecap="round"
+        />
 
         <!-- Hojas -->
         <ellipse
@@ -453,10 +698,38 @@ defineExpose({
         />
 
         <!-- Sprinkles decorativos -->
-        <rect x="130" y="160" width="3" height="12" fill="#FFD700" transform="rotate(20 130 160)" />
-        <rect x="220" y="165" width="3" height="10" fill="#00CED1" transform="rotate(-30 220 165)" />
-        <rect x="160" y="125" width="3" height="8" fill="#FF4500" transform="rotate(45 160 125)" />
-        <rect x="190" y="130" width="3" height="10" fill="#9370DB" transform="rotate(-15 190 130)" />
+        <rect
+          x="130"
+          y="160"
+          width="3"
+          height="12"
+          fill="#FFD700"
+          transform="rotate(20 130 160)"
+        />
+        <rect
+          x="220"
+          y="165"
+          width="3"
+          height="10"
+          fill="#00CED1"
+          transform="rotate(-30 220 165)"
+        />
+        <rect
+          x="160"
+          y="125"
+          width="3"
+          height="8"
+          fill="#FF4500"
+          transform="rotate(45 160 125)"
+        />
+        <rect
+          x="190"
+          y="130"
+          width="3"
+          height="10"
+          fill="#9370DB"
+          transform="rotate(-15 190 130)"
+        />
       </svg>
 
       <!-- Partículas decorativas mejoradas -->

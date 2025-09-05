@@ -8,7 +8,10 @@ const classList = computed(() => {
 })
 </script>
 <template>
-  <div class="grid grid-cols-5" :class="classList">
+  <div
+    class="grid grid-cols-5"
+    :class="classList"
+  >
     <aside class="col-span-1 md:px-2 lg:pl-[8rem] py-10 flex flex-col">
       <slot name="left-menu" />
     </aside>

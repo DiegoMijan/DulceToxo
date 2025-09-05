@@ -33,30 +33,47 @@ const pt = {
 
 <template>
   <div>
-    <Select v-model="selectedSort" :options="sortOptions"  optionLabel="name" placeholder="Ordenar por" class="w-full" size="small" :pt showClear >
+    <Select
+      v-model="selectedSort"
+      :options="sortOptions"
+      option-label="name"
+      placeholder="Ordenar por"
+      class="w-full"
+      size="small"
+      :pt
+      show-clear
+    >
       <template #dropdownicon>
         <NuxtIcon name="tabler:arrows-down-up" />
       </template>
       <template #option="slotProps">
         <div class="flex items-center">
-          <NuxtIcon :name="slotProps.option.icon" class="mr-2 text-xl"/>
+          <NuxtIcon
+            :name="slotProps.option.icon"
+            class="mr-2 text-xl"
+          />
           <div>{{ slotProps.option.name }}</div>
         </div>
       </template>
       <template #value="slotProps">
-        <div v-if="slotProps.value" class="flex items-center">
-            <NuxtIcon :name="slotProps.value.icon" class="mr-2 text-xl"/>
-            <div>{{ slotProps.value.name }}</div>
+        <div
+          v-if="slotProps.value"
+          class="flex items-center"
+        >
+          <NuxtIcon
+            :name="slotProps.value.icon"
+            class="mr-2 text-xl"
+          />
+          <div>{{ slotProps.value.name }}</div>
         </div>
         <span v-else>
-            {{ slotProps.placeholder }}
+          {{ slotProps.placeholder }}
         </span>
-    </template>
+      </template>
     </Select>
   </div>
 </template>
 
 <style scoped lang="scss"> 
-
 
 </style>

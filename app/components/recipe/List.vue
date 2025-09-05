@@ -15,11 +15,11 @@ const selectedOption = ref(null)
 </script>
 <template>
   <ListBox
+    v-model="selectedOption"
     :options="options"
     option-label="name"
     option-value="id"
-    v-model="selectedOption"
     class="flex-1"
-    listStyle="max-height: 100% !important;"
+    list-style="max-height: 100% !important;"
   />
 </template>

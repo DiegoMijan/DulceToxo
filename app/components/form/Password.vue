@@ -8,9 +8,9 @@ const {
   placeholder = "",
   form,
 } = defineProps<{
-  name: string
-  type: string
-  placeholder: string
+  name?: string
+  type?: string
+  placeholder?: string
   form: {
     register: (field: string, options: unknown) => unknown
     reset: () => void
