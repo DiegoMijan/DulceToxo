@@ -36,7 +36,7 @@
     "eslint": "^9.35.0",
     "eslint-plugin-typed-rocks": "^1.0.8",
     "magic-regexp": "^0.10.0",
-    "nuxt": "^4.1.0",
+    "nuxt": "^4.1.1",
     "pinia": "latest",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.9",
