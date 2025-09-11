@@ -3,6 +3,9 @@ import tailwindcss from "@tailwindcss/vite"
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   imports: {
+    autoImport: true,
+    dirs: ["../shared/schemas/**"],
+    scan: true,
     presets: [
       {
         from: "valibot",

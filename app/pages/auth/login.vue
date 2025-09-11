@@ -21,25 +21,7 @@ const cupcakeRef = useTemplateRef<InstanceType<typeof LoginCupCake>>("cupcakeRef
 const error = ref("")
 
 const isLoading = ref(false)
-const resolver = ref(
-  valibotResolver(
-    v.object({
-      email: v.pipe(
-        v.string(),
-        v.minLength(1, t("auth.register.error.emailRequired")),
-        v.email(t("auth.register.error.invalidEmail")),
-      ),
-      password: v.pipe(
-        v.string(),
-        v.minLength(1, t("auth.register.error.passwordRequired")),
-        v.regex(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-          t("auth.register.error.passwordRequirements"),
-        ),
-      ),
-    }),
-  ),
-)
+const resolver = ref(valibotResolver(createLoginPasswordSchema(t)))
 
 const unmasked = computed({
   get() {
@@ -70,8 +52,12 @@ const onSubmit = async (event: FormSubmitEvent) => {
 
     const redirectTo = (route.query.redirect as string) || "/dashboard"
     await router.push(redirectTo)
-  } catch (err: any) {
-    error.value = err.message || t("auth.errors.invalidCredentials")
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      error.value = err.message
+    } else {
+      error.value = t("auth.errors.invalidCredentials")
+    }
   } finally {
     isLoading.value = false
   }
@@ -89,18 +75,44 @@ const onSubmit = async (event: FormSubmitEvent) => {
         </h2>
       </div>
       
-      <Form v-slot="$form" @submit="onSubmit" :resolver="resolver" :initial-values="form" class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
-        <FormField fieldName="email" :form="$form">
+      <Form
+        v-slot="$form"
+        :resolver="resolver"
+        :initial-values="form"
+        class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg"
+        @submit="onSubmit"
+      >
+        <FormField
+          field-name="email"
+          :form="$form"
+        >
           <template #field>
-            <InputText name="email" type="text" :placeholder="$t('auth.login.email')" />
+            <InputText
+              name="email"
+              type="text"
+              :placeholder="$t('auth.login.email')"
+            />
           </template>
         </FormField>
-        <FormField fieldName="password" :form="$form">
+        <FormField
+          field-name="password"
+          :form="$form"
+        >
           <template #field>
-            <FormPassword ref="formPasswordRef" name="password" type="password" :placeholder="$t('auth.login.password')" :form="$form" />
+            <FormPassword
+              ref="formPasswordRef"
+              name="password"
+              type="password"
+              :placeholder="$t('auth.login.password')"
+              :form="$form"
+            />
           </template>
         </FormField>
-        <Button type="submit" :disabled="isLoading" class="w-full">
+        <Button
+          type="submit"
+          :disabled="isLoading"
+          class="w-full"
+        >
           {{ $t('auth.login.button') }}
         </Button>
       </Form>
