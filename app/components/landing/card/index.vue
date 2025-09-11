@@ -45,7 +45,6 @@ const goToCategory = () => {
 
 <template>
   <Card
-    @click="goToCategory"
     ref="cardRef"
     class="cursor-pointer card-container"
     :style="{ transform: transformStyle }"
@@ -54,6 +53,7 @@ const goToCategory = () => {
         class: 'content',
       },
     }"
+    @click="goToCategory"
   >
     <template #header>
       <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">

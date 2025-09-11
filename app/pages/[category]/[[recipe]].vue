@@ -10,8 +10,11 @@ const { category, recipe } = route.params as {
   <NuxtLayout name="sidebar">
     <template #left-menu>
       <RecipeSortSelect />
-      <Divider type="dotted" class="my-8!"/>
-      <RecipeList class="w-full"/>
+      <Divider
+        type="dotted"
+        class="my-8!"
+      />
+      <RecipeList class="w-full" />
     </template>
     <template #content>
       <div>Main</div>
