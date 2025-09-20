@@ -1,9 +1,15 @@
 <script setup lang="ts">
 const route = useRoute()
-const { category, recipe } = route.params as {
+const { category, recipe: recipeParam } = route.params as {
   category: string
   recipe?: string
 }
+
+const recipe = ref(recipeParam)
+
+watch(recipe, (newRecipe) => {
+  navigateTo(`/${category}/${newRecipe}`)
+})
 </script>
 
 <template>
@@ -14,7 +20,10 @@ const { category, recipe } = route.params as {
         type="dotted"
         class="my-8!"
       />
-      <RecipeList class="w-full" />
+      <RecipeList
+        v-model="recipe"
+        class="w-full"
+      />
     </template>
     <template #content>
       <div>Main</div>
