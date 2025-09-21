@@ -34,12 +34,18 @@ const handleSignOut = async () => {
               {{ user?.name || user?.email }}
             </span>
             <button
-              @click="handleSignOut"
               :disabled="isSigningOut"
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              @click="handleSignOut"
             >
-              <span v-if="isSigningOut" class="mr-2">
-                <NuxtIcon name="mdi:loading" class="animate-spin h-4 w-4" />
+              <span
+                v-if="isSigningOut"
+                class="mr-2"
+              >
+                <NuxtIcon
+                  name="mdi:loading"
+                  class="animate-spin h-4 w-4"
+                />
               </span>
               {{ $t('auth.profile.signOut') }}
             </button>
@@ -84,7 +90,10 @@ const handleSignOut = async () => {
                 to="/"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-french-lilac-700 bg-french-lilac-100 hover:bg-french-lilac-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-french-lilac-500 transition-colors"
               >
-                <NuxtIcon name="mdi:arrow-left" class="mr-2 h-4 w-4" />
+                <NuxtIcon
+                  name="mdi:arrow-left"
+                  class="mr-2 h-4 w-4"
+                />
                 Volver al inicio
               </NuxtLink>
             </div>

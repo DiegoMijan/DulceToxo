@@ -9,8 +9,6 @@ definePageMeta({
 })
 
 const { t } = useI18n()
-const { signUp } = useAuth()
-const router = useRouter()
 const formRef = useTemplateRef<InstanceType<typeof Form>>("formRef")
 const { reactiveForm: form } = useForm<{
   name: string
@@ -26,40 +24,17 @@ const { reactiveForm: form } = useForm<{
 
 const isLoading = ref(false)
 const error = ref("")
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/
 
-const resolver = ref(
-  valibotResolver(
-    v.object({
-      name: v.pipe(v.string(), v.minLength(1, t("auth.register.error.nameRequired"))),
-      email: v.pipe(
-        v.string(),
-        v.minLength(1, t("auth.register.error.emailRequired")),
-        v.email(t("auth.register.error.invalidEmail")),
-      ),
-      password: v.pipe(
-        v.string(),
-        v.minLength(1, t("auth.register.error.passwordRequired")),
-        v.regex(passwordRegex, t("auth.register.error.passwordRequirements")),
-      ),
-      confirmPassword: v.pipe(
-        v.string(),
-        v.minLength(1, t("auth.register.error.confirmPasswordRequired")),
-        v.regex(passwordRegex, t("auth.register.error.passwordRequirements")),
-        v.check((check) => validatePassword(check), t("auth.register.error.passwordsDontMatch")),
-      ),
-    }),
-  ),
-)
+const resolver = ref(valibotResolver(createRegisterPasswordSchema(t, validatePassword)))
 
-const validatePassword = (check: string) => {
+function validatePassword(check: string) {
   const passwordValue = formRef.value as unknown as { states: { password: { value: string } } }
   return passwordValue.states && passwordValue.states.password.value === check
 }
 
 const onSubmit = async (event: FormSubmitEvent) => {
   console.log(event)
-  const { valid, values } = event as FormSubmitEvent<{
+  const { valid } = event as FormSubmitEvent<{
     name: string
     email: string
     password: string
@@ -78,34 +53,78 @@ const onSubmit = async (event: FormSubmitEvent) => {
         </h2>
       </div>
       
-      <Form v-slot="$form" @submit="onSubmit" :resolver="resolver" :initial-values="form" class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg" ref="formRef">
-        <div v-if="error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg">
+      <Form
+        v-slot="$form"
+        ref="formRef"
+        :resolver="resolver"
+        :initial-values="form"
+        class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg"
+        @submit="onSubmit"
+      >
+        <div
+          v-if="error"
+          class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg"
+        >
           {{ error }}
         </div>
         <div class="space-y-4">
-          <FormField fieldName="name" :form="$form">
+          <FormField
+            field-name="name"
+            :form="$form"
+          >
             <template #field>
-              <InputText name="name" type="text" :placeholder="$t('auth.register.name')" />
+              <InputText
+                name="name"
+                type="text"
+                :placeholder="$t('auth.register.name')"
+              />
             </template>
           </FormField>
-          <FormField fieldName="email" :form="$form">
+          <FormField
+            field-name="email"
+            :form="$form"
+          >
             <template #field>
-              <InputText name="email" type="text" :placeholder="$t('auth.register.email')" />
+              <InputText
+                name="email"
+                type="text"
+                :placeholder="$t('auth.register.email')"
+              />
             </template>
           </FormField>
-          <FormField fieldName="password" :form="$form">
+          <FormField
+            field-name="password"
+            :form="$form"
+          >
             <template #field>
-              <FormPassword name="password" type="password" :placeholder="$t('auth.register.password')" :form="$form" />
+              <FormPassword
+                name="password"
+                type="password"
+                :placeholder="$t('auth.register.password')"
+                :form="$form"
+              />
             </template>
           </FormField>
-          <FormField fieldName="confirmPassword" :form="$form">
+          <FormField
+            field-name="confirmPassword"
+            :form="$form"
+          >
             <template #field>
-              <FormPassword name="confirmPassword" type="password" :placeholder="$t('auth.register.confirmPassword')" :form="$form" />
+              <FormPassword
+                name="confirmPassword"
+                type="password"
+                :placeholder="$t('auth.register.confirmPassword')"
+                :form="$form"
+              />
             </template>
           </FormField>
         </div>
 
-        <Button type="submit" :disabled="isLoading" class="w-full">
+        <Button
+          type="submit"
+          :disabled="isLoading"
+          class="w-full"
+        >
           {{ $t('auth.register.button') }}
         </Button>
 
