@@ -5,9 +5,23 @@ const { category, recipe: recipeParam } = route.params as {
   recipe?: string
 }
 
-const recipe = ref(recipeParam)
+const recipeSelected = ref<string | undefined>(recipeParam)
+const recipe = ref<Recipe>({
+  id: "",
+  title: "Delicioso Cheesecake Brownie",
+  description:
+    "Un brownie con un sabor irresistible y una textura única. Ideal para cualquier ocasión.",
+  ingredients: [],
+  instructions: [],
+  difficulty: 2,
+  prepTime: 30,
+  cookTime: 15,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  category,
+})
 
-watch(recipe, (newRecipe) => {
+watch(recipeSelected, (newRecipe) => {
   navigateTo(`/${category}/${newRecipe}`)
 })
 </script>
@@ -21,12 +35,15 @@ watch(recipe, (newRecipe) => {
         class="my-8!"
       />
       <RecipeList
-        v-model="recipe"
+        v-model="recipeSelected"
         class="w-full"
       />
     </template>
     <template #content>
-      <div>Main</div>
+      <RecipeContent
+        v-if="recipeSelected"
+        :recipe
+      />
     </template>
     <template #right-menu>
       <div>Selecciona una receta</div>

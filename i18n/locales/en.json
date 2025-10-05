@@ -105,5 +105,10 @@
       "passwordChanged": "Password changed successfully",
       "signOutSuccess": "Successfully signed out"
     }
+  },
+  "recipe": {
+    "prepTime": "Preparation time: {time} min",
+    "cookTime": "Cooking time: {time} min",
+    "difficulty": "Difficulty: "
   }
 }

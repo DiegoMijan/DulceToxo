@@ -105,5 +105,10 @@
       "passwordChanged": "Contraseña cambiada correctamente",
       "signOutSuccess": "Sesión cerrada correctamente"
     }
+  },
+  "recipe": {
+    "prepTime": "Tiempo de preparación: {time} min",
+    "cookTime": "Tiempo de cocción: {time} min",
+    "difficulty": "Dificultad: "
   }
 }

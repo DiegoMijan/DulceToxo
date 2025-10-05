@@ -105,5 +105,10 @@
       "passwordChanged": "Contrasinal cambiado correctamente",
       "signOutSuccess": "Sesión pechada correctamente"
     }
+  },
+  "recipe": {
+    "prepTime": "Tempo de preparación: {time} min",
+    "cookTime": "Tempo de cocción: {time} min",
+    "difficulty": "Dificultade: "
   }
 }
