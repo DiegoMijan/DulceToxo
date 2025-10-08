@@ -11,7 +11,13 @@ const recipe = ref<Recipe>({
   title: "Delicioso Cheesecake Brownie",
   description:
     "Un brownie con un sabor irresistible y una textura única. Ideal para cualquier ocasión.",
-  ingredients: [],
+  ingredients: [
+    {
+      id: "1",
+      description: "100g de chocolate",
+      order: 1,
+    },
+  ],
   instructions: [],
   difficulty: 2,
   prepTime: 30,

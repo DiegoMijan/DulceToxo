@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite"
 export default defineNuxtConfig({
   imports: {
     autoImport: true,
-    dirs: ["../shared/schemas/**", "types/**"],
+    dirs: ["../shared/schemas/**"],
     scan: true,
     presets: [
       {
