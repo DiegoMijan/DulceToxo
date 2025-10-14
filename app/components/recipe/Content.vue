@@ -46,13 +46,13 @@ const { t } = useI18n()
         src="/img/ejemplo_receta.jpg"
         alt="Brownie"
         image-class="rounded w-full mt-4"
-        image-style="height: 360px; !important; object-fit: cover;"
+        image-style="height: 360px !important; object-fit: cover;"
         preview
       />
     </section>
     <section class="flex gap-4">
       <div class="flex flex-1 flex-col gap-4">
-        <h2 class="title text-3xl title text-left">Ingredientes</h2>
+        <h2 class="title text-3xl text-left">Ingredientes</h2>
         <div class="flex flex-col gap-4">
           <div
             v-for="ingredient in recipe.ingredients"
@@ -68,7 +68,7 @@ const { t } = useI18n()
         </div>
       </div>
       <div class="flex flex-2 flex-col gap-4">
-        <h2 class="title text-3xl title text-left">Instrucciones</h2>
+        <h2 class="title text-3xl text-left">Instrucciones</h2>
         <div class="flex flex-col gap-4">
           <div
             v-for="instruction, index in recipe.instructions"
