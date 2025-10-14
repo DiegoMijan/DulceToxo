@@ -9,8 +9,8 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="w-full h-full pl-8 pr-8 overflow-auto text-center">
-    <section class="flex flex-col gap-4 mb-8 text-center">
+  <div class="w-full h-full pl-10 pr-10 overflow-auto text-center">
+    <section class="flex flex-col gap-4 mb-10 text-center">
       <h1 class="title text-5xl font-bold ">{{ recipe.title }}</h1>
       <p class="sub-title flex flex-row gap-3 text-sm justify-center">
         <span
@@ -46,32 +46,39 @@ const { t } = useI18n()
         src="/img/ejemplo_receta.jpg"
         alt="Brownie"
         image-class="rounded w-full mt-4"
-        image-style="height: 420px; !important; object-fit: cover;"
+        image-style="height: 360px; !important; object-fit: cover;"
         preview
       />
     </section>
     <section class="flex gap-4">
-      <div class="flex flex-1 flex-row gap-4">
-        <h2 class="title text-3xl title">Ingredientes</h2>
-        <ul class="list-disc list-inside">
-          <li
+      <div class="flex flex-1 flex-col gap-4">
+        <h2 class="title text-3xl title text-left">Ingredientes</h2>
+        <div class="flex flex-col gap-4">
+          <div
             v-for="ingredient in recipe.ingredients"
             :key="ingredient.id"
+            class="flex flex-row gap-2 items-center"
           >
-            {{ ingredient.description }}
-          </li>
-        </ul>
+            <NuxtIcon
+              name="emojione-v1:sparkles"
+              class="text-xl"
+            />
+            <span class="text-md">{{ ingredient.description }}</span>
+          </div>
+        </div>
       </div>
-      <div class="flex flex-2 flex-row gap-4">
-        <h2 class="title text-3xl title">Instrucciones</h2>
-        <ul class="list-disc list-inside">
-          <li
-            v-for="instruction in recipe.instructions"
+      <div class="flex flex-2 flex-col gap-4">
+        <h2 class="title text-3xl title text-left">Instrucciones</h2>
+        <div class="flex flex-col gap-4">
+          <div
+            v-for="instruction, index in recipe.instructions"
             :key="instruction.id"
+            class="flex flex-row gap-2 items-center"
           >
-            {{ instruction.description }}
-          </li>
-        </ul>
+            <Badge :value="index + 1" />
+            <span class="text-md">{{ instruction.description }}</span>
+          </div>
+        </div>
       </div>
     </section>
   </div>

@@ -19,6 +19,7 @@ const calculatedIcon = computed(() => {
 
 const cardRef = ref<HTMLElement | null>(null)
 const transformStyle = ref("rotateX(0deg) rotateY(0deg) scale(1)")
+const hasPrefetched = ref(false)
 
 const { elementX, elementY, isOutside } = useMouseInElement(cardRef)
 const { width, height } = useElementBounding(cardRef)
@@ -41,6 +42,14 @@ watchEffect(() => {
 const goToCategory = () => {
   navigateTo(`/${title.toLowerCase()}`)
 }
+
+const handleMouseEnter = () => {
+  if (!hasPrefetched.value) {
+    const targetRoute = `/${title.toLowerCase()}`
+    preloadRouteComponents(targetRoute)
+    hasPrefetched.value = true
+  }
+}
 </script>
 
 <template>
@@ -53,6 +62,7 @@ const goToCategory = () => {
         class: 'content',
       },
     }"
+    @mouseenter="handleMouseEnter"
     @click="goToCategory"
   >
     <template #header>
