@@ -109,6 +109,36 @@
   "recipe": {
     "prepTime": "Preparation time: {time} min",
     "cookTime": "Cooking time: {time} min",
-    "difficulty": "Difficulty: "
+    "difficulty": "Difficulty: ",
+    "sortBy": "Sort by",
+    "difficultyTooltip": "Click to see the explanation of each difficulty level",
+    "difficultyExplanationTitle": "Difficulty explanation",
+    "difficultyExplanation": {
+      "1": {
+        "title": "Easy",
+        "description": "Simple recipes that use basic ingredients, require little time (less than 30 minutes) and don't need specialized equipment. Ideal for absolute beginners.",
+        "explanation": "Example: Basic muffins"
+      },
+      "2": {
+        "title": "Medium",
+        "description": "Involves basic cooking or mixing steps, with common ingredients and moderate time (30-60 minutes). Requires minimal attention, but some experience in cooking.",
+        "explanation": "Example: Oat cookies"
+      },
+      "3": {
+        "title": "Hard",
+        "description": "Requires specific techniques like beating whites or assembling layers, with multiple steps and extended time (1-2 hours). Requires precision to avoid common errors.",
+        "explanation": "Example: Lemon cake"
+      },
+      "4": {
+        "title": "Very hard",
+        "description": "Involves complex processes like rolling dough or delicate emulsions, with specialized ingredients and high risk of failure. Time: 2-4 hours, more cooled.",
+        "explanation": "Example: Homemade croissants"
+      },
+      "5": {
+        "title": "Extremely hard",
+        "description": "Professional recipes with multiple components (creams, glazes, decorations), precise millimeter precision and advanced equipment. Time: more than 4 hours, often in stages.",
+        "explanation": "Example: Chocolate multilayer entremet"
+      }
+    }
   }
 }

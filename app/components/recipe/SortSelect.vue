@@ -1,21 +1,15 @@
 <script setup lang="ts">
 import { useStorage } from "@vueuse/core"
 
-interface SortOption {
-  name: string
-  code: string
-  icon?: string
-}
-
 const selectedSort = useStorage("sort", null, localStorage, {
   mergeDefaults: true,
   serializer: {
     read: (v: null | string) => (v ? JSON.parse(v) : null),
-    write: (v: null | SortOption) => JSON.stringify(v),
+    write: (v: null | SelectOption) => JSON.stringify(v),
   },
 })
 
-const sortOptions = ref<SortOption[]>([
+const sortOptions = ref<SelectOption[]>([
   { name: "Nombre", code: "name", icon: "line-md:cake-twotone" },
   { name: "Fecha de publicación", code: "date", icon: "line-md:calendar" },
   { name: "Fecha de actualización", code: "update", icon: "line-md:bell-twotone-loop" },
@@ -37,7 +31,7 @@ const pt = {
       v-model="selectedSort"
       :options="sortOptions"
       option-label="name"
-      placeholder="Ordenar por"
+      :placeholder="$t('recipe.sortBy')"
       class="w-full"
       size="small"
       :pt

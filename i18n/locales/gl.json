@@ -109,6 +109,36 @@
   "recipe": {
     "prepTime": "Tempo de preparación: {time} min",
     "cookTime": "Tempo de cocción: {time} min",
-    "difficulty": "Dificultade: "
+    "difficulty": "Dificultade: ",
+    "sortBy": "Ordenar por",
+    "difficultyTooltip": "Fai clic para ver a explicación de cada nivel de dificultade",
+    "difficultyExplanationTitle": "Explicación da dificultade",
+    "difficultyExplanation": {
+      "1": {
+        "title": "Fácil",
+        "description": "Recetas artesanais simples que usan ingredientes básicos, requíron pouco tempo (menos de 30 minutos) e non necesitan equipo especializado. Ideal para principiantes absolutos.",
+        "explanation": "Exemplo: Magdalenas básicas"
+      },
+      "2": {
+        "title": "Medio",
+        "description": "Involucra pasos básicos de cocción o mezclado, con ingredientes comunes e tempo moderado (30-60 minutos). Requíron atención mínima, pero algo de experiencia en cocina.",
+        "explanation": "Exemplo: Galletas de avena"
+      },
+      "3": {
+        "title": "Difícil",
+        "description": "Requíron técnicas específicas como batir claras o armar capas, con múltiples pasos e tempo extendido (1-2 horas). Demánda precisión para evitar erros comuns.",
+        "explanation": "Exemplo: Torta de limón"
+      },
+      "4": {
+        "title": "Moi difícil",
+        "description": "Involucra procesos complexos como laminado de masa o emulsións delicadas, con ingredientes especializados e alto risco de fracaso. Tempo: 2-4 horas, máis enfriado.",
+        "explanation": "Exemplo: Croissants caseros"
+      },
+      "5": {
+        "title": "Extremadamente difícil",
+        "description": "Recetas profesionais con múltiples componentes (cremas, glaseados, decoracións), precisión milimétrica e equipo avanzado. Tempo: máis de 4 horas, moitas veces en etapas.",
+        "explanation": "Exemplo: Entremet de chocolate multicapa"
+      }
+    }
   }
 }

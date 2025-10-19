@@ -5,6 +5,8 @@ const { category, recipe: recipeParam } = route.params as {
   recipe?: string
 }
 
+const localePath = useLocalePath()
+
 const recipeSelected = ref<string | undefined>(recipeParam)
 const recipe = ref<Recipe>({
   id: "",
@@ -64,7 +66,7 @@ const recipe = ref<Recipe>({
 })
 
 watch(recipeSelected, (newRecipe) => {
-  navigateTo(`/${category}/${newRecipe}`)
+  navigateTo(localePath(`/${category}/${newRecipe}`))
 })
 </script>
 
@@ -88,7 +90,9 @@ watch(recipeSelected, (newRecipe) => {
       />
     </template>
     <template #right-menu>
-      <div>Selecciona una receta</div>
+      <CategorySelect
+        :category
+      />
     </template>
   </NuxtLayout>
 </template>

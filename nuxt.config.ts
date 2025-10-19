@@ -25,7 +25,6 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@nuxt/eslint",
     "@primevue/nuxt-module",
-    "@tresjs/nuxt",
   ],
   image: {
     inject: true,

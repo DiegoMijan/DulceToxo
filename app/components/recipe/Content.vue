@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import Image from "primevue/image"
-
 const { recipe } = defineProps<{
   recipe: Recipe
 }>()
 
 const { t } = useI18n()
+const difficultyDrawerVisible = ref(false)
 </script>
 
 <template>
@@ -23,13 +22,18 @@ const { t } = useI18n()
         >
           {{ t("recipe.cookTime", { time: recipe.cookTime }) }}
         </span>
-        <span class="flex flex-row gap-2 justify-center cursor-pointer ">
+        <span
+          v-tooltip.top="$t('recipe.difficultyTooltip')"
+          class="flex flex-row gap-2 justify-center cursor-pointer"
+          @click="difficultyDrawerVisible = true"
+        >
           {{ t("recipe.difficulty") }}<Rating
             disabled
             :stars="recipe.difficulty"
           >
             <template #onicon>
               <NuxtIcon
+                class="text-lg"
                 name="icon-park-twotone:chef-hat-one"
               />
             </template>
@@ -45,7 +49,8 @@ const { t } = useI18n()
       <Image
         src="/img/ejemplo_receta.jpg"
         alt="Brownie"
-        image-class="rounded w-full mt-4"
+        class="mt-4 rounded"
+        image-class="rounded w-full"
         image-style="height: 360px !important; object-fit: cover;"
         preview
       />
@@ -81,6 +86,10 @@ const { t } = useI18n()
         </div>
       </div>
     </section>
+    <RecipeDifficultyDrawer
+      v-model:visible="difficultyDrawerVisible"
+      :difficulty-selected="recipe.difficulty"
+    />
   </div>
 </template>
 

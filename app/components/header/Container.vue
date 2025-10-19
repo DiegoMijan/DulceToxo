@@ -3,6 +3,7 @@ const isScrolled = ref(false)
 const appElementRef = ref<HTMLElement | null>(null)
 
 const { y } = useScroll(appElementRef)
+const localePath = useLocalePath()
 
 onMounted(() => {
   appElementRef.value = document.getElementById("app")
@@ -28,7 +29,7 @@ watch(y, () => {
       src="/img/logo_toxo.webp"
       alt="Logo Dulce Toxo"
       style="height: 50px;"
-      @click="navigateTo('/')"
+      @click="navigateTo(localePath(`/`))"
     />
     <nav
       role="toolbar"
