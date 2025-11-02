@@ -1,23 +1,27 @@
 <script setup lang="ts">
-const isScrolled = ref(false)
-const appElementRef = ref<HTMLElement | null>(null)
+  const isScrolled = ref(false)
+  const appElementRef = ref<HTMLElement | null>(null)
 
-const { y } = useScroll(appElementRef)
-const localePath = useLocalePath()
+  const { y } = useScroll(appElementRef)
+  const localePath = useLocalePath()
 
-onMounted(() => {
-  appElementRef.value = document.getElementById("app")
-})
+  onMounted(() => {
+    appElementRef.value = document.getElementById("app")
+  })
 
-watch(y, () => {
-  isScrolled.value = y.value > 0
-})
+  watch(y, () => {
+    isScrolled.value = y.value > 0
+  })
+
+  const goToHome = () => {
+    navigateTo(localePath("/"))
+  }
 </script> 
 
 <template>
   <header
     role="banner"
-    class="sticky top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center z-[25]"
+    class="sticky top-0 left-0 right-0 flex px-6 md:px-8 xl:px-[20rem] py-2 items-center z-25"
     :class="[
       isScrolled
         ? 'dark:bg-french-lilac-950/80! backdrop-blur-sm'
@@ -29,7 +33,7 @@ watch(y, () => {
       src="/img/logo_toxo.webp"
       alt="Logo Dulce Toxo"
       style="height: 50px;"
-      @click="navigateTo(localePath(`/`))"
+      @click="goToHome"
     />
     <nav
       role="toolbar"

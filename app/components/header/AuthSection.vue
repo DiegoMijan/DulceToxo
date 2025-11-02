@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import { useAuth } from "~/composables/useAuth"
+  import { useAuth } from "~/composables/useAuth"
 
-const { user, isLoggedIn, signOut } = useAuth()
+  const { user, isLoggedIn, signOut } = useAuth()
 
-const isDropdownOpen = ref(false)
-const isSigningOut = ref(false)
+  const isDropdownOpen = ref(false)
+  const isSigningOut = ref(false)
 
-const handleSignOut = async () => {
-  try {
-    isSigningOut.value = true
-    await signOut()
-    isDropdownOpen.value = false
-  } catch (error) {
-    console.error("Sign out error:", error)
-  } finally {
-    isSigningOut.value = false
+  const handleSignOut = async () => {
+    try {
+      isSigningOut.value = true
+      await signOut()
+      isDropdownOpen.value = false
+    } catch (error) {
+      console.error("Sign out error:", error)
+    } finally {
+      isSigningOut.value = false
+    }
   }
-}
 
-const dropdownRef = ref<HTMLElement>()
+  const dropdownRef = ref<HTMLElement>()
 
-const closeDropdown = () => {
-  isDropdownOpen.value = false
-}
+  const closeDropdown = () => {
+    isDropdownOpen.value = false
+  }
 
-// Close dropdown when clicking outside
-onClickOutside(dropdownRef, closeDropdown)
+  // Close dropdown when clicking outside
+  onClickOutside(dropdownRef, closeDropdown)
 </script>
 
 <template>
@@ -113,16 +113,24 @@ onClickOutside(dropdownRef, closeDropdown)
       class="flex items-center space-x-2"
     >
       <NuxtLink
-        to="/auth/login"
+        :to="$localePath('/auth/login')"
         class="px-3 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white/20"
       >
-        {{ $t('auth.login.title') }}
+        <NuxtIcon
+          name="mdi:login"
+          class="w-4 h-4 mr-2 text-2xl lg:hidden! md:hidden!"
+        />
+        <span class="hidden md:block!">{{ $t('auth.login.title') }}</span>
       </NuxtLink>
       <NuxtLink
-        to="/auth/register"
+        :to="$localePath('/auth/register')"
         class="px-3 py-2 text-sm font-medium bg-white text-french-lilac-700 hover:bg-white/90 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white"
       >
-        {{ $t('auth.register.title') }}
+        <NuxtIcon
+          name="mdi:account-plus"
+          class="w-4 h-4 mr-2 text-2xl lg:hidden! md:hidden!"
+        />
+        <span class="hidden md:block!">{{ $t('auth.register.title') }}</span>
       </NuxtLink>
     </div>
   </div>

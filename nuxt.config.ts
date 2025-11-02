@@ -11,6 +11,15 @@ export default defineNuxtConfig({
         from: "valibot",
         imports: [{ name: "*", as: "v" }],
       },
+      {
+        from: "@antfu/utils",
+        imports: [
+          "*",
+          { name: "Nullable", type: true },
+          { name: "Arrayable", type: true },
+          { name: "Awaitable", type: true },
+        ],
+      },
     ],
   },
   modules: [

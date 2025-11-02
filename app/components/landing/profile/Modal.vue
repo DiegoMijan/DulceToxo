@@ -1,21 +1,21 @@
 <!-- eslint-disable vue/no-v-html -->
 <script lang="ts" setup>
-defineEmits(["close"])
+  defineEmits(["close"])
 
-const calculateYears = (birthDate: Date): number => {
-  const today = new Date()
-  let age = today.getFullYear() - birthDate.getFullYear()
-  const month = today.getMonth() - birthDate.getMonth()
+  const calculateYears = (birthDate: Date): number => {
+    const today = new Date()
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const month = today.getMonth() - birthDate.getMonth()
 
-  if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
-    age--
+    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+
+    return age
   }
 
-  return age
-}
-
-const birthDate = new Date(1993, 9, 11)
-const age = calculateYears(birthDate)
+  const birthDate = new Date(1993, 9, 11)
+  const age = calculateYears(birthDate)
 </script>
 
 <template>

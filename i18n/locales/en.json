@@ -13,7 +13,7 @@
     "title": "About me",
     "greeting": "Hello, my name is Lucia Chas Álvarez. I am {age} years old and I am a software engineer.",
     "introduction": "Although if you're here, it's not because of IT 😂😂, but because of one of my greatest passions, which is baking.",
-    "business": "At <i class=\"font-bold sub-title dark:text-french-lilac-400! text-french-lilac-950\">Dulce Toxo</i>, you will find a wide variety of handmade desserts and sweets such as:",
+    "business": "At <i class=\"font-bold sub-title\">Dulce Toxo</i>, you will find a wide variety of handmade desserts and sweets such as:",
     "cupcakes": "🧁 Cupcakes",
     "cookies": "🍪 Cookies",
     "cheesecakes": "🍰 Cheesecakes",

@@ -1,10 +1,20 @@
 <script setup lang="ts">
-const { recipe } = defineProps<{
-  recipe: Recipe
-}>()
+  const { recipe } = defineProps<{
+    recipe: Recipe
+  }>()
 
-const { t } = useI18n()
-const difficultyDrawerVisible = ref(false)
+  const { t } = useI18n()
+  const difficultyDrawerVisible = ref(false)
+  const images = ref<{ src: string; alt: string }[]>([
+    {
+      src: "/img/ejemplo_receta.jpg",
+      alt: "Brownie",
+    },
+    {
+      src: "/img/ejemplo_receta.jpg",
+      alt: "Brownie",
+    },
+  ])
 </script>
 
 <template>
@@ -46,14 +56,18 @@ const difficultyDrawerVisible = ref(false)
           </Rating>
         </span>
       </p>
-      <Image
-        src="/img/ejemplo_receta.jpg"
-        alt="Brownie"
-        class="mt-4 rounded"
-        image-class="rounded w-full"
-        image-style="height: 360px !important; object-fit: cover;"
-        preview
-      />
+      <Carousel :value="images" :numVisible="1" :numScroll="1" orientation="horizontal">
+        <template #item="{ data }">
+          <Image
+            :src="data.src"
+            :alt="data.alt"
+            class="mt-4 rounded w-full"
+            image-class="rounded w-full"
+            image-style="height: 320px !important; object-fit: cover;"
+            preview
+          />
+      </template>
+      </Carousel>
     </section>
     <section class="flex gap-4">
       <div class="flex flex-1 flex-col gap-4">
@@ -96,6 +110,6 @@ const difficultyDrawerVisible = ref(false)
 <style scoped lang="scss">
 .separator-right {
   border-right: 2px solid white !important;
-  border-right-color: #ffffff !important;
+  border-right-color: white !important;
 }
 </style>
