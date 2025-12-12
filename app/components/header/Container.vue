@@ -1,13 +1,8 @@
 <script setup lang="ts">
   const isScrolled = ref(false)
-  const appElementRef = ref<HTMLElement | null>(null)
 
-  const { y } = useScroll(appElementRef)
+  const { y } = useWindowScroll()
   const localePath = useLocalePath()
-
-  onMounted(() => {
-    appElementRef.value = document.getElementById("app")
-  })
 
   watch(y, () => {
     isScrolled.value = y.value > 0
