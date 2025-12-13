@@ -1,5 +1,5 @@
 export interface Recipe {
-  id: string
+  id: Nullable<string>
   title: string
   description: string
   ingredients: Ingredient[]
@@ -7,8 +7,8 @@ export interface Recipe {
   difficulty: 1 | 2 | 3 | 4 | 5
   prepTime: number
   cookTime: number
-  createdAt: Date
-  updatedAt: Date
+  createdAt: Nullable<Date>
+  updatedAt: Nullable<Date>
   category: string
 }
 

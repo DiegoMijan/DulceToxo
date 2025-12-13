@@ -1,9 +1,13 @@
 <script setup lang="ts">
+  import { navigateTo } from "#app"
+
   const { recipe } = defineProps<{
     recipe: Recipe
   }>()
 
   const { t } = useI18n()
+  const localePath = useLocalePath()
+
   const difficultyDrawerVisible = ref(false)
   const images = ref<{ src: string; alt: string }[]>([
     {
@@ -20,7 +24,9 @@
 <template>
   <div class="w-full h-full pl-10 pr-10 overflow-auto text-center">
     <section class="flex flex-col gap-4 mb-10 text-center">
-      <h1 class="title text-5xl font-bold ">{{ recipe.title }}</h1>
+      <h1 class="title text-5xl font-bold flex flex-row gap-2 items-center justify-center">
+        {{ recipe.title }}
+      </h1>
       <p class="sub-title flex flex-row gap-3 text-sm justify-center">
         <span
           class="separator-right  pr-3"
@@ -37,7 +43,8 @@
           class="flex flex-row gap-2 justify-center cursor-pointer"
           @click="difficultyDrawerVisible = true"
         >
-          {{ t("recipe.difficulty") }}<Rating
+          {{ t("recipe.difficulty") }}
+          <Rating
             disabled
             :stars="recipe.difficulty"
           >
@@ -56,7 +63,12 @@
           </Rating>
         </span>
       </p>
-      <Carousel :value="images" :numVisible="1" :numScroll="1" orientation="horizontal">
+      <Carousel
+        :value="images"
+        :num-visible="1"
+        :num-scroll="1"
+        orientation="horizontal"
+      >
         <template #item="{ data }">
           <Image
             :src="data.src"
@@ -66,7 +78,7 @@
             image-style="height: 320px !important; object-fit: cover;"
             preview
           />
-      </template>
+        </template>
       </Carousel>
     </section>
     <section class="flex gap-4">
@@ -103,6 +115,18 @@
     <RecipeDifficultyDrawer
       v-model:visible="difficultyDrawerVisible"
       :difficulty-selected="recipe.difficulty"
+    />
+  </div>
+  <div
+    v-tooltip.top="t('recipe.edit.button')"
+    class="absolute bottom-10 right-10"
+  >
+    <Button
+      icon="pi pi-pencil"
+      rounded
+      size="large"
+      :aria-label="t('recipe.edit.button')"
+      @click="navigateTo(localePath(`/edit/${recipe.id}`))"
     />
   </div>
 </template>

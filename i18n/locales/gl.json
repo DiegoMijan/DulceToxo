@@ -1,4 +1,8 @@
 {
+  "common": {
+    "delete": "Eliminar",
+    "cancel": "Cancelar"
+  },
   "header": {
     "theme": "Cambiar tema da páxina",
     "language": "Cambiar idioma",
@@ -107,6 +111,29 @@
     }
   },
   "recipe": {
+    "edit": {
+      "button": "Editar receta",
+      "recipeSelected": "Selecciona unha receta",
+      "categorySelected": "Selecciona unha categoría",
+      "error": {
+        "titleRequired": "O título é obrigatorio",
+        "descriptionRequired": "A descripción é obrigatoria",
+        "ingredientsRequired": "Os ingredientes son obrigatorios",
+        "instructionsRequired": "As instruccions son obrigatorias",
+        "difficultyRequired": "A dificultade é obrigatoria",
+        "prepTimeRequired": "O tempo de preparación é obrigatorio",
+        "cookTimeRequired": "O tempo de cocción é obrigatorio"
+      },
+      "form": {
+        "title": "Título",
+        "description": "Descripción",
+        "ingredients": "Ingredientes",
+        "instructions": "Instrucións",
+        "difficulty": "Dificultade",
+        "prepTime": "Tempo de preparación",
+        "cookTime": "Tempo de cocción"
+      }
+    },
     "prepTime": "Tempo de preparación: {time} min",
     "cookTime": "Tempo de cocción: {time} min",
     "difficulty": "Dificultade: ",
@@ -140,5 +167,9 @@
         "explanation": "Exemplo: Entremet de chocolate multicapa"
       }
     }
+  },
+  "upload": {
+    "removeImage": "Eliminar imaxe",
+    "confirmDelete": "¿Desexa eliminar esta imaxe?"
   }
 }

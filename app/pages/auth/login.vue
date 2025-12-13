@@ -1,67 +1,67 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@primevue/forms/form"
-import { valibotResolver } from "@primevue/forms/resolvers/valibot"
-import { FormField, FormPassword, LoginCupCake } from "#components"
+  import type { FormSubmitEvent } from "@primevue/forms/form"
+  import { valibotResolver } from "@primevue/forms/resolvers/valibot"
+  import { FormField, FormPassword, LoginCupCake } from "#components"
 
-definePageMeta({
-  middleware: "guest",
-})
+  definePageMeta({
+    middleware: "guest",
+  })
 
-const { t } = useI18n()
-const { signIn } = useAuth()
-const router = useRouter()
-const route = useRoute()
-const { reactiveForm: form } = useForm<{ email: string; password: string }>({
-  email: "",
-  password: "",
-})
+  const { t } = useI18n()
+  const { signIn } = useAuth()
+  const router = useRouter()
+  const route = useRoute()
+  const { reactiveForm: form } = useForm<{ email: string; password: string }>({
+    email: "",
+    password: "",
+  })
 
-const formPasswordRef = useTemplateRef<InstanceType<typeof FormPassword>>("formPasswordRef")
-const cupcakeRef = useTemplateRef<InstanceType<typeof LoginCupCake>>("cupcakeRef")
-const error = ref("")
+  const formPasswordRef = useTemplateRef<InstanceType<typeof FormPassword>>("formPasswordRef")
+  const cupcakeRef = useTemplateRef<InstanceType<typeof LoginCupCake>>("cupcakeRef")
+  const error = ref("")
 
-const isLoading = ref(false)
-const resolver = ref(valibotResolver(createLoginPasswordSchema(t)))
+  const isLoading = ref(false)
+  const resolver = ref(valibotResolver(createLoginPasswordSchema(t)))
 
-const unmasked = computed({
-  get() {
-    return (
-      (formPasswordRef.value?.passwordField as unknown as { unmasked: boolean })?.unmasked ?? true
-    )
-  },
-  set(newValue) {
-    if (!formPasswordRef.value) return
-    ;(formPasswordRef.value.passwordField as unknown as { unmasked: boolean }).unmasked = newValue
-  },
-})
+  const unmasked = computed({
+    get() {
+      return (
+        (formPasswordRef.value?.passwordField as unknown as { unmasked: boolean })?.unmasked ?? true
+      )
+    },
+    set(newValue) {
+      if (!formPasswordRef.value) return
+      ;(formPasswordRef.value.passwordField as unknown as { unmasked: boolean }).unmasked = newValue
+    },
+  })
 
-watch(unmasked, () => {
-  cupcakeRef.value?.toggleEyes()
-})
+  watch(unmasked, () => {
+    cupcakeRef.value?.toggleEyes()
+  })
 
-onMounted(() => {
-  unmasked.value = true
-})
+  onMounted(() => {
+    unmasked.value = true
+  })
 
-const onSubmit = async (event: FormSubmitEvent) => {
-  const { valid, values } = event as FormSubmitEvent<{ email: string; password: string }>
-  if (!valid) return
-  try {
-    isLoading.value = true
-    await signIn(values.email, values.password)
+  const onSubmit = async (event: FormSubmitEvent) => {
+    const { valid, values } = event as FormSubmitEvent<{ email: string; password: string }>
+    if (!valid) return
+    try {
+      isLoading.value = true
+      await signIn(values.email, values.password)
 
-    const redirectTo = (route.query.redirect as string) || "/dashboard"
-    await router.push(redirectTo)
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      error.value = err.message
-    } else {
-      error.value = t("auth.errors.invalidCredentials")
+      const redirectTo = (route.query.redirect as string) || "/dashboard"
+      await router.push(redirectTo)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        error.value = err.message
+      } else {
+        error.value = t("auth.errors.invalidCredentials")
+      }
+    } finally {
+      isLoading.value = false
     }
-  } finally {
-    isLoading.value = false
   }
-}
 </script>
 
 <template>
@@ -77,13 +77,13 @@ const onSubmit = async (event: FormSubmitEvent) => {
       
       <Form
         v-slot="$form"
-        :resolver="resolver"
+        :resolver
         :initial-values="form"
         class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg"
         @submit="onSubmit"
       >
         <FormField
-          field-name="email"
+          fieldName="email"
           :form="$form"
         >
           <template #field>
@@ -95,7 +95,7 @@ const onSubmit = async (event: FormSubmitEvent) => {
           </template>
         </FormField>
         <FormField
-          field-name="password"
+          fieldName="password"
           :form="$form"
         >
           <template #field>

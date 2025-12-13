@@ -1,47 +1,46 @@
 <script setup lang="ts">
-import type Form from "@primevue/forms/form"
-import type { FormSubmitEvent } from "@primevue/forms/form"
-import { valibotResolver } from "@primevue/forms/resolvers/valibot"
-import { FormField, FormPassword } from "#components"
+  import type Form from "@primevue/forms/form"
+  import type { FormSubmitEvent } from "@primevue/forms/form"
+  import { valibotResolver } from "@primevue/forms/resolvers/valibot"
+  import { FormField, FormPassword } from "#components"
 
-definePageMeta({
-  middleware: "guest",
-})
+  definePageMeta({
+    middleware: "guest",
+  })
 
-const { t } = useI18n()
-const formRef = useTemplateRef<InstanceType<typeof Form>>("formRef")
-const { reactiveForm: form } = useForm<{
-  name: string
-  email: string
-  password: string
-  confirmPassword: string
-}>({
-  name: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-})
-
-const isLoading = ref(false)
-const error = ref("")
-
-const resolver = ref(valibotResolver(createRegisterPasswordSchema(t, validatePassword)))
-
-function validatePassword(check: string) {
-  const passwordValue = formRef.value as unknown as { states: { password: { value: string } } }
-  return passwordValue.states && passwordValue.states.password.value === check
-}
-
-const onSubmit = async (event: FormSubmitEvent) => {
-  console.log(event)
-  const { valid } = event as FormSubmitEvent<{
+  const { t } = useI18n()
+  const formRef = useTemplateRef<InstanceType<typeof Form>>("formRef")
+  const { reactiveForm: form } = useForm<{
     name: string
     email: string
     password: string
     confirmPassword: string
-  }>
-  if (!valid) return
-}
+  }>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  })
+
+  const isLoading = ref(false)
+  const error = ref("")
+
+  const resolver = ref(valibotResolver(createRegisterPasswordSchema(t, validatePassword)))
+
+  function validatePassword(check: string) {
+    const passwordValue = formRef.value as unknown as { states: { password: { value: string } } }
+    return passwordValue.states && passwordValue.states.password.value === check
+  }
+
+  const onSubmit = async (event: FormSubmitEvent) => {
+    const { valid } = event as FormSubmitEvent<{
+      name: string
+      email: string
+      password: string
+      confirmPassword: string
+    }>
+    if (!valid) return
+  }
 </script>
 
 <template>
@@ -69,7 +68,7 @@ const onSubmit = async (event: FormSubmitEvent) => {
         </div>
         <div class="space-y-4">
           <FormField
-            field-name="name"
+            fieldName="name"
             :form="$form"
           >
             <template #field>
@@ -81,7 +80,7 @@ const onSubmit = async (event: FormSubmitEvent) => {
             </template>
           </FormField>
           <FormField
-            field-name="email"
+            fieldName="email"
             :form="$form"
           >
             <template #field>
@@ -93,7 +92,7 @@ const onSubmit = async (event: FormSubmitEvent) => {
             </template>
           </FormField>
           <FormField
-            field-name="password"
+            fieldName="password"
             :form="$form"
           >
             <template #field>
@@ -106,7 +105,7 @@ const onSubmit = async (event: FormSubmitEvent) => {
             </template>
           </FormField>
           <FormField
-            field-name="confirmPassword"
+            fieldName="confirmPassword"
             :form="$form"
           >
             <template #field>

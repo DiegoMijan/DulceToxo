@@ -18,32 +18,32 @@
   "dependencies": {
     "@antfu/utils": "^9.3.0",
     "@formkit/auto-animate": "^0.9.0",
-    "@nuxt/eslint": "^1.10.0",
+    "@nuxt/eslint": "^1.12.1",
     "@nuxt/fonts": "^0.12.1",
     "@nuxt/icon": "^2.1.0",
     "@nuxt/image": "^2.0.0",
     "@nuxtjs/color-mode": "^4.0.0",
     "@nuxtjs/i18n": "^10.2.1",
     "@pinia/nuxt": "latest",
-    "@primeuix/themes": "^1.2.5",
-    "@primevue/forms": "^4.4.1",
-    "@primevue/nuxt-module": "^4.4.1",
-    "@tailwindcss/vite": "^4.1.17",
-    "@vueuse/core": "^14.0.0",
-    "@vueuse/nuxt": "^14.0.0",
-    "better-auth": "^1.4.0",
+    "@primeuix/themes": "^2.0.2",
+    "@primevue/forms": "^4.5.3",
+    "@primevue/nuxt-module": "^4.5.3",
+    "@tailwindcss/vite": "^4.1.18",
+    "@vueuse/core": "^14.1.0",
+    "@vueuse/nuxt": "^14.1.0",
+    "better-auth": "^1.4.6",
     "blendy": "^0.0.1",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "eslint-plugin-typed-rocks": "^1.0.8",
     "magic-regexp": "^0.10.0",
-    "nuxt": "^4.2.1",
+    "nuxt": "^4.2.2",
     "pinia": "latest",
     "primeicons": "^7.0.0",
-    "primevue": "^4.4.1",
-    "tailwindcss": "^4.1.17",
-    "valibot": "^1.1.0",
+    "primevue": "^4.5.3",
+    "tailwindcss": "^4.1.18",
+    "valibot": "^1.2.0",
     "vue": "latest",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.4"
   },
   "comentario": "Para que funcione NuxtImage hay que hacer esto tanto en bun como en pnpm",
   "bun": {
@@ -54,9 +54,9 @@
     ]
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.7",
+    "@biomejs/biome": "^2.3.8",
     "eslint-plugin-unused-imports": "^4.3.0",
-    "sass-embedded": "^1.93.3",
+    "sass-embedded": "^1.96.0",
     "typescript": "^5.9.3"
   }
 }

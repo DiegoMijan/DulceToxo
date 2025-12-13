@@ -1,4 +1,8 @@
 {
+  "common": {
+    "delete": "Delete",
+    "cancel": "Cancel"
+  },
   "header": {
     "theme": "Change page theme",
     "language": "Change language",
@@ -107,6 +111,29 @@
     }
   },
   "recipe": {
+    "edit": {
+      "button": "Edit recipe",
+      "recipeSelected": "Select a recipe",
+      "categorySelected": "Select a category",
+      "error": {
+        "titleRequired": "Title is required",
+        "descriptionRequired": "Description is required",
+        "ingredientsRequired": "Ingredients are required",
+        "instructionsRequired": "Instructions are required",
+        "difficultyRequired": "Difficulty is required",
+        "prepTimeRequired": "Preparation time is required",
+        "cookTimeRequired": "Cooking time is required"
+      },
+      "form": {
+        "title": "Title",
+        "description": "Description",
+        "ingredients": "Ingredients",
+        "instructions": "Instructions",
+        "difficulty": "Difficulty",
+        "prepTime": "Preparation time",
+        "cookTime": "Cooking time"
+      }
+    },
     "prepTime": "Preparation time: {time} min",
     "cookTime": "Cooking time: {time} min",
     "difficulty": "Difficulty: ",
@@ -140,5 +167,9 @@
         "explanation": "Example: Chocolate multilayer entremet"
       }
     }
+  },
+  "upload": {
+    "removeImage": "Remove image",
+    "confirmDelete": "Do you want to delete this image?"
   }
 }

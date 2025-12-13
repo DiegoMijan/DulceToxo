@@ -160,6 +160,7 @@ export default withNuxt({
     "vue/valid-v-pre": "error",
     "vue/no-required-prop-with-default": "off",
     "vue/require-default-prop": "off",
+    "vue/attribute-hyphenation": "off",
   },
   plugins: {
     "unused-imports": unusedImports,
