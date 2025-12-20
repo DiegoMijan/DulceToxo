@@ -8,6 +8,7 @@
     name="sidebar"
   >
     <template #content>
+      <ConfirmPopup />
       <RecipeEditForm />
     </template>
   </NuxtLayout>

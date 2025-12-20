@@ -3,6 +3,9 @@
   import { valibotResolver } from "@primevue/forms/resolvers/valibot"
   import type { SelectChangeEvent } from "primevue/select"
   import { FormField } from "#components"
+  import es from "@/../public/img/es.svg"
+  import gl from "@/../public/img/es-ga.svg"
+  import en from "@/../public/img/gb.svg"
 
   const route = useRoute()
   const { recipe } = route.params as {
@@ -12,19 +15,6 @@
   const localePath = useLocalePath()
 
   const { t } = useI18n()
-  const { reactiveForm: initialValues } = useForm<Recipe>({
-    id: recipe || "",
-    title: "",
-    description: "",
-    ingredients: [],
-    instructions: [],
-    difficulty: 2,
-    prepTime: 0,
-    cookTime: 0,
-    createdAt: new Date(),
-    updatedAt: null,
-    category: "",
-  })
 
   const resolver = ref(valibotResolver(recipeFormSchema(t)))
 
@@ -40,11 +30,53 @@
     { id: "chocoLotusCupcake", title: "Cupcake de choco-lotus" },
   ])
 
+  const { reactiveForm: initialValues } = useForm<Recipe>({
+    id: recipe || "",
+    title: "",
+    description: "",
+    ingredients: [],
+    instructions: [],
+    difficulty: 2,
+    prepTime: 1,
+    cookTime: 1,
+    createdAt: new Date(),
+    updatedAt: null,
+    category: "",
+    locales: {
+      es: {
+        title: getInitialTitle() || "",
+        description: "",
+        ingredients: [],
+        instructions: [],
+      },
+      en: {
+        title: getInitialTitle() || "",
+        description: "",
+        ingredients: [],
+        instructions: [],
+      },
+      gl: {
+        title: getInitialTitle() || "",
+        description: "",
+        ingredients: [],
+        instructions: [],
+      },
+    },
+  })
+
   const categoryOptions = ref<{ id: string; title: string }[]>([
     { id: "cupcakes", title: "Cupcakes" },
     { id: "cheesecakes", title: "Cheesecakes" },
     { id: "cookies", title: "Cookies" },
   ])
+
+  const steps = ref<{ id: number; locale: "es" | "en" | "gl"; img: string }[]>([
+    { id: 1, locale: "gl", img: gl },
+    { id: 2, locale: "es", img: es },
+    { id: 3, locale: "en", img: en },
+  ])
+
+  const activeStep = ref(1)
 
   const onSubmit = (valuesForm: FormSubmitEvent<Recipe>) => {
     const { valid } = valuesForm
@@ -55,13 +87,8 @@
     navigateTo(localePath(`/edit/${event.value}`))
   }
 
-  const handleTitleBlur = (event: FocusEvent) => {
-    const input = event.target as HTMLInputElement
-    const trimmed = input.value.trim()
-    if (input.value !== trimmed) {
-      input.value = trimmed
-      input.dispatchEvent(new Event("input", { bubbles: true }))
-    }
+  function getInitialTitle() {
+    return options.value.find((option) => option.id === recipe)?.title || ""
   }
 </script>
 <template>
@@ -89,23 +116,9 @@
           />
         </template>
       </FormField>
-      <FormField
-        fieldName="category"
-        :form="$form"
-      >
-        <template #field>
-          <Select
-            filter
-            name="category"
-            :options="categoryOptions"
-            option-value="id"
-            option-label="title"
-            :placeholder="$t('recipe.edit.categorySelected')"
-          />
-        </template>
-      </FormField>
+     
       <Rating
-        v-model="$form.difficulty.value"
+        :model-value="$form.difficulty?.value"
         name="difficulty"
       >
         <template #onicon>
@@ -123,19 +136,81 @@
       </Rating>
     </div>
     <FormUpload />
-    <div class="flex gap-4 flex-wrap w-full align-center">
+    <div>
+      <Stepper
+        v-model:value="activeStep"
+        class="basis-[40rem]"
+      >
+        <StepList>
+          <Step
+            v-for="step in steps"
+            v-slot="{ activateCallback, value, a11yAttrs }"
+            :key="step.id"
+            asChild
+            :value="step.id"
+          >
+            <div
+              :class="['flex flex-row flex-auto gap-2', step.id === 3 ? 'flex-none': 'flex-auto']"
+              v-bind="a11yAttrs.root"
+            >
+              <button
+                class="bg-transparent border-0 inline-flex flex-col gap-2 cursor-pointer"
+                v-bind="a11yAttrs.header"
+                type="button"
+                @click="activateCallback"
+              >
+                <span
+                  :class="[
+                    'rounded-full border-2 w-12 h-12 inline-flex items-center justify-center',
+                    { 'border-fuchsia-700  border-primary': Number(value) === activeStep, 'border-fuchsia-300': Number(value) !== activeStep }
+                  ]"
+                >
+                  <img
+                    :src="step.img"
+                    :alt="step.locale"
+                    class="h-4 rounded"
+                  >
+                </span>
+              </button>
+              <Divider
+                v-if="step.id !== steps.length"
+                class="mr-2!"
+              />
+            </div>
+          </Step>
+        </StepList>
+        <StepPanels class="px-0!">
+          <StepPanel
+            v-for="step in steps"
+            :key="step.id"
+            :value="step.id"
+            class="bg-transparent!"
+          >
+            <RecipeEditLocale
+              v-model:form="$form.locales"
+              :locale="step.locale"
+              :formInstance="$form"
+            />
+          </StepPanel>
+        </StepPanels>
+      </Stepper>
+    </div>
+    <div class="flex gap-4 w-full align-center">
       <FormField
-        fieldName="title"
+        fieldName="category"
+        :label="$t('recipe.edit.category')"
         :form="$form"
-        class="flex-2"
-        fakeLabel
+        class="basis-1/3"
       >
         <template #field>
-          <InputText
-            name="title"
-            :placeholder="$t('recipe.edit.form.title')"
-            :maxlength="100"
-            @blur="handleTitleBlur"
+          <Select
+            filter
+            name="category"
+            :options="categoryOptions"
+            optionValue="id"
+            optionLabel="title"
+            showClear 
+            :placeholder="$t('recipe.edit.categorySelected')"
           />
         </template>
       </FormField>

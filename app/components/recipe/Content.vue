@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { navigateTo } from "#app"
-
   const { recipe } = defineProps<{
     recipe: Recipe
   }>()
@@ -19,6 +17,10 @@
       alt: "Brownie",
     },
   ])
+
+  const goToEdit = () => {
+    navigateTo(localePath(`/edit/${recipe.id}`))
+  }
 </script>
 
 <template>
@@ -126,7 +128,7 @@
       rounded
       size="large"
       :aria-label="t('recipe.edit.button')"
-      @click="navigateTo(localePath(`/edit/${recipe.id}`))"
+      @click="goToEdit"
     />
   </div>
 </template>

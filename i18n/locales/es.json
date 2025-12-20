@@ -1,7 +1,8 @@
 {
   "common": {
     "delete": "Eliminar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "empty": "No hay elementos"
   },
   "header": {
     "theme": "Cambiar tema de la página",
@@ -115,6 +116,7 @@
       "button": "Editar receta",
       "recipeSelected": "Selecciona una receta",
       "categorySelected": "Selecciona una categoría",
+      "category": "Categoría",
       "error": {
         "titleRequired": "El título es obligatorio",
         "descriptionRequired": "La descripción es obligatoria",
@@ -125,13 +127,15 @@
         "cookTimeRequired": "El tiempo de cocción es obligatorio"
       },
       "form": {
+        "confirmDelete": "¿Desea eliminar este elemento?",
         "title": "Título",
         "description": "Descripción",
         "ingredients": "Ingredientes",
         "instructions": "Instrucciones",
         "difficulty": "Dificultad",
         "prepTime": "Tiempo de preparación",
-        "cookTime": "Tiempo de cocción"
+        "cookTime": "Tiempo de cocción",
+        "order": "Orden"
       }
     },
     "prepTime": "Tiempo de preparación: {time} min",
@@ -170,6 +174,9 @@
   },
   "upload": {
     "removeImage": "Eliminar imagen",
-    "confirmDelete": "¿Desea eliminar esta imagen?"
+    "confirmDelete": "¿Desea eliminar esta imagen?",
+    "confirmDeleteAll": "¿Desea eliminar todas las imágenes?",
+    "chooseImages": "Elegir imágenes",
+    "removeAllImages": "Eliminar todas las imágenes"
   }
 }

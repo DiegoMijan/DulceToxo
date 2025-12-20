@@ -9,7 +9,7 @@
 
   const recipeSelected = ref<string | undefined>(recipeParam)
   const recipe = ref<Recipe>({
-    id: "",
+    id: recipeParam || "",
     title: "Delicioso Cheesecake Brownie",
     description:
       "Un brownie con un sabor irresistible y una textura única. Ideal para cualquier ocasión.",

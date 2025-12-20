@@ -28,10 +28,10 @@
     }
   }
 
-  const confirm2 = (event: Event, index: number) => {
+  const confirmDelete = (event: Event, index: number, fullRemove = false) => {
     confirm.require({
       target: event.currentTarget as HTMLElement,
-      message: t("upload.confirmDelete"),
+      message: fullRemove ? t("upload.confirmDeleteAll") : t("upload.confirmDelete"),
       icon: "pi pi-info-circle",
       rejectProps: {
         label: t("common.cancel"),
@@ -43,29 +43,43 @@
         severity: "danger",
       },
       accept: () => {
+        if (fullRemove) {
+          listSrcs.value = []
+          carouselKey.value++
+          return
+        }
         removeImage(index)
       },
     })
   }
 </script>
 <template>
-  <ConfirmPopup />
   <div
     class="card flex flex-col "
     :class="{ 'gap-4': listSrcs.length > 0 }"
   >
-    <FileUpload
-      mode="basic"
-      custom-upload
-      auto
-      :multiple="true"
-      severity="secondary"
-      class="p-button-outlined"
-      :max-file-size="5242880"
-      :accept="'.jpg, .jpeg, .png, .gif, .bmp, .webp'"
-      :choose-label="'Escoller imaxes'"
-      @select="onFileSelect"
-    />
+    <div class="flex gap-4">
+      <FileUpload
+        mode="basic"
+        custom-upload
+        auto
+        :multiple="true"
+        severity="secondary"
+        class="p-button-outlined"
+        :max-file-size="5242880"
+        :accept="'.jpg, .jpeg, .png, .gif, .bmp, .webp'"
+        :choose-label="t('upload.chooseImages')"
+        @select="onFileSelect"
+      />
+      <Button
+        :disabled="listSrcs.length === 0"
+        icon="pi pi-trash"
+        severity="danger"
+        :label="t('upload.removeAllImages')"
+        outlined
+        @click="confirmDelete($event, 0, true)"
+      />
+    </div>
     <Carousel
       :key="carouselKey"
       :value="listSrcs"
@@ -90,7 +104,7 @@
                 icon="pi pi-trash"
                 rounded
                 class="absolute! z-9999 bottom-2 right-2"
-                @click="confirm2($event, index)"
+                @click="confirmDelete($event, index)"
               />
               <NuxtImg
                 :src="data"

@@ -1,7 +1,8 @@
 {
   "common": {
     "delete": "Eliminar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "empty": "Non hai elementos"
   },
   "header": {
     "theme": "Cambiar tema da páxina",
@@ -115,6 +116,7 @@
       "button": "Editar receta",
       "recipeSelected": "Selecciona unha receta",
       "categorySelected": "Selecciona unha categoría",
+      "category": "Categoría",
       "error": {
         "titleRequired": "O título é obrigatorio",
         "descriptionRequired": "A descripción é obrigatoria",
@@ -125,13 +127,15 @@
         "cookTimeRequired": "O tempo de cocción é obrigatorio"
       },
       "form": {
+        "confirmDelete": "¿Desexa eliminar este elemento?",
         "title": "Título",
         "description": "Descripción",
         "ingredients": "Ingredientes",
         "instructions": "Instrucións",
         "difficulty": "Dificultade",
         "prepTime": "Tempo de preparación",
-        "cookTime": "Tempo de cocción"
+        "cookTime": "Tempo de cocción",
+        "order": "Orden"
       }
     },
     "prepTime": "Tempo de preparación: {time} min",
@@ -170,6 +174,9 @@
   },
   "upload": {
     "removeImage": "Eliminar imaxe",
-    "confirmDelete": "¿Desexa eliminar esta imaxe?"
+    "confirmDelete": "¿Desexa eliminar esta imaxe?",
+    "confirmDeleteAll": "¿Desexa eliminar todas as imaxes?",
+    "chooseImages": "Escoller imaxes",
+    "removeAllImages": "Eliminar todas as imaxes"
   }
 }
