@@ -7,7 +7,13 @@ export const recipeFormSchema = (t: (key: string) => string) =>
     difficulty: v.number(),
     prepTime: v.pipe(v.number(t("recipe.edit.error.prepTimeRequired"))),
     cookTime: v.pipe(v.number(t("recipe.edit.error.cookTimeRequired"))),
-    category: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.categoryRequired"))),
+    category: v.pipe(
+      v.any(),
+      v.check(
+        (value) => value !== null && typeof value === "string" && value.length > 0,
+        t("recipe.edit.error.categoryRequired"),
+      ),
+    ),
     locales: v.object({
       es: v.object({
         title: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.titleRequired"))),

@@ -124,7 +124,8 @@
         "instructionsRequired": "Las instrucciones son obligatorias",
         "difficultyRequired": "La dificultad es obligatoria",
         "prepTimeRequired": "El tiempo de preparación es obligatorio",
-        "cookTimeRequired": "El tiempo de cocción es obligatorio"
+        "cookTimeRequired": "El tiempo de cocción es obligatorio",
+        "categoryRequired": "La categoría es obligatoria"
       },
       "form": {
         "confirmDelete": "¿Desea eliminar este elemento?",

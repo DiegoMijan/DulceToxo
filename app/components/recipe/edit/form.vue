@@ -13,8 +13,8 @@
   }
 
   const localePath = useLocalePath()
-
   const { t } = useI18n()
+  const { formStates, resetForm } = useStateForm("form")
 
   const resolver = ref(valibotResolver(recipeFormSchema(t)))
 
@@ -44,13 +44,13 @@
     category: "",
     locales: {
       es: {
-        title: getInitialTitle() || "",
+        title: "",
         description: "",
         ingredients: [],
         instructions: [],
       },
       en: {
-        title: getInitialTitle() || "",
+        title: "",
         description: "",
         ingredients: [],
         instructions: [],
@@ -87,6 +87,16 @@
     navigateTo(localePath(`/edit/${event.value}`))
   }
 
+  const onCancel = () => {
+    resetForm()
+  }
+
+  const onBack = () => {
+    const { category, id } = initialValues.value
+    if (!category || !id) return
+    navigateTo(localePath(`/${category}/${id}`))
+  }
+
   function getInitialTitle() {
     return options.value.find((option) => option.id === recipe)?.title || ""
   }
@@ -94,9 +104,10 @@
 <template>
   <Form
     v-slot="$form"
+    ref="form"
     :resolver
     :initialValues
-    class="mt-8 space-y-6 bg-fuchsia-100 p-8 rounded-xl shadow-lg flex flex-col flex-1"
+    class="mt-6 space-y-6 bg-fuchsia-100 p-7 rounded-xl shadow-lg flex flex-col flex-1"
     @submit="onSubmit"
   >
     <div class="flex gap-4 flex-wrap">
@@ -111,7 +122,7 @@
             :options
             option-value="id"
             option-label="title"
-            :placeholder="$t('recipe.edit.recipeSelected')"
+            :placeholder="t('recipe.edit.recipeSelected')"
             @change="handleChange"
           />
         </template>
@@ -198,7 +209,7 @@
     <div class="flex gap-4 w-full align-center">
       <FormField
         fieldName="category"
-        :label="$t('recipe.edit.category')"
+        :label="t('recipe.edit.category')"
         :form="$form"
         class="basis-1/3"
       >
@@ -210,13 +221,13 @@
             optionValue="id"
             optionLabel="title"
             showClear 
-            :placeholder="$t('recipe.edit.categorySelected')"
+            :placeholder="t('recipe.edit.categorySelected')"
           />
         </template>
       </FormField>
       <FormField
         fieldName="cookTime"
-        :label="$t('recipe.edit.form.cookTime')"
+        :label="t('recipe.edit.form.cookTime')"
         :form="$form"
       >
         <template #field>
@@ -232,7 +243,7 @@
       </FormField>
       <FormField
         fieldName="prepTime"
-        :label="$t('recipe.edit.form.prepTime')"
+        :label="t('recipe.edit.form.prepTime')"
         :form="$form"
       >
         <template #field>
@@ -246,6 +257,28 @@
           />
         </template>
       </FormField>
+    </div>
+    <div class="flex justify-end gap-4">
+      <Button
+        label="Volver a la receta"
+        icon="pi pi-arrow-left"
+        type="button"
+        class="mr-auto!"
+        @click="onBack"
+      />
+      <Button
+        label="Cancelar cambios"
+        icon="pi pi-times"
+        type="button"
+        :disabled="!formStates.isDirty"
+        @click="onCancel"
+      />
+      <Button
+        label="Guardar"
+        icon="pi pi-save"
+        type="submit"
+        :disabled="!formStates.isDirty"
+      />
     </div>
   </form>
 </template>
