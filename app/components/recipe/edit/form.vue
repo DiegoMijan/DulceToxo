@@ -1,11 +1,12 @@
 <script setup lang="ts">
-  import type { FormSubmitEvent } from "@primevue/forms/form"
+  import type { FormFieldState, FormSubmitEvent } from "@primevue/forms/form"
   import { valibotResolver } from "@primevue/forms/resolvers/valibot"
   import type { SelectChangeEvent } from "primevue/select"
   import { FormField } from "#components"
   import es from "@/../public/img/es.svg"
   import gl from "@/../public/img/es-ga.svg"
   import en from "@/../public/img/gb.svg"
+  import { FormField as PrimeVueFormField } from "@primevue/forms"
 
   const route = useRoute()
   const { recipe } = route.params as {
@@ -14,11 +15,10 @@
 
   const localePath = useLocalePath()
   const { t } = useI18n()
-  const { formStates, resetForm } = useStateForm("form")
-
+  const { formStates, resetForm, form } = useStateForm("form")
   const resolver = ref(valibotResolver(recipeFormSchema(t)))
 
-  const options = ref<{ id: string; title: string }[]>([
+  const options = ref<{ id: string; title: string; noSave?: boolean }[]>([
     { id: "chocolateCupcake", title: "Cupcake de chocolate" },
     { id: "kinderBuenoCupcake", title: "Cupcake de kinder bueno" },
     { id: "tiramisuCupcake", title: "Cupcake de tiramisú" },
@@ -30,38 +30,44 @@
     { id: "chocoLotusCupcake", title: "Cupcake de choco-lotus" },
   ])
 
+  const locales = {
+    es: {
+      id: "",
+      title: "",
+      description: "",
+      ingredients: [],
+      instructions: [],
+    },
+    en: {
+      id: "",
+      title: "",
+      description: "",
+      ingredients: [],
+      instructions: [],
+    },
+    gl: {
+      id: getInitialRecipe().id || "",
+      title: getInitialRecipe().title || "",
+      description: "",
+      ingredients: [],
+      instructions: [],
+    },
+  }
+
   const { reactiveForm: initialValues } = useForm<Recipe>({
     id: recipe || "",
     title: "",
     description: "",
     ingredients: [],
     instructions: [],
+    images: [],
     difficulty: 2,
     prepTime: 1,
     cookTime: 1,
     createdAt: new Date(),
     updatedAt: null,
     category: "",
-    locales: {
-      es: {
-        title: "",
-        description: "",
-        ingredients: [],
-        instructions: [],
-      },
-      en: {
-        title: "",
-        description: "",
-        ingredients: [],
-        instructions: [],
-      },
-      gl: {
-        title: getInitialTitle() || "",
-        description: "",
-        ingredients: [],
-        instructions: [],
-      },
-    },
+    locales: structuredClone(locales),
   })
 
   const categoryOptions = ref<{ id: string; title: string }[]>([
@@ -78,6 +84,19 @@
 
   const activeStep = ref(1)
 
+  watch(formStates, () => {
+    if (formStates.value.isDirty) {
+      setOptionNoSave(true)
+    }
+  })
+
+  function setOptionNoSave(noSave: boolean) {
+    const option = options.value.find((option) => option.id === recipe)
+    if (option) {
+      option.noSave = noSave
+    }
+  }
+
   const onSubmit = (valuesForm: FormSubmitEvent<Recipe>) => {
     const { valid } = valuesForm
     if (!valid) return
@@ -88,6 +107,12 @@
   }
 
   const onCancel = () => {
+    if (form.value?.states?.images) {
+      form.value.states.images.value = []
+      initialValues.value.images = []
+    }
+    initialValues.value.locales = structuredClone(locales)
+    setOptionNoSave(false)
     resetForm()
   }
 
@@ -97,8 +122,33 @@
     navigateTo(localePath(`/${category}/${id}`))
   }
 
-  function getInitialTitle() {
-    return options.value.find((option) => option.id === recipe)?.title || ""
+  function getInitialRecipe() {
+    const { title, id } = options.value.find((option) => option.id === recipe) || {}
+    return { title, id }
+  }
+
+  const triggerImagesChange = () => {
+    if (form.value?.states?.images) {
+      form.value.states.images.dirty = true
+      form.value.states.images.pristine = false
+    }
+  }
+
+  const triggerLocalesChange = (
+    locale: "es" | "en" | "gl",
+    type: "ingredients" | "instructions",
+  ) => {
+    const localesStates = form.value?.states?.locales as
+      | Record<"es" | "en" | "gl", { ingredients?: FormFieldState; instructions?: FormFieldState }>
+      | undefined
+
+    if (!localesStates) return
+
+    const fieldState = localesStates[locale]?.[type]
+    if (!fieldState) return
+
+    fieldState.dirty = true
+    fieldState.pristine = false
   }
 </script>
 <template>
@@ -124,7 +174,34 @@
             option-label="title"
             :placeholder="t('recipe.edit.recipeSelected')"
             @change="handleChange"
-          />
+          >
+            <template #value="slotProps">
+              <div
+                v-if="slotProps.value"
+                class="flex items-center gap-2"
+              >
+                <div>{{ options.find((option) => option.id === slotProps.value)?.title }}</div>
+                <NuxtIcon
+                  v-if="options.find((option) => option.id === slotProps.value)?.noSave"
+                  name="line-md:pencil-twotone"
+                  class="text-xl text-amber-300"
+                />
+              </div>
+              <span v-else>
+                {{ slotProps.placeholder }}
+              </span>
+            </template>
+            <template #option="slotProps">
+              <div class="flex items-center gap-2">
+                <NuxtIcon
+                  v-if="slotProps.option.noSave"
+                  name="line-md:pencil-twotone"
+                  class="text-xl text-amber-300"
+                />
+                <div :class="{ 'ml-7': !slotProps.option.noSave }">{{ slotProps.option.title }}</div>
+              </div>
+            </template>
+          </Select>
         </template>
       </FormField>
      
@@ -146,11 +223,20 @@
         </template>
       </Rating>
     </div>
-    <FormUpload />
+    <PrimeVueFormField
+      name="images"
+    >
+      <template v-if="$form.images?.value">
+        <FormUpload 
+          v-model:listSrcs="$form.images.value"
+          @change="triggerImagesChange"
+        />
+      </template>
+    </PrimeVueFormField>
     <div>
       <Stepper
         v-model:value="activeStep"
-        class="basis-[40rem]"
+        class="basis-160"
       >
         <StepList>
           <Step
@@ -201,6 +287,7 @@
               v-model:form="$form.locales"
               :locale="step.locale"
               :formInstance="$form"
+              @change="triggerLocalesChange"
             />
           </StepPanel>
         </StepPanels>
@@ -260,21 +347,21 @@
     </div>
     <div class="flex justify-end gap-4">
       <Button
-        label="Volver a la receta"
+        :label="t('recipe.edit.back')"
         icon="pi pi-arrow-left"
         type="button"
         class="mr-auto!"
         @click="onBack"
       />
       <Button
-        label="Cancelar cambios"
+        :label="t('recipe.edit.cancelChanges')"
         icon="pi pi-times"
         type="button"
         :disabled="!formStates.isDirty"
         @click="onCancel"
       />
       <Button
-        label="Guardar"
+        :label="t('recipe.edit.save')"
         icon="pi pi-save"
         type="submit"
         :disabled="!formStates.isDirty"

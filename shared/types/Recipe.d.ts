@@ -10,6 +10,7 @@ export interface Recipe extends State {
   description: string
   ingredients: Ingredient[]
   instructions: Step[]
+  images?: Nullable<string[]>
   difficulty: 1 | 2 | 3 | 4 | 5
   prepTime: number
   cookTime: number
@@ -19,6 +20,7 @@ export interface Recipe extends State {
   locales?: Record<
     "es" | "en" | "gl",
     {
+      id: string
       title: string
       description: string
       ingredients: Ingredient[]
@@ -34,3 +36,35 @@ export interface Ingredient extends State {
 }
 
 export interface Step extends State, Ingredient {}
+
+export type RecipeLocaleForm = {
+  id: {
+    invalid: boolean
+    error: {
+      message: string | null
+    }
+    value: string
+  }
+  title: {
+    invalid: boolean
+    error: {
+      message: string | null
+    }
+    value: string
+  }
+  ingredients: {
+    invalid: boolean
+    error: {
+      message: string | null
+    }
+    value: Ingredient[]
+  }
+  instructions: {
+    invalid: boolean
+    error: {
+      message: string | null
+    }
+    message: string
+    value: Step[]
+  }
+}

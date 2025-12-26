@@ -114,6 +114,9 @@
   "recipe": {
     "edit": {
       "button": "Editar receta",
+      "save": "Gardar",
+      "cancelChanges": "Cancelar cambios",
+      "back": "Voltar á receta",
       "recipeSelected": "Selecciona unha receta",
       "categorySelected": "Selecciona unha categoría",
       "category": "Categoría",
@@ -125,7 +128,8 @@
         "difficultyRequired": "A dificultade é obrigatoria",
         "prepTimeRequired": "O tempo de preparación é obrigatorio",
         "cookTimeRequired": "O tempo de cocción é obrigatorio",
-        "categoryRequired": "A categoría é obrigatoria"
+        "categoryRequired": "A categoría é obrigatoria",
+        "idRequired": "ID é obrigatorio"
       },
       "form": {
         "confirmDelete": "¿Desexa eliminar este elemento?",
@@ -136,7 +140,8 @@
         "difficulty": "Dificultade",
         "prepTime": "Tempo de preparación",
         "cookTime": "Tempo de cocción",
-        "order": "Orden"
+        "order": "Orden",
+        "id": "ID (para mostrar na URL)"
       }
     },
     "prepTime": "Tempo de preparación: {time} min",

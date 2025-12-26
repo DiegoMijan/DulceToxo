@@ -1,10 +1,14 @@
 <script setup lang="ts">
   import type { FileUploadSelectEvent } from "primevue/fileupload"
 
+  const emit = defineEmits<{
+    change: []
+  }>()
+
+  const listSrcs = defineModel<string[]>("listSrcs", { required: true })
+
   const confirm = useConfirm()
   const { t } = useI18n()
-
-  const listSrcs = ref<string[]>([])
   const carouselKey = ref(0)
 
   const onFileSelect = (event: FileUploadSelectEvent) => {
@@ -18,11 +22,16 @@
         }
       }
       reader.readAsDataURL(file)
+      reader.onloadend = () => {
+        emit("change")
+      }
     })
   }
 
   const removeImage = async (index: number) => {
     listSrcs.value = listSrcs.value.filter((_, i) => i !== index)
+    emit("change")
+    carouselKey.value++
     if (listSrcs.value.length === 1) {
       carouselKey.value++
     }
@@ -100,7 +109,7 @@
           <template #image>
             <div class="relative h-full w-full">
               <Button
-                v-tooltip.top="$t('upload.removeImage')"
+                v-tooltip.top="t('upload.removeImage')"
                 icon="pi pi-trash"
                 rounded
                 class="absolute! z-9999 bottom-2 right-2"

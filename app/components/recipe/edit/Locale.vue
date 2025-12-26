@@ -18,37 +18,18 @@
     formInstance: FormInstance
   }>()
 
+  const emit = defineEmits<{
+    change: [locale: "es" | "en" | "gl", type: "ingredients" | "instructions"]
+  }>()
+
   const form = defineModel<{
-    [key: string]: {
-      title: {
-        invalid: boolean
-        error: {
-          message: string
-        }
-        value: string
-      }
-      ingredients: {
-        invalid: boolean
-        error: {
-          message: string
-        }
-        value: Ingredient[]
-      }
-      instructions: {
-        invalid: boolean
-        error: {
-          message: string
-        }
-        message: string
-        value: Step[]
-      }
-    }
+    [key: string]: RecipeLocaleForm
   }>("form", { required: true })
 
   const { t } = useI18n()
   const confirm = useConfirm()
 
-  const handleTitleBlur = (event: FocusEvent) => {
+  const handleBlur = (event: FocusEvent) => {
     const input = event.target as HTMLInputElement
     const trimmed = input.value.trim()
     if (input.value !== trimmed) {
@@ -65,9 +46,13 @@
     }))
   }
 
-  const onCellEditComplete = (event: DataTableCellEditCompleteEvent) => {
+  const onCellEditComplete = (
+    event: DataTableCellEditCompleteEvent,
+    type: "ingredients" | "instructions",
+  ) => {
     const { data, newValue, field } = event
     data[field] = newValue ? newValue.trim() : ""
+    emit("change", locale, type)
   }
 
   const addItem = (type: "ingredients" | "instructions") => {
@@ -87,6 +72,7 @@
       ;["es", "en"].forEach((local) => {
         form.value[local]?.[type]?.value.push({ ...newItem })
       })
+      emit("change", locale, type)
     }
   }
 
@@ -109,6 +95,7 @@
             }))
         }
       })
+      emit("change", locale, type)
     }
   }
 
@@ -138,24 +125,40 @@
 </script>
 <template>
   <div
-    class="flex flex-col gap-4"
+    class="flex flex-col gap-4 mt-2"
   >
-    <FormField
-      :fieldName="`locales.${locale}.title`"
-      :form="formInstance"
-      class="w-1/2"
-      fakeLabel
-    >
-      <template #field>
-        <InputText
-          :name="`locales.${locale}.title`"
-          :placeholder="t('recipe.edit.form.title')"
-          :maxlength="200"
-          :value="form?.[locale]?.title?.value"
-          @blur="handleTitleBlur"
-        />
-      </template>
-    </FormField>
+    <div class="flex gap-4">
+      <FormField
+        :fieldName="`locales.${locale}.title`"
+        :form="formInstance"
+        class="w-1/2"
+      >
+        <template #field>
+          <InputText
+            :name="`locales.${locale}.title`"
+            :placeholder="t('recipe.edit.form.title')"
+            :maxlength="200"
+            :value="form?.[locale]?.title?.value"
+            @blur="handleBlur"
+          />
+        </template>
+      </FormField>
+      <FormField
+        :fieldName="`locales.${locale}.id`"
+        :form="formInstance"
+        class="w-1/2"
+      >
+        <template #field>
+          <InputText
+            :name="`locales.${locale}.id`"
+            :placeholder="t('recipe.edit.form.id')"
+            :maxlength="200"
+            :value="form?.[locale]?.id?.value"
+            @blur="handleBlur"
+          />
+        </template>
+      </FormField>
+    </div>
     <div class="w-full">
       <div class="flex justify-between items-center mb-2">
         <h1 class="text-2xl font-bold text-french-lilac-600">{{ t('recipe.edit.form.ingredients') }}</h1>
@@ -188,7 +191,7 @@
             })
           }
         }"
-        @cell-edit-complete="onCellEditComplete"
+        @cell-edit-complete="(event: DataTableCellEditCompleteEvent) =>onCellEditComplete(event, 'ingredients')"
         @row-reorder="(event: DataTableRowReorderEvent) =>onRowReorder(event, 'ingredients')"
       >
         <Column
@@ -272,7 +275,7 @@
             })
           }
         }"
-        @cell-edit-complete="onCellEditComplete"
+        @cell-edit-complete="(event: DataTableCellEditCompleteEvent) => onCellEditComplete(event, 'instructions')"
         @row-reorder="(event: DataTableRowReorderEvent) =>onRowReorder(event, 'instructions')"
       >
         <Column
