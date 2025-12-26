@@ -129,7 +129,7 @@
         "prepTimeRequired": "O tempo de preparación é obrigatorio",
         "cookTimeRequired": "O tempo de cocción é obrigatorio",
         "categoryRequired": "A categoría é obrigatoria",
-        "idRequired": "ID é obrigatorio"
+        "idRequired": "O ID é obrigatorio"
       },
       "form": {
         "confirmDelete": "¿Desexa eliminar este elemento?",

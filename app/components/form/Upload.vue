@@ -16,15 +16,14 @@
 
     files.forEach((file) => {
       const reader = new FileReader()
-      reader.onload = async (e) => {
-        if (!listSrcs.value.includes(e.target?.result as string)) {
-          listSrcs.value.push(e.target?.result as string)
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        if (!listSrcs.value.includes(result)) {
+          listSrcs.value.push(result)
+          emit("change")
         }
       }
       reader.readAsDataURL(file)
-      reader.onloadend = () => {
-        emit("change")
-      }
     })
   }
 
