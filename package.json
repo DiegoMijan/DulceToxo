@@ -31,7 +31,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "@vueuse/core": "^14.1.0",
     "@vueuse/nuxt": "^14.1.0",
-    "better-auth": "^1.4.7",
+    "better-auth": "^1.4.10",
     "blendy": "^0.0.1",
     "eslint": "^9.39.2",
     "eslint-plugin-typed-rocks": "^1.0.8",
@@ -54,7 +54,7 @@
     ]
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.10",
+    "@biomejs/biome": "^2.3.11",
     "eslint-plugin-unused-imports": "^4.3.0",
     "sass-embedded": "^1.97.1",
     "typescript": "^5.9.3"

@@ -35,7 +35,7 @@
 <template>
   <Drawer
     v-model:visible="visible"
-    :header="$t('recipe.difficultyExplanationTitle')"
+    :header="t('recipe.difficultyExplanationTitle')"
     position="right"
     class="w-full! md:w-80! lg:w-120!"
     @show="toggleBodyOverflow"
