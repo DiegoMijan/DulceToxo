@@ -68,3 +68,17 @@ export type RecipeLocaleForm = {
     value: Step[]
   }
 }
+
+export interface LocaleContent {
+  id: string
+  name: string
+  url_name: string
+}
+
+export type LocaleKey = "es" | "gl" | "en"
+
+export interface CategoryWithLocales {
+  id: string
+  created_at: string
+  locale: Record<LocaleKey, LocaleContent>
+}

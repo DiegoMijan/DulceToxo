@@ -22,6 +22,11 @@ export default defineNuxtConfig({
       },
     ],
   },
+  nitro: {
+    routeRules: {
+      "/api/**": { proxy: `${process.env.BACKEND_URL}/**` },
+    },
+  },
   modules: [
     "@vueuse/nuxt",
     "@pinia/nuxt",
@@ -34,7 +39,11 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@nuxt/eslint",
     "@primevue/nuxt-module",
+    "pinia-plugin-persistedstate/nuxt",
   ],
+  piniaPluginPersistedstate: {
+    storage: "localStorage",
+  },
   image: {
     inject: true,
   },

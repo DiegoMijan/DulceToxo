@@ -16,6 +16,7 @@
   const localePath = useLocalePath()
   const { t } = useI18n()
   const { formStates, resetForm, form } = useStateForm("form")
+  const { categoriesByLocale } = useCategories()
   const resolver = ref(valibotResolver(recipeFormSchema(t)))
 
   const options = ref<{ id: string; title: string; noSave?: boolean }[]>([
@@ -69,12 +70,6 @@
     category: "",
     locales: structuredClone(locales),
   })
-
-  const categoryOptions = ref<{ id: string; title: string }[]>([
-    { id: "cupcakes", title: "Cupcakes" },
-    { id: "cheesecakes", title: "Cheesecakes" },
-    { id: "cookies", title: "Cookies" },
-  ])
 
   const steps = ref<{ id: number; locale: "es" | "en" | "gl"; img: string }[]>([
     { id: 1, locale: "gl", img: gl },
@@ -304,9 +299,9 @@
           <Select
             filter
             name="category"
-            :options="categoryOptions"
-            optionValue="id"
-            optionLabel="title"
+            :options="categoriesByLocale"
+            optionValue="url_name"
+            optionLabel="name"
             showClear 
             :placeholder="t('recipe.edit.categorySelected')"
           />
