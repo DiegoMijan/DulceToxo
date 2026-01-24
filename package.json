@@ -34,7 +34,7 @@
     "@vueuse/nuxt": "^14.1.0",
     "better-auth": "^1.4.17",
     "blendy": "^0.0.1",
-    "eslint": "^9.39.2",
+    "eslint": "9.38.0",
     "eslint-plugin-typed-rocks": "^1.0.8",
     "magic-regexp": "^0.10.0",
     "mdn-data": "^2.26.0",
