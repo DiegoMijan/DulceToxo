@@ -66,14 +66,14 @@
     class="card flex flex-col "
     :class="{ 'gap-4': listSrcs.length > 0 }"
   >
-    <div class="flex gap-4">
+    <div class="flex flex-wrap gap-3">
       <FileUpload
         mode="basic"
         custom-upload
         auto
         :multiple="true"
         severity="secondary"
-        class="p-button-outlined"
+        class="p-button-outlined [&_.p-button]:whitespace-nowrap"
         :max-file-size="5242880"
         :accept="'.jpg, .jpeg, .png, .gif, .bmp, .webp'"
         :choose-label="t('upload.chooseImages')"
@@ -85,6 +85,7 @@
         severity="danger"
         :label="t('upload.removeAllImages')"
         outlined
+        class="whitespace-nowrap"
         @click="confirmDelete($event, 0, true)"
       />
     </div>

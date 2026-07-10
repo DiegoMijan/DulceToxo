@@ -18,12 +18,12 @@ interface HeartConfig {
 // Referencias del DOM
 const containerRef = ref<HTMLDivElement>()
 const cupcakeSvgRef = ref<SVGSVGElement>()
-const leftEyeBaseRef = ref<SVGCircleElement>()
-const rightEyeBaseRef = ref<SVGCircleElement>()
-const leftEyelidRef = ref<SVGPathElement>()
-const rightEyelidRef = ref<SVGPathElement>()
-const leftPupilRef = ref<SVGCircleElement>()
-const rightPupilRef = ref<SVGCircleElement>()
+const leftEyeBaseRef = ref<SVGEllipseElement>()
+const rightEyeBaseRef = ref<SVGEllipseElement>()
+const leftEyelidRef = ref<SVGGElement>()
+const rightEyelidRef = ref<SVGGElement>()
+const leftPupilRef = ref<SVGEllipseElement>()
+const rightPupilRef = ref<SVGEllipseElement>()
 const leftShine1Ref = ref<SVGCircleElement>()
 const leftShine2Ref = ref<SVGCircleElement>()
 const rightShine1Ref = ref<SVGCircleElement>()
@@ -34,12 +34,12 @@ const eyesOpen = ref<boolean>(true)
 const automaticBlinking = ref<boolean>(true)
 
 // Posiciones de las pupilas y brillos
-const leftPupilPos = reactive<Position>({ x: 150, y: 180 })
-const rightPupilPos = reactive<Position>({ x: 200, y: 180 })
-const leftShine1Pos = reactive<Position>({ x: 155, y: 175 })
-const leftShine2Pos = reactive<Position>({ x: 160, y: 182 })
-const rightShine1Pos = reactive<Position>({ x: 205, y: 175 })
-const rightShine2Pos = reactive<Position>({ x: 210, y: 182 })
+const leftPupilPos = reactive<Position>({ x: 150, y: 170 })
+const rightPupilPos = reactive<Position>({ x: 200, y: 170 })
+const leftShine1Pos = reactive<Position>({ x: 146, y: 161 })
+const leftShine2Pos = reactive<Position>({ x: 153, y: 178 })
+const rightShine1Pos = reactive<Position>({ x: 196, y: 161 })
+const rightShine2Pos = reactive<Position>({ x: 203, y: 178 })
 
 // Configuración de partículas
 const sparkles: SparkleConfig[] = [
@@ -60,7 +60,7 @@ const hearts: HeartConfig[] = [
 let blinkInterval: number | null = null
 
 // Obtener las coordenadas del centro de cada ojo
-const getEyeCenter = (eyeBase: SVGCircleElement): Position => {
+const getEyeCenter = (eyeBase: SVGEllipseElement): Position => {
   if (!cupcakeSvgRef.value) return { x: 0, y: 0 }
 
   const rect = cupcakeSvgRef.value.getBoundingClientRect()
@@ -122,21 +122,21 @@ const moveEyes = (mouseX: number, mouseY: number): void => {
 
   // Actualizar posiciones reactivas
   leftPupilPos.x = 150 + leftSvgMoveX
-  leftPupilPos.y = 180 + leftSvgMoveY
+  leftPupilPos.y = 170 + leftSvgMoveY
 
   rightPupilPos.x = 200 + rightSvgMoveX
-  rightPupilPos.y = 180 + rightSvgMoveY
+  rightPupilPos.y = 170 + rightSvgMoveY
 
   // Actualizar brillo en los ojos
-  leftShine1Pos.x = 155 + leftSvgMoveX * 0.6
-  leftShine1Pos.y = 175 + leftSvgMoveY * 0.6
-  leftShine2Pos.x = 160 + leftSvgMoveX * 0.4
-  leftShine2Pos.y = 182 + leftSvgMoveY * 0.4
+  leftShine1Pos.x = 146 + leftSvgMoveX * 0.6
+  leftShine1Pos.y = 161 + leftSvgMoveY * 0.6
+  leftShine2Pos.x = 153 + leftSvgMoveX * 0.4
+  leftShine2Pos.y = 178 + leftSvgMoveY * 0.4
 
-  rightShine1Pos.x = 205 + rightSvgMoveX * 0.6
-  rightShine1Pos.y = 175 + rightSvgMoveY * 0.6
-  rightShine2Pos.x = 210 + rightSvgMoveX * 0.4
-  rightShine2Pos.y = 182 + rightSvgMoveY * 0.4
+  rightShine1Pos.x = 196 + rightSvgMoveX * 0.6
+  rightShine1Pos.y = 161 + rightSvgMoveY * 0.6
+  rightShine2Pos.x = 203 + rightSvgMoveX * 0.4
+  rightShine2Pos.y = 178 + rightSvgMoveY * 0.4
 }
 
 // Función para parpadear
@@ -296,6 +296,7 @@ defineExpose({
       ref="containerRef"
       class="container"
     >
+      <!-- Estilo rubber hose años 30 (Cuphead): contornos gruesos, colores planos crema/rojo -->
       <svg
         id="cupcake-svg"
         ref="cupcakeSvgRef"
@@ -305,430 +306,326 @@ defineExpose({
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <!-- Gradientes mejorados -->
-          <radialGradient
-            id="baseGradient"
-            cx="50%"
-            cy="20%"
-          >
-            <stop
-              offset="0%"
-              stop-color="#D2B48C"
-            />
-            <stop
-              offset="50%"
-              stop-color="#8B4513"
-            />
-            <stop
-              offset="100%"
-              stop-color="#654321"
-            />
-          </radialGradient>
-          <radialGradient
-            id="frostingGradient"
-            cx="40%"
-            cy="30%"
-          >
-            <stop
-              offset="0%"
-              stop-color="#FF91A4"
-            />
-            <stop
-              offset="50%"
-              stop-color="#FF69B4"
-            />
-            <stop
-              offset="100%"
-              stop-color="#E91E63"
-            />
-          </radialGradient>
-          <radialGradient
-            id="cherryGradient"
-            cx="30%"
-            cy="30%"
-          >
-            <stop
-              offset="0%"
-              stop-color="#FF4444"
-            />
-            <stop
-              offset="100%"
-              stop-color="#CC0000"
-            />
-          </radialGradient>
-          <linearGradient
-            id="wrapperGradient"
-            x1="0%"
-            y1="0%"
-            x2="0%"
-            y2="100%"
-          >
-            <stop
-              offset="0%"
-              stop-color="#FFF"
-            />
-            <stop
-              offset="20%"
-              stop-color="#F5F5F5"
-            />
-            <stop
-              offset="100%"
-              stop-color="#E0E0E0"
-            />
-          </linearGradient>
-          <!-- Patrón de rayas para el wrapper -->
-          <pattern
-            id="stripes"
-            patternUnits="userSpaceOnUse"
-            width="8"
-            height="8"
-            patternTransform="rotate(45)"
-          >
-            <rect
-              width="4"
-              height="8"
-              fill="#FFB6C1"
-            />
-            <rect
-              x="4"
-              width="4"
-              height="8"
-              fill="#FF69B4"
-            />
-          </pattern>
+          <clipPath id="strawClip">
+            <path d="M127.6 109.6 L103.6 33.6 L88.4 38.4 L112.4 114.4 Z" />
+          </clipPath>
         </defs>
 
-        <!-- Sombra mejorada -->
+        <!-- Sombra plana -->
         <ellipse
           cx="175"
-          cy="430"
-          rx="100"
-          ry="18"
-          fill="rgba(0,0,0,0.3)"
+          cy="424"
+          rx="102"
+          ry="14"
+          fill="#241F1C"
+          opacity="0.25"
         />
 
-        <!-- Base del cupcake (wrapper) con patrón -->
+        <!-- Pajita a rayas (marca de la casa Cuphead) -->
+        <g>
+          <path
+            d="M127.6 109.6 L103.6 33.6 L88.4 38.4 L112.4 114.4 Z"
+            fill="#F2E4C0"
+          />
+          <g clip-path="url(#strawClip)">
+            <line
+              x1="95.2"
+              y1="96.4"
+              x2="131.4"
+              y2="85.0"
+              class="cc-accent-stroke"
+              stroke-width="10"
+            />
+            <line
+              x1="89.4"
+              y1="78.2"
+              x2="125.6"
+              y2="66.8"
+              class="cc-accent-stroke"
+              stroke-width="10"
+            />
+            <line
+              x1="83.7"
+              y1="59.9"
+              x2="119.9"
+              y2="48.5"
+              class="cc-accent-stroke"
+              stroke-width="10"
+            />
+          </g>
+          <path
+            d="M127.6 109.6 L103.6 33.6 L88.4 38.4 L112.4 114.4 Z"
+            fill="none"
+            stroke="#241F1C"
+            stroke-width="6"
+            stroke-linejoin="round"
+          />
+        </g>
+
+        <!-- Base del cupcake (wrapper) con estrías crema; el color acompaña a la cabecera -->
         <path
-          d="M85 230 L265 230 L250 390 L100 390 Z"
-          fill="url(#wrapperGradient)"
-          stroke="#2C3E50"
-          stroke-width="5"
-        />
-
-        <!-- Patrón decorativo en el wrapper -->
-        <rect
-          x="95"
-          y="240"
-          width="160"
-          height="140"
-          fill="url(#stripes)"
-          opacity="0.3"
-        />
-
-        <!-- Líneas decorativas mejoradas -->
-        <line
-          x1="105"
-          y1="250"
-          x2="245"
-          y2="250"
-          stroke="#2C3E50"
-          stroke-width="3"
-          opacity="0.7"
+          d="M88 228 L262 228 L246 388 L104 388 Z"
+          class="cc-accent-fill"
+          stroke="#241F1C"
+          stroke-width="7"
+          stroke-linejoin="round"
         />
         <line
-          x1="110"
-          y1="270"
-          x2="240"
-          y2="270"
-          stroke="#2C3E50"
-          stroke-width="3"
-          opacity="0.7"
+          x1="118"
+          y1="240"
+          x2="124"
+          y2="378"
+          stroke="#F2E4C0"
+          stroke-width="7"
         />
         <line
-          x1="115"
-          y1="290"
-          x2="235"
-          y2="290"
-          stroke="#2C3E50"
-          stroke-width="3"
-          opacity="0.7"
+          x1="146"
+          y1="240"
+          x2="149"
+          y2="378"
+          stroke="#F2E4C0"
+          stroke-width="7"
         />
         <line
-          x1="120"
-          y1="310"
-          x2="230"
-          y2="310"
-          stroke="#2C3E50"
-          stroke-width="3"
-          opacity="0.7"
+          x1="175"
+          y1="240"
+          x2="175"
+          y2="378"
+          stroke="#F2E4C0"
+          stroke-width="7"
+        />
+        <line
+          x1="204"
+          y1="240"
+          x2="201"
+          y2="378"
+          stroke="#F2E4C0"
+          stroke-width="7"
+        />
+        <line
+          x1="232"
+          y1="240"
+          x2="226"
+          y2="378"
+          stroke="#F2E4C0"
+          stroke-width="7"
         />
 
-        <!-- Frosting base -->
-        <ellipse
-          cx="175"
-          cy="210"
-          rx="95"
-          ry="50"
-          fill="url(#frostingGradient)"
-          stroke="#8B008B"
-          stroke-width="5"
+        <!-- Frosting: nube crema con goterones, silueta cartoon -->
+        <path
+          d="M80 214
+             C 72 240, 96 250, 104 234
+             C 110 252, 136 254, 142 236
+             C 150 256, 178 256, 184 236
+             C 192 254, 216 252, 222 234
+             C 230 248, 252 246, 258 228
+             C 264 240, 276 232, 274 214
+             C 282 196, 272 180, 258 176
+             C 272 158, 262 136, 244 134
+             C 252 112, 234 96, 214 100
+             C 214 78, 190 68, 174 80
+             C 158 64, 132 72, 130 94
+             C 108 92, 96 110, 104 128
+             C 86 132, 78 152, 90 166
+             C 74 176, 72 200, 80 214
+             Z"
+          class="cc-frosting"
+          stroke="#241F1C"
+          stroke-width="7"
+          stroke-linejoin="round"
         />
 
-        <!-- Remolinos de frosting más detallados -->
+        <!-- Cereza con brillo y rabito -->
         <circle
-          cx="140"
-          cy="170"
-          r="30"
-          fill="url(#frostingGradient)"
-          stroke="#8B008B"
-          stroke-width="4"
-        />
-        <circle
-          cx="210"
-          cy="175"
-          r="28"
-          fill="url(#frostingGradient)"
-          stroke="#8B008B"
-          stroke-width="4"
-        />
-        <circle
-          cx="175"
-          cy="145"
-          r="35"
-          fill="url(#frostingGradient)"
-          stroke="#8B008B"
-          stroke-width="4"
-        />
-
-        <!-- Remolinos pequeños adicionales -->
-        <circle
-          cx="125"
-          cy="195"
-          r="18"
-          fill="url(#frostingGradient)"
-          stroke="#8B008B"
-          stroke-width="3"
-        />
-        <circle
-          cx="225"
-          cy="200"
+          cx="212"
+          cy="80"
           r="16"
-          fill="url(#frostingGradient)"
-          stroke="#8B008B"
-          stroke-width="3"
+          fill="#B3382C"
+          stroke="#241F1C"
+          stroke-width="6"
+        />
+        <ellipse
+          cx="206"
+          cy="74"
+          rx="4.5"
+          ry="6.5"
+          fill="#F2E4C0"
+          opacity="0.9"
+          transform="rotate(-25 206 74)"
+        />
+        <path
+          d="M212 64 Q218 48 230 42"
+          fill="none"
+          stroke="#241F1C"
+          stroke-width="5"
+          stroke-linecap="round"
+        />
+        <ellipse
+          cx="234"
+          cy="40"
+          rx="9"
+          ry="5"
+          fill="#66803F"
+          stroke="#241F1C"
+          stroke-width="4"
+          transform="rotate(-20 234 40)"
         />
 
-        <!-- Cara mejorada -->
-        <!-- Ojos base más grandes -->
-        <circle
+        <!-- Ojos: óvalos verticales estilo rubber hose -->
+        <ellipse
           ref="leftEyeBaseRef"
           cx="150"
-          cy="180"
-          r="28"
-          fill="white"
-          stroke="#2C3E50"
-          stroke-width="5"
+          cy="170"
+          rx="23"
+          ry="30"
+          fill="#FFFDF4"
+          stroke="#241F1C"
+          stroke-width="7"
         />
-        <circle
+        <ellipse
           ref="rightEyeBaseRef"
           cx="200"
-          cy="180"
-          r="28"
-          fill="white"
-          stroke="#2C3E50"
-          stroke-width="5"
+          cy="170"
+          rx="23"
+          ry="30"
+          fill="#FFFDF4"
+          stroke="#241F1C"
+          stroke-width="7"
         />
 
-        <!-- Párpados para el parpadeo -->
-        <path
+        <!-- Párpados para el parpadeo: tapa crema + pestaña de ojo cerrado -->
+        <g
           ref="leftEyelidRef"
-          d="M122 180 A28 28 0 0 1 178 180 Z"
-          fill="url(#frostingGradient)"
-          stroke="#8B008B"
-          stroke-width="4"
-          :style="{ transformOrigin: '150px 180px', transform: 'scaleY(0)', opacity: '0' }"
-        />
-        <path
+          :style="{ transformOrigin: '150px 170px', transform: 'scaleY(0)', opacity: '0' }"
+        >
+          <ellipse
+            cx="150"
+            cy="170"
+            rx="23"
+            ry="30"
+            class="cc-frosting"
+            stroke="#241F1C"
+            stroke-width="7"
+          />
+          <path
+            d="M134 178 Q150 190 166 178"
+            fill="none"
+            stroke="#241F1C"
+            stroke-width="5"
+            stroke-linecap="round"
+          />
+        </g>
+        <g
           ref="rightEyelidRef"
-          d="M172 180 A28 28 0 0 1 228 180 Z"
-          fill="url(#frostingGradient)"
-          stroke="#8B008B"
-          stroke-width="4"
-          :style="{ transformOrigin: '200px 180px', transform: 'scaleY(0)', opacity: '0' }"
-        />
+          :style="{ transformOrigin: '200px 170px', transform: 'scaleY(0)', opacity: '0' }"
+        >
+          <ellipse
+            cx="200"
+            cy="170"
+            rx="23"
+            ry="30"
+            class="cc-frosting"
+            stroke="#241F1C"
+            stroke-width="7"
+          />
+          <path
+            d="M184 178 Q200 190 216 178"
+            fill="none"
+            stroke="#241F1C"
+            stroke-width="5"
+            stroke-linecap="round"
+          />
+        </g>
 
-        <!-- Pupilas que seguirán el ratón -->
-        <circle
+        <!-- Pupilas: óvalos negros sólidos que siguen el ratón -->
+        <ellipse
           ref="leftPupilRef"
           :cx="leftPupilPos.x"
           :cy="leftPupilPos.y"
-          r="15"
-          fill="#2C3E50"
+          rx="10"
+          ry="16"
+          fill="#241F1C"
         />
-        <circle
+        <ellipse
           ref="rightPupilRef"
           :cx="rightPupilPos.x"
           :cy="rightPupilPos.y"
-          r="15"
-          fill="#2C3E50"
+          rx="10"
+          ry="16"
+          fill="#241F1C"
         />
 
-        <!-- Brillo en los ojos más detallado -->
+        <!-- Brillos de las pupilas -->
         <circle
           ref="leftShine1Ref"
           :cx="leftShine1Pos.x"
           :cy="leftShine1Pos.y"
-          r="6"
-          fill="white"
+          r="4.5"
+          fill="#FFFDF4"
         />
         <circle
           ref="leftShine2Ref"
           :cx="leftShine2Pos.x"
           :cy="leftShine2Pos.y"
-          r="3"
-          fill="white"
-          opacity="0.7"
+          r="2.5"
+          fill="#FFFDF4"
+          opacity="0.8"
         />
         <circle
           ref="rightShine1Ref"
           :cx="rightShine1Pos.x"
           :cy="rightShine1Pos.y"
-          r="6"
-          fill="white"
+          r="4.5"
+          fill="#FFFDF4"
         />
         <circle
           ref="rightShine2Ref"
           :cx="rightShine2Pos.x"
           :cy="rightShine2Pos.y"
-          r="3"
-          fill="white"
-          opacity="0.7"
-        />
-
-        <!-- Boca sonriente mejorada -->
-        <path
-          d="M155 205 Q175 225 195 205"
-          fill="none"
-          stroke="#2C3E50"
-          stroke-width="6"
-          stroke-linecap="round"
-        />
-
-        <!-- Lengua -->
-        <ellipse
-          cx="175"
-          cy="215"
-          rx="12"
-          ry="8"
-          fill="#FF69B4"
-          stroke="#E91E63"
-          stroke-width="2"
-        />
-
-        <!-- Mejillas rosadas mejoradas -->
-        <circle
-          cx="115"
-          cy="195"
-          r="15"
-          fill="#FFB6C1"
-          opacity="0.8"
-        />
-        <circle
-          cx="235"
-          cy="195"
-          r="15"
-          fill="#FFB6C1"
+          r="2.5"
+          fill="#FFFDF4"
           opacity="0.8"
         />
 
-        <!-- Cerezas múltiples -->
-        <circle
-          cx="165"
-          cy="110"
-          r="14"
-          fill="url(#cherryGradient)"
-          stroke="#8B0000"
-          stroke-width="4"
-        />
-        <circle
-          cx="185"
-          cy="115"
-          r="12"
-          fill="url(#cherryGradient)"
-          stroke="#8B0000"
-          stroke-width="3"
-        />
-
-        <!-- Tallos de las cerezas -->
+        <!-- Sonrisa con remates curvos en los extremos -->
         <path
-          d="M165 96 Q160 80 155 75"
+          d="M152 212 Q175 230 198 212"
           fill="none"
-          stroke="#228B22"
-          stroke-width="4"
+          stroke="#241F1C"
+          stroke-width="7"
           stroke-linecap="round"
         />
         <path
-          d="M185 103 Q188 88 190 82"
+          d="M152 212 Q145 209 143 202"
           fill="none"
-          stroke="#228B22"
-          stroke-width="3"
+          stroke="#241F1C"
+          stroke-width="5"
+          stroke-linecap="round"
+        />
+        <path
+          d="M198 212 Q205 209 207 202"
+          fill="none"
+          stroke="#241F1C"
+          stroke-width="5"
           stroke-linecap="round"
         />
 
-        <!-- Hojas -->
+        <!-- Mejillas -->
         <ellipse
-          cx="157"
-          cy="78"
-          rx="8"
-          ry="12"
-          fill="#32CD32"
-          stroke="#228B22"
-          stroke-width="2"
-          transform="rotate(-30 157 78)"
+          cx="116"
+          cy="192"
+          rx="11"
+          ry="7"
+          fill="#DE9E7F"
+          opacity="0.6"
         />
         <ellipse
-          cx="192"
-          cy="85"
-          rx="6"
-          ry="10"
-          fill="#32CD32"
-          stroke="#228B22"
-          stroke-width="2"
-          transform="rotate(20 192 85)"
-        />
-
-        <!-- Sprinkles decorativos -->
-        <rect
-          x="130"
-          y="160"
-          width="3"
-          height="12"
-          fill="#FFD700"
-          transform="rotate(20 130 160)"
-        />
-        <rect
-          x="220"
-          y="165"
-          width="3"
-          height="10"
-          fill="#00CED1"
-          transform="rotate(-30 220 165)"
-        />
-        <rect
-          x="160"
-          y="125"
-          width="3"
-          height="8"
-          fill="#FF4500"
-          transform="rotate(45 160 125)"
-        />
-        <rect
-          x="190"
-          y="130"
-          width="3"
-          height="10"
-          fill="#9370DB"
-          transform="rotate(-15 190 130)"
+          cx="234"
+          cy="192"
+          rx="11"
+          ry="7"
+          fill="#DE9E7F"
+          opacity="0.6"
         />
       </svg>
 
@@ -758,7 +655,6 @@ defineExpose({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /*background: linear-gradient(135deg, #4a90e2 0%, #7b68ee 50%, #ff6b9d 100%);*/
   font-family: 'Arial Black', sans-serif;
   overflow: hidden;
 }
@@ -770,8 +666,29 @@ defineExpose({
 }
 
 #cupcake-svg {
+  /* Modo claro: frosting de chocolate; acento = color de la cabecera */
+  --cc-frosting: #7b4b2a;
+  --cc-accent: var(--color-french-lilac-700);
   filter: drop-shadow(12px 12px 20px rgba(0, 0, 0, 0.4));
   animation: bounce 3s ease-in-out infinite;
+}
+
+/* Modo oscuro: frosting crema; acento = color de la cabecera en oscuro */
+.dark #cupcake-svg {
+  --cc-frosting: #f2e4c0;
+  --cc-accent: var(--color-french-lilac-950);
+}
+
+.cc-frosting {
+  fill: var(--cc-frosting);
+}
+
+.cc-accent-fill {
+  fill: var(--cc-accent);
+}
+
+.cc-accent-stroke {
+  stroke: var(--cc-accent);
 }
 
 @keyframes bounce {
@@ -822,10 +739,6 @@ defineExpose({
   50% {
     opacity: 1;
     transform: translateY(-20px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-80px) scale(0.5);
   }
 }
 </style>

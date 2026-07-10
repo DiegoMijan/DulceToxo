@@ -125,13 +125,14 @@
 </script>
 <template>
   <div
-    class="flex flex-col gap-4 mt-2"
+    class="flex flex-col gap-6 mt-2"
   >
-    <div class="flex gap-4">
+    <div class="flex flex-wrap gap-4">
       <FormField
         :fieldName="`locales.${locale}.title`"
+        :label="t('recipe.edit.form.title')"
         :form="formInstance"
-        class="w-1/2"
+        class="grow basis-64"
       >
         <template #field>
           <InputText
@@ -139,14 +140,16 @@
             :placeholder="t('recipe.edit.form.title')"
             :maxlength="200"
             :value="form?.[locale]?.title?.value"
+            class="w-full"
             @blur="handleBlur"
           />
         </template>
       </FormField>
       <FormField
         :fieldName="`locales.${locale}.id`"
+        :label="t('recipe.edit.form.id')"
         :form="formInstance"
-        class="w-1/2"
+        class="grow basis-64"
       >
         <template #field>
           <InputText
@@ -154,6 +157,7 @@
             :placeholder="t('recipe.edit.form.id')"
             :maxlength="200"
             :value="form?.[locale]?.id?.value"
+            class="w-full"
             @blur="handleBlur"
           />
         </template>
@@ -161,11 +165,12 @@
     </div>
     <div class="w-full">
       <div class="flex justify-between items-center mb-2">
-        <h1 class="text-2xl font-bold text-french-lilac-600">{{ t('recipe.edit.form.ingredients') }}</h1>
+        <h1 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300">{{ t('recipe.edit.form.ingredients') }}</h1>
         <Button
           v-if="locale === 'gl'"
           icon="pi pi-plus"
           size="small"
+          rounded
           @click="addItem('ingredients')"
         />
       </div>
@@ -237,7 +242,7 @@
           </template>
         </Column>
         <template #empty>
-          <div class="flex justify-center items-center h-full">
+          <div class="flex justify-center items-center h-full py-6 text-gray-400 dark:text-gray-500">
             {{ t('common.empty') }}
           </div>
         </template>
@@ -245,11 +250,12 @@
     </div>
     <div class="w-full">
       <div class="flex justify-between items-center mb-2">
-        <h1 class="text-2xl font-bold text-french-lilac-600">{{ t('recipe.edit.form.instructions') }}</h1>
+        <h1 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300">{{ t('recipe.edit.form.instructions') }}</h1>
         <Button
           v-if="locale === 'gl'"
           icon="pi pi-plus"
           size="small"
+          rounded
           @click="addItem('instructions')"
         />
       </div>
@@ -321,7 +327,7 @@
           </template>
         </Column>
         <template #empty>
-          <div class="flex justify-center items-center h-full">
+          <div class="flex justify-center items-center h-full py-6 text-gray-400 dark:text-gray-500">
             {{ t('common.empty') }}
           </div>
         </template>

@@ -1,9 +1,29 @@
 <script setup lang="ts">
-const colorMode = useColorMode()
+  declare global {
+    interface Document {
+      startViewTransition?: (callback: () => void | Promise<void>) => { finished: Promise<void> }
+    }
+  }
 
-const toggleDarkMode = () => {
-  colorMode.preference = colorMode.preference === "dark" ? "light" : "dark"
-}
+  const colorMode = useColorMode()
+
+  const switchTheme = () => {
+    colorMode.preference = colorMode.preference === "dark" ? "light" : "dark"
+  }
+
+  const toggleDarkMode = () => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+    if (!document.startViewTransition || prefersReducedMotion) {
+      switchTheme()
+      return
+    }
+
+    document.startViewTransition(async () => {
+      switchTheme()
+      await nextTick()
+    })
+  }
 </script>
 
 <template>

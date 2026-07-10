@@ -21,6 +21,18 @@
   const goToEdit = () => {
     navigateTo(localePath(`/edit/${recipe.id}`))
   }
+
+  const { downloadRecipePdf } = useRecipePdf()
+
+  const downloadPdf = () => {
+    downloadRecipePdf(recipe, {
+      prepTime: t("recipe.prepTime", { time: recipe.prepTime }),
+      cookTime: t("recipe.cookTime", { time: recipe.cookTime }),
+      difficulty: t("recipe.difficulty"),
+      ingredients: t("recipe.edit.form.ingredients"),
+      instructions: t("recipe.edit.form.instructions"),
+    })
+  }
 </script>
 
 <template>
@@ -65,6 +77,15 @@
           </Rating>
         </span>
       </p>
+      <Button
+        icon="pi pi-file-pdf"
+        severity="secondary"
+        outlined
+        size="small"
+        class="self-center!"
+        :label="t('recipe.downloadPdf')"
+        @click="downloadPdf"
+      />
       <Carousel
         :value="images"
         :num-visible="1"

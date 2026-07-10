@@ -147,6 +147,7 @@
     "prepTime": "Tiempo de preparación: {time} min",
     "cookTime": "Tiempo de cocción: {time} min",
     "difficulty": "Dificultad: ",
+    "downloadPdf": "Descargar PDF",
     "sortBy": "Ordenar por",
     "difficultyTooltip": "Hacer click para ver la explicación de cada nivel de dificultad",
     "difficultyExplanationTitle": "Explicación de la dificultad",
@@ -179,6 +180,7 @@
     }
   },
   "upload": {
+    "title": "Imágenes",
     "removeImage": "Eliminar imagen",
     "confirmDelete": "¿Desea eliminar esta imagen?",
     "confirmDeleteAll": "¿Desea eliminar todas las imágenes?",

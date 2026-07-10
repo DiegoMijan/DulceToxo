@@ -4,12 +4,10 @@
   })
 </script>
 <template>
-  <NuxtLayout
-    name="sidebar"
-  >
-    <template #content>
+  <div class="w-full flex-1 flex justify-center px-4 py-10 md:px-8">
+    <div class="w-full max-w-5xl">
       <ConfirmPopup />
       <RecipeEditForm />
-    </template>
-  </NuxtLayout>
+    </div>
+  </div>
 </template>
