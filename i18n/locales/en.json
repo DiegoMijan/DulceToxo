@@ -68,7 +68,9 @@
     },
     "register": {
       "title": "Sign Up",
-      "name": "Name",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "dateOfBirth": "Date of birth",
       "email": "Email",
       "password": "Password",
       "confirmPassword": "Confirm Password",
@@ -78,7 +80,10 @@
       "error": {
         "emailRequired": "Email is required",
         "passwordRequired": "Password is required",
-        "nameRequired": "Name is required",
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "dateOfBirthRequired": "Date of birth is required",
+        "dateOfBirthInvalid": "Enter a valid date of birth",
         "confirmPasswordRequired": "Confirm password is required",
         "passwordsDontMatch": "Passwords don't match",
         "weakPassword": "Password must be at least 8 characters long",

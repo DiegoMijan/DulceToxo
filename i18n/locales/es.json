@@ -68,7 +68,9 @@
     },
     "register": {
       "title": "Registrarse",
-      "name": "Nombre",
+      "firstName": "Nombre",
+      "lastName": "Apellidos",
+      "dateOfBirth": "Fecha de nacimiento",
       "email": "Correo Electrónico",
       "password": "Contraseña",
       "confirmPassword": "Confirmar Contraseña",
@@ -78,7 +80,10 @@
       "error": {
         "emailRequired": "El correo electrónico es obligatorio",
         "passwordRequired": "La contraseña es obligatoria",
-        "nameRequired": "El nombre es obligatorio",
+        "firstNameRequired": "El nombre es obligatorio",
+        "lastNameRequired": "Los apellidos son obligatorios",
+        "dateOfBirthRequired": "La fecha de nacimiento es obligatoria",
+        "dateOfBirthInvalid": "Introduce una fecha de nacimiento válida",
         "confirmPasswordRequired": "La confirmación de la contraseña es obligatoria",
         "passwordsDontMatch": "Las contraseñas no coinciden",
         "weakPassword": "La contraseña debe tener al menos 8 caracteres",

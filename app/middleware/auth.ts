@@ -1,12 +1,15 @@
 import { useAuth } from "~/composables/useAuth"
 
-export default defineNuxtRouteMiddleware((to) => {
-  const { isLoggedIn } = useAuth()
+export default defineNuxtRouteMiddleware(async (to) => {
+  const { ensureSessionLoaded } = useAuth()
+  const localePath = useLocalePath()
+
+  const isLoggedIn = await ensureSessionLoaded()
 
   // Redirect to login if not authenticated
-  if (!isLoggedIn.value) {
+  if (!isLoggedIn) {
     return navigateTo({
-      path: "/auth/login",
+      path: localePath("/auth/login"),
       query: {
         redirect: to.fullPath,
       },

@@ -11,6 +11,7 @@
   const { signIn } = useAuth()
   const router = useRouter()
   const route = useRoute()
+  const localePath = useLocalePath()
   const { reactiveForm: form } = useForm<{ email: string; password: string }>({
     email: "",
     password: "",
@@ -51,7 +52,7 @@
       await signIn(values.email, values.password)
 
       const redirectTo = (route.query.redirect as string) || "/dashboard"
-      await router.push(redirectTo)
+      await router.push(localePath(redirectTo))
     } catch (err: unknown) {
       if (err instanceof Error) {
         error.value = err.message

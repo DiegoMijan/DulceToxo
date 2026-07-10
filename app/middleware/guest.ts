@@ -1,13 +1,11 @@
-export default defineNuxtRouteMiddleware(() => {
-  const { isLoggedIn, isLoading } = useAuth()
+export default defineNuxtRouteMiddleware(async () => {
+  const { ensureSessionLoaded } = useAuth()
+  const localePath = useLocalePath()
 
-  // Wait for session to load
-  if (isLoading.value) {
-    return
-  }
+  const isLoggedIn = await ensureSessionLoaded()
 
   // Redirect to dashboard if already authenticated
-  if (isLoggedIn.value) {
-    return navigateTo("/dashboard")
+  if (isLoggedIn) {
+    return navigateTo(localePath("/dashboard"))
   }
 })

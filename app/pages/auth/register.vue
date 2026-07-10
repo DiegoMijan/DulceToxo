@@ -9,14 +9,21 @@
   })
 
   const { t } = useI18n()
+  const { signUp } = useAuth()
+  const router = useRouter()
+  const localePath = useLocalePath()
   const formRef = useTemplateRef<InstanceType<typeof Form>>("formRef")
   const { reactiveForm: form } = useForm<{
-    name: string
+    firstName: string
+    lastName: string
+    dateOfBirth: string
     email: string
     password: string
     confirmPassword: string
   }>({
-    name: "",
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -33,13 +40,31 @@
   }
 
   const onSubmit = async (event: FormSubmitEvent) => {
-    const { valid } = event as FormSubmitEvent<{
-      name: string
+    const { valid, values } = event as FormSubmitEvent<{
+      firstName: string
+      lastName: string
+      dateOfBirth: Date
       email: string
       password: string
       confirmPassword: string
     }>
     if (!valid) return
+
+    try {
+      isLoading.value = true
+      error.value = ""
+      // toISOString() convierte a UTC y desplaza la fecha un día cuando la zona
+      // horaria local va por delante de UTC (p.ej. España); usamos los componentes
+      // locales del Date tal cual los eligió el calendario.
+      const birthDate = values.dateOfBirth
+      const dateOfBirth = `${birthDate.getFullYear()}-${String(birthDate.getMonth() + 1).padStart(2, "0")}-${String(birthDate.getDate()).padStart(2, "0")}`
+      await signUp(values.email, values.password, values.firstName, values.lastName, dateOfBirth)
+      await router.push(localePath("/dashboard"))
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : t("auth.errors.invalidCredentials")
+    } finally {
+      isLoading.value = false
+    }
   }
 </script>
 
@@ -51,7 +76,7 @@
           {{ $t('auth.register.title') }}
         </h2>
       </div>
-      
+
       <Form
         v-slot="$form"
         ref="formRef"
@@ -67,15 +92,46 @@
           {{ error }}
         </div>
         <div class="space-y-4">
+          <div class="flex gap-4">
+            <FormField
+              fieldName="firstName"
+              :form="$form"
+              class="w-1/2"
+            >
+              <template #field>
+                <InputText
+                  name="firstName"
+                  type="text"
+                  :placeholder="$t('auth.register.firstName')"
+                />
+              </template>
+            </FormField>
+            <FormField
+              fieldName="lastName"
+              :form="$form"
+              class="w-1/2"
+            >
+              <template #field>
+                <InputText
+                  name="lastName"
+                  type="text"
+                  :placeholder="$t('auth.register.lastName')"
+                />
+              </template>
+            </FormField>
+          </div>
           <FormField
-            fieldName="name"
+            fieldName="dateOfBirth"
             :form="$form"
           >
             <template #field>
-              <InputText
-                name="name"
-                type="text"
-                :placeholder="$t('auth.register.name')"
+              <Calendar
+                name="dateOfBirth"
+                date-format="dd/mm/yy"
+                show-icon
+                icon-display="input"
+                :placeholder="$t('auth.register.dateOfBirth')"
+                class="w-full"
               />
             </template>
           </FormField>
@@ -130,8 +186,8 @@
         <div class="text-center space-y-2">
           <p class="text-sm text-gray-600 dark:text-gray-400">
             {{ $t('auth.register.hasAccount') }}
-            <NuxtLink 
-              to="/auth/login" 
+            <NuxtLink
+              to="/auth/login"
               class="font-medium text-french-lilac-600 hover:text-french-lilac-500 dark:text-french-lilac-400"
             >
               {{ $t('auth.register.signInLink') }}
