@@ -1,12 +1,7 @@
 import { useAuth } from "~/composables/useAuth"
 
 export default defineNuxtRouteMiddleware((to) => {
-  const { isLoggedIn, isLoading } = useAuth()
-
-  // Wait for session to load
-  //if (isLoading.value) {
-  //  return
-  //}
+  const { isLoggedIn } = useAuth()
 
   // Redirect to login if not authenticated
   if (!isLoggedIn.value) {
