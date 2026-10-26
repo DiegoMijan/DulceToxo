@@ -22,6 +22,12 @@ export const useCategories = defineStore(
       categories.value = data.value || []
     }
 
+    const refreshCategories = async () => {
+      categories.value = []
+      const { data } = await useFetch<CategoryWithLocales[]>("/api/categories")
+      categories.value = data.value || []
+    }
+
     const getCategoryIdByUrlName = (url_name: string): Nullable<string> => {
       return (
         categories.value.find((category) => category.locale[locale.value].url_name === url_name)
@@ -40,6 +46,7 @@ export const useCategories = defineStore(
       categories,
       categoriesByLocale,
       getCategories,
+      refreshCategories,
       getCategoryIdByUrlName,
       getCategoryUrlNameById,
     }
