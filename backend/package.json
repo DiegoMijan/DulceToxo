@@ -1,0 +1,25 @@
+{
+  "name": "dulce-toxo-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "db:migrate": "bun run src/db/migrate.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "@libsql/client": "^0.18.0",
+    "better-auth": "^1.7.13",
+    "cloudinary": "^2.11.0",
+    "drizzle-orm": "^0.45.4",
+    "hono": "^4.13.14",
+    "kysely": "^0.29.7",
+    "kysely-libsql": "^0.7.1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2"
+  }
+}
