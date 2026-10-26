@@ -2,7 +2,7 @@
   const { getCategories } = useCategories()
 
   onMounted(async () => {
-    await getCategories()
+    await getCategories(true)
   })
 </script>
 

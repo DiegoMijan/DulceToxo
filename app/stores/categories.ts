@@ -15,17 +15,10 @@ export const useCategories = defineStore(
       })
     })
 
-    const getCategories = async () => {
-      if (categories.value.length > 0) return
-      const { data } = await useFetch<CategoryWithLocales[]>("/api/categories")
-
-      categories.value = data.value || []
-    }
-
-    const refreshCategories = async () => {
-      categories.value = []
-      const { data } = await useFetch<CategoryWithLocales[]>("/api/categories")
-      categories.value = data.value || []
+    const getCategories = async (force = false) => {
+      if (!force && categories.value.length > 0) return
+      const data = await $fetch<CategoryWithLocales[]>("/api/categories")
+      categories.value = data || []
     }
 
     const getCategoryIdByUrlName = (url_name: string): Nullable<string> => {
@@ -46,7 +39,6 @@ export const useCategories = defineStore(
       categories,
       categoriesByLocale,
       getCategories,
-      refreshCategories,
       getCategoryIdByUrlName,
       getCategoryUrlNameById,
     }
