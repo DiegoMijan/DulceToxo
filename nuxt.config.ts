@@ -1,4 +1,4 @@
-import Aura from "@primeuix/themes/aura"
+import Aura from "@primeuix/themes/aura-compat"
 import tailwindcss from "@tailwindcss/vite"
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -78,6 +78,12 @@ export default defineNuxtConfig({
   5."Roboto" - Como fuente de respaldo y para elementos de interfaz
   */
   fonts: {
+    // @nuxt/fonts v1: mantener el comportamiento de v0.x
+    // (no romper el build si un proveedor falla y resolver solo peso 400 por defecto)
+    throwOnError: false,
+    defaults: {
+      weights: [400],
+    },
     families: [
       {
         name: "Playfair Display",
@@ -144,6 +150,13 @@ export default defineNuxtConfig({
   icon: {
     componentName: "NuxtIcon",
   },
+  runtimeConfig: {
+    public: {
+      // Clave de la Community License de PrimeUI (PrimeVue 5).
+      // Se define en .env como NUXT_PUBLIC_PRIMEUI_LICENSE
+      PRIMEUI_LICENSE: "",
+    },
+  },
   primevue: {
     options: {
       ripple: true,
@@ -153,6 +166,8 @@ export default defineNuxtConfig({
           semantic: {
             ...Aura.semantic,
             primary: {
+              // En v5 primary incluye color, contrastColor, hoverColor...: hay que conservarlos
+              ...Aura.semantic.primary,
               50: "{fuchsia.50}",
               100: "{fuchsia.100}",
               200: "{fuchsia.200}",

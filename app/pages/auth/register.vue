@@ -125,7 +125,7 @@
             :form="$form"
           >
             <template #field>
-              <Calendar
+              <DatePicker
                 name="dateOfBirth"
                 date-format="dd/mm/yy"
                 show-icon
