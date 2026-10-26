@@ -1,6 +1,7 @@
 <script setup lang="ts">
   definePageMeta({
-    key: "recipe-edit", // Clave fija = componente persiste siempre
+    middleware: "admin",
+    key: "recipe-edit",
   })
 </script>
 <template>
