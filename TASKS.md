@@ -11,7 +11,8 @@ Depende de los endpoints de recetas del backend (ver TASKS.md del backend).
 - [ ] `pages/[category]/[[recipe]].vue`: cargar listado real y receta seleccionada; eliminar el mock.
 - [ ] `RecipeList.vue`: listado desde la API en vez del array fijo.
 - [ ] `recipe/edit/form.vue`: quitar el array fijo de opciones, cargar la receta existente, implementar `onSubmit` (crear/editar) con feedback (toast) y errores.
-- [ ] `form/Upload.vue`: subir imagenes al endpoint de uploads.
+- [ ] Configurar el proveedor `cloudinary` de @nuxt/image con `baseURL: https://res.cloudinary.com/dulcetoxo/image/upload/` y pintar las imagenes de recetas con `<NuxtImg provider="cloudinary" :src="public_id">` (formato y tamanio por modificadores).
+- [ ] `form/Upload.vue`: subir imagenes a `POST /api/uploads` del backend y guardar el `public_id` devuelto.
 - [ ] Estados de carga, vacio y error en listado y detalle.
 
 ## PrimeVue 5: sustituir APIs obsoletas (funcionan hasta v6)
