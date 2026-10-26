@@ -1,5 +1,6 @@
 import { Hono } from "hono"
 import { v2 as cloudinary } from "cloudinary"
+import { requireAdmin } from "../middleware/auth"
 
 const app = new Hono()
 
@@ -10,8 +11,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-// POST /uploads - Upload image to Cloudinary (TODO: add admin guard)
-app.post("/", async (c) => {
+// POST /uploads - Upload image to Cloudinary (admin only)
+app.post("/", requireAdmin, async (c) => {
   try {
     const formData = await c.req.formData()
     const file = formData.get("file") as File | null
@@ -42,8 +43,8 @@ app.post("/", async (c) => {
   }
 })
 
-// DELETE /uploads/:publicId - Delete image from Cloudinary (TODO: add admin guard)
-app.delete("/:publicId", async (c) => {
+// DELETE /uploads/:publicId - Delete image from Cloudinary (admin only)
+app.delete("/:publicId", requireAdmin, async (c) => {
   try {
     const publicId = c.req.param("publicId")
     

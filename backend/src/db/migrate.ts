@@ -1,8 +1,10 @@
 import { getDb } from "./client"
 import * as migration001 from "./migrations/001_initial_schema"
+import * as migration002 from "./migrations/002_add_user_type"
 
 const migrations = [
   { name: "001_initial_schema", ...migration001 },
+  { name: "002_add_user_type", ...migration002 },
 ]
 
 async function createMigrationsTable(db: ReturnType<typeof getDb>) {

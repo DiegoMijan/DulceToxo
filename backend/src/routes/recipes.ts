@@ -1,5 +1,6 @@
 import { Hono } from "hono"
 import { getDb } from "../db/client"
+import { requireAdmin } from "../middleware/auth"
 
 const app = new Hono()
 
@@ -128,8 +129,8 @@ app.get("/:id", async (c) => {
   return c.json(recipe)
 })
 
-// POST /recipes - Create recipe (TODO: add admin guard)
-app.post("/", async (c) => {
+// POST /recipes - Create recipe (admin only)
+app.post("/", requireAdmin, async (c) => {
   const db = getDb()
   const body = await c.req.json()
   
@@ -175,8 +176,8 @@ app.post("/", async (c) => {
   return c.json({ id, message: "Recipe created successfully" }, 201)
 })
 
-// PUT /recipes/:id - Update recipe (TODO: add admin guard)
-app.put("/:id", async (c) => {
+// PUT /recipes/:id - Update recipe (admin only)
+app.put("/:id", requireAdmin, async (c) => {
   const db = getDb()
   const id = c.req.param("id")
   const body = await c.req.json()
@@ -240,8 +241,8 @@ app.put("/:id", async (c) => {
   return c.json({ message: "Recipe updated successfully" })
 })
 
-// DELETE /recipes/:id - Delete recipe (TODO: add admin guard)
-app.delete("/:id", async (c) => {
+// DELETE /recipes/:id - Delete recipe (admin only)
+app.delete("/:id", requireAdmin, async (c) => {
   const db = getDb()
   const id = c.req.param("id")
   

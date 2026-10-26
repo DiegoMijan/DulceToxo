@@ -38,6 +38,11 @@ export const auth = betterAuth({
         type: "string",
         required: false,
       },
+      type: {
+        type: "number",
+        required: false,
+        defaultValue: 0,
+      },
     },
   },
   trustedOrigins: [
