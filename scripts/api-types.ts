@@ -1,5 +1,6 @@
 import fs from "node:fs/promises"
 import path from "node:path"
+import { spawnSync } from "node:child_process"
 import openapiTS, { astToString } from "openapi-typescript"
 
 const BACKEND_URL = process.env.BACKEND_URL
@@ -21,6 +22,16 @@ async function main() {
 
     await fs.mkdir(path.dirname(OUTPUT_PATH), { recursive: true })
     await fs.writeFile(OUTPUT_PATH, contents, "utf-8")
+
+    // Formatear con Biome para que regenerar no ensucie el diff
+    const format = spawnSync("bunx", ["biome", "format", "--write", OUTPUT_PATH], {
+      stdio: "inherit",
+      shell: process.platform === "win32",
+    })
+    if (format.status !== 0) {
+      console.error("Biome no pudo formatear el fichero generado")
+      process.exit(1)
+    }
 
     console.log(`Types generated successfully at ${OUTPUT_PATH}`)
   } catch (error) {
