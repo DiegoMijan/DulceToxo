@@ -363,29 +363,32 @@
 
     <div class="flex flex-wrap justify-end gap-3 px-6 md:px-8 py-5 bg-french-lilac-50 dark:bg-gray-900/40 border-t border-french-lilac-100 dark:border-gray-700">
       <Button
-        :label="t('recipe.edit.back')"
-        icon="pi pi-arrow-left"
         type="button"
         severity="secondary"
         text
         class="mr-auto!"
         @click="onBack"
-      />
+      >
+        <i class="pi pi-arrow-left mr-2" />
+        {{ t('recipe.edit.back') }}
+      </Button>
       <Button
-        :label="t('recipe.edit.cancelChanges')"
-        icon="pi pi-times"
         type="button"
         severity="danger"
         outlined
         :disabled="!formStates.isDirty"
         @click="onCancel"
-      />
+      >
+        <i class="pi pi-times mr-2" />
+        {{ t('recipe.edit.cancelChanges') }}
+      </Button>
       <Button
-        :label="t('recipe.edit.save')"
-        icon="pi pi-save"
         type="submit"
         :disabled="!formStates.isDirty"
-      />
+      >
+        <i class="pi pi-save mr-2" />
+        {{ t('recipe.edit.save') }}
+      </Button>
     </div>
   </form>
 </template>
