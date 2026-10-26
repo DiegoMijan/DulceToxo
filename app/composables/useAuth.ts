@@ -7,6 +7,9 @@ export const useAuth = () => {
 
   const user = computed(() => session.value.data?.user ?? null)
   const isLoggedIn = computed(() => !!session.value.data?.user)
+  const isAdmin = computed(
+    () => (session.value.data?.user as { type?: number } | undefined)?.type === 1,
+  )
   const isLoading = computed(() => session.value.isPending)
   const error = ref<string | null>(null)
 
@@ -62,6 +65,18 @@ export const useAuth = () => {
     return !!data?.user
   }
 
+  const ensureAdminSession = async (): Promise<{
+    isLoggedIn: boolean
+    isAdmin: boolean
+  }> => {
+    const { data } = await authClient.getSession()
+    if (!data?.user) {
+      return { isLoggedIn: false, isAdmin: false }
+    }
+    const userType = (data.user as { type?: number }).type
+    return { isLoggedIn: true, isAdmin: userType === 1 }
+  }
+
   const updatePassword = async (currentPassword: string, newPassword: string) => {
     error.value = null
     const { data, error: changeError } = await authClient.changePassword({
@@ -78,6 +93,7 @@ export const useAuth = () => {
   return {
     user,
     isLoggedIn,
+    isAdmin,
     isLoading,
     error,
     signIn,
@@ -85,5 +101,6 @@ export const useAuth = () => {
     signOut,
     updatePassword,
     ensureSessionLoaded,
+    ensureAdminSession,
   }
 }
