@@ -5,6 +5,7 @@
 
   const { t } = useI18n()
   const localePath = useLocalePath()
+  const { isAdmin } = useAuth()
 
   const difficultyDrawerVisible = ref(false)
   const images = ref<{ src: string; alt: string }[]>([
@@ -141,6 +142,7 @@
     />
   </div>
   <div
+    v-if="isAdmin"
     v-tooltip.top="t('recipe.edit.button')"
     class="absolute bottom-10 right-10"
   >

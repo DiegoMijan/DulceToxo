@@ -8,6 +8,7 @@ export const useAuth = () => {
   const user = computed(() => session.value.data?.user ?? null)
   const isLoggedIn = computed(() => !!session.value.data?.user)
   const isLoading = computed(() => session.value.isPending)
+  const isAdmin = computed(() => (user.value as { type?: number } | null)?.type === 1)
   const error = ref<string | null>(null)
 
   const signIn = async (email: string, password: string) => {
@@ -79,6 +80,7 @@ export const useAuth = () => {
     user,
     isLoggedIn,
     isLoading,
+    isAdmin,
     error,
     signIn,
     signUp,
