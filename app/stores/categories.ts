@@ -17,8 +17,12 @@ export const useCategories = defineStore(
 
     const getCategories = async (force = false) => {
       if (!force && categories.value.length > 0) return
-      const data = await $fetch<CategoryWithLocales[]>("/api/categories")
-      categories.value = data || []
+      try {
+        const data = await $fetch<CategoryWithLocales[]>("/api/categories")
+        categories.value = data || []
+      } catch {
+        // Keep persisted data on fetch failure
+      }
     }
 
     const getCategoryIdByUrlName = (url_name: string): Nullable<string> => {
