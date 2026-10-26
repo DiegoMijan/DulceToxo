@@ -1,4 +1,14 @@
 {
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to your Dashboard!",
+    "welcomeMessage": "You have successfully signed in. Here you can manage your account and access exclusive content.",
+    "accountInfo": "Your account information:",
+    "name": "Name:",
+    "notSpecified": "Not specified",
+    "email": "Email:",
+    "backToHome": "Back to home"
+  },
   "common": {
     "delete": "Delete",
     "cancel": "Cancel",

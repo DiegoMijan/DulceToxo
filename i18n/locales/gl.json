@@ -1,4 +1,14 @@
 {
+  "dashboard": {
+    "title": "Panel",
+    "welcome": "Benvido ao teu Panel!",
+    "welcomeMessage": "Iniciaches sesión correctamente. Aquí podes xestionar a túa conta e acceder a contido exclusivo.",
+    "accountInfo": "Información da túa conta:",
+    "name": "Nome:",
+    "notSpecified": "Non especificado",
+    "email": "Email:",
+    "backToHome": "Volver ao inicio"
+  },
   "common": {
     "delete": "Eliminar",
     "cancel": "Cancelar",

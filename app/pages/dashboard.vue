@@ -25,7 +25,7 @@ const handleSignOut = async () => {
         <div class="flex justify-between h-16">
           <div class="flex items-center">
             <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-              Dashboard
+              {{ $t('dashboard.title') }}
             </h1>
           </div>
           
@@ -59,26 +59,26 @@ const handleSignOut = async () => {
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div class="px-4 py-5 sm:p-6">
             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-              ¡Bienvenido a tu Dashboard!
+              {{ $t('dashboard.welcome') }}
             </h3>
             <div class="mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400">
               <p>
-                Has iniciado sesión correctamente. Aquí puedes gestionar tu cuenta y acceder a contenido exclusivo.
+                {{ $t('dashboard.welcomeMessage') }}
               </p>
             </div>
             
             <div class="mt-6">
               <div class="bg-french-lilac-50 dark:bg-french-lilac-900/20 border border-french-lilac-200 dark:border-french-lilac-800 rounded-lg p-4">
                 <h4 class="text-sm font-medium text-french-lilac-800 dark:text-french-lilac-200 mb-2">
-                  Información de tu cuenta:
+                  {{ $t('dashboard.accountInfo') }}
                 </h4>
                 <dl class="space-y-1 text-sm">
                   <div class="flex">
-                    <dt class="font-medium text-french-lilac-700 dark:text-french-lilac-300 w-20">Nombre:</dt>
-                    <dd class="text-french-lilac-900 dark:text-french-lilac-100">{{ user?.name || 'No especificado' }}</dd>
+                    <dt class="font-medium text-french-lilac-700 dark:text-french-lilac-300 w-20">{{ $t('dashboard.name') }}</dt>
+                    <dd class="text-french-lilac-900 dark:text-french-lilac-100">{{ user?.name || $t('dashboard.notSpecified') }}</dd>
                   </div>
                   <div class="flex">
-                    <dt class="font-medium text-french-lilac-700 dark:text-french-lilac-300 w-20">Email:</dt>
+                    <dt class="font-medium text-french-lilac-700 dark:text-french-lilac-300 w-20">{{ $t('dashboard.email') }}</dt>
                     <dd class="text-french-lilac-900 dark:text-french-lilac-100">{{ user?.email }}</dd>
                   </div>
                 </dl>
@@ -94,7 +94,7 @@ const handleSignOut = async () => {
                   name="mdi:arrow-left"
                   class="mr-2 h-4 w-4"
                 />
-                Volver al inicio
+                {{ $t('dashboard.backToHome') }}
               </NuxtLink>
             </div>
           </div>
