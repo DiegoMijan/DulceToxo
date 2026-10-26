@@ -79,14 +79,15 @@
         </span>
       </p>
       <Button
-        icon="pi pi-file-pdf"
         severity="secondary"
         outlined
         size="small"
         class="self-center!"
-        :label="t('recipe.downloadPdf')"
         @click="downloadPdf"
-      />
+      >
+        <i class="pi pi-file-pdf mr-2" />
+        {{ t('recipe.downloadPdf') }}
+      </Button>
       <Carousel
         :value="images"
         :num-visible="1"
@@ -147,12 +148,13 @@
     class="absolute bottom-10 right-10"
   >
     <Button
-      icon="pi pi-pencil"
       rounded
       size="large"
       :aria-label="t('recipe.edit.button')"
       @click="goToEdit"
-    />
+    >
+      <i class="pi pi-pencil" />
+    </Button>
   </div>
 </template>
 

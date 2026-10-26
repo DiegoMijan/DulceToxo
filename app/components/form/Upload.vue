@@ -81,13 +81,14 @@
       />
       <Button
         :disabled="listSrcs.length === 0"
-        icon="pi pi-trash"
         severity="danger"
-        :label="t('upload.removeAllImages')"
         outlined
         class="whitespace-nowrap"
         @click="confirmDelete($event, 0, true)"
-      />
+      >
+        <i class="pi pi-trash mr-2" />
+        {{ t('upload.removeAllImages') }}
+      </Button>
     </div>
     <Carousel
       :key="carouselKey"
@@ -110,11 +111,12 @@
             <div class="relative h-full w-full">
               <Button
                 v-tooltip.top="t('upload.removeImage')"
-                icon="pi pi-trash"
                 rounded
                 class="absolute! z-9999 bottom-2 right-2"
                 @click="confirmDelete($event, index)"
-              />
+              >
+                <i class="pi pi-trash" />
+              </Button>
               <NuxtImg
                 :src="data"
                 :alt="`Image ${listSrcs.indexOf(data) + 1}`"

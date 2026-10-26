@@ -168,11 +168,12 @@
         <h1 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300">{{ t('recipe.edit.form.ingredients') }}</h1>
         <Button
           v-if="locale === 'gl'"
-          icon="pi pi-plus"
           size="small"
           rounded
           @click="addItem('ingredients')"
-        />
+        >
+          <i class="pi pi-plus" />
+        </Button>
       </div>
       <PrimeVueFormField
         :name="`locales.${locale}.ingredients`"
@@ -233,12 +234,13 @@
           <template #body="{ data }">
             <Button
               type="button"
-              icon="pi pi-trash"
               rounded
               severity="secondary"
               size="small"
               @click="confirmDelete($event, 'ingredients', data as Ingredient)"
-            />
+            >
+              <i class="pi pi-trash" />
+            </Button>
           </template>
         </Column>
         <template #empty>
@@ -253,11 +255,12 @@
         <h1 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300">{{ t('recipe.edit.form.instructions') }}</h1>
         <Button
           v-if="locale === 'gl'"
-          icon="pi pi-plus"
           size="small"
           rounded
           @click="addItem('instructions')"
-        />
+        >
+          <i class="pi pi-plus" />
+        </Button>
       </div>
       <PrimeVueFormField
         :name="`locales.${locale}.instructions`"
@@ -318,12 +321,13 @@
           <template #body="{ data }">
             <Button
               type="button"
-              icon="pi pi-trash"
               rounded
               severity="secondary"
               size="small"
               @click="confirmDelete($event, 'instructions', data as Step)"
-            />
+            >
+              <i class="pi pi-trash" />
+            </Button>
           </template>
         </Column>
         <template #empty>

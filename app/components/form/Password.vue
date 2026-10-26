@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormFieldState } from "@primevue/forms/form"
-import type Password from "primevue/password"
+import type InputPassword from "primevue/inputpassword"
 
 const {
   name = "password",
@@ -20,7 +20,7 @@ const {
   }
 }>()
 
-const passwordField = useTemplateRef<InstanceType<typeof Password>>("passwordField")
+const passwordField = useTemplateRef<InstanceType<typeof InputPassword>>("passwordField")
 
 const visibility = (isOk: boolean) => {
   return !isOk ? "invisible" : ""
@@ -32,7 +32,7 @@ defineExpose({
 </script>
 
 <template>
-  <Password
+  <InputPassword
     ref="passwordField"
     :name
     :type
@@ -78,5 +78,5 @@ defineExpose({
         </li>
       </ul>
     </template>
-  </Password>
+  </InputPassword>
 </template>
