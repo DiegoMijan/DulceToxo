@@ -46,6 +46,9 @@ export default defineNuxtConfig({
   },
   image: {
     inject: true,
+    cloudinary: {
+      baseURL: "https://res.cloudinary.com/dulcetoxo/image/upload/",
+    },
   },
   ssr: false,
   devtools: { enabled: true },
