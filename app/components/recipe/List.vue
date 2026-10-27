@@ -1,24 +1,37 @@
 <script setup lang="ts">
-  const recipe = defineModel<string>()
+  const { categoryId } = defineProps<{
+    categoryId: string
+  }>()
 
-  const options = ref([
-    { id: "chocolateCupcake", name: "Cupcake de chocolate" },
-    { id: "kinderBuenoCupcake", name: "Cupcake de kinder bueno" },
-    { id: "tiramisuCupcake", name: "Cupcake de tiramisú" },
-    { id: "chipsAhoyCupcake", name: "Cupcake de chips ahoy" },
-    { id: "oreoCupcake", name: "Cupcake de oreo" },
-    { id: "cheeseCupcake", name: "Chesse Cupcake" },
-    { id: "operaCupcake", name: "Cupcake opera" },
-    { id: "cheeseCreamCupcake", name: "Cupcake con crema de queso" },
-    { id: "chocoLotusCupcake", name: "Cupcake de choco-lotus" },
-  ])
+  const recipe = defineModel<string>()
+  const { t } = useI18n()
+
+  const recipesStore = useRecipes()
+  const options = computed(() => recipesStore.getRecipesListByLocale(categoryId))
+  const loading = computed(() => recipesStore.loadingList)
 </script>
 <template>
+  <div
+    v-if="loading"
+    class="flex justify-center items-center py-8"
+  >
+    <ProgressSpinner
+      style="width: 40px; height: 40px"
+      stroke-width="4"
+    />
+  </div>
+  <div
+    v-else-if="options.length === 0"
+    class="text-center text-surface-500 py-4"
+  >
+    {{ t('common.empty') }}
+  </div>
   <ListBox
+    v-else
     v-model="recipe"
     :options="options"
-    option-label="name"
-    option-value="id"
+    option-label="title"
+    option-value="slug"
     class="flex-1"
     list-style="max-height: 100% !important;"
   />
