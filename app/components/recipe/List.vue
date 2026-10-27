@@ -15,9 +15,7 @@
   const loading = computed(() => recipesStore.loadingList)
   const listRoot = useTemplateRef<HTMLElement>("listRoot")
   const listScrollHeight = shallowRef("")
-  const nativeScrollIntoView = HTMLElement.prototype.scrollIntoView
   let pendingAlignSelected = true
-  let allowOptionScrollIntoView = false
   let preservedScrollTop = 0
 
   const options = computed(() => {
@@ -39,10 +37,7 @@
   const guardOptionScrollIntoView = (option: HTMLElement) => {
     if (option.dataset.scrollGuard === "true") return
     option.dataset.scrollGuard = "true"
-    option.scrollIntoView = ((arg?: boolean | ScrollIntoViewOptions) => {
-      if (!allowOptionScrollIntoView) return
-      nativeScrollIntoView.call(option, arg as boolean | ScrollIntoViewOptions)
-    }) as HTMLElement["scrollIntoView"]
+    option.scrollIntoView = (() => {}) as HTMLElement["scrollIntoView"]
   }
 
   const measureListViewport = () => {
