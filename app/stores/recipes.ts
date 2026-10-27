@@ -14,6 +14,11 @@ export type UpsertRecipeRatingRequest = components["schemas"]["UpsertRecipeRatin
 export const useRecipes = defineStore("recipes", () => {
   const { locale } = useI18n()
 
+  // Cache keys are categoryId / recipeId only — they do not include locale.
+  // GET /categories/:id/recipes and GET /recipes/:id return gl+es+en fields together;
+  // views pick the active language with locale.value. If the backend ever returns a
+  // single locale, key these maps per locale or lists/details will stay in the old
+  // language after a locale change.
   const recipesByCategory = ref<Map<string, RecipeListItem[]>>(new Map())
   const recipesCache = ref<Map<string, RecipeDetail>>(new Map())
   const loadingList = ref(false)

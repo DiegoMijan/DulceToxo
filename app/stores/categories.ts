@@ -3,6 +3,10 @@ export const useCategories = defineStore(
   () => {
     const { locale } = useI18n()
 
+    // Cache is the full category list, not keyed by locale: GET /categories returns
+    // gl+es+en on each item and views pick the field with locale.value. If the backend
+    // ever returns a single locale, key this cache per locale or names/url_name will
+    // stay in the old language after a locale change.
     const categories = ref<CategoryWithLocales[]>([])
 
     const categoriesByLocale = computed(() => {
