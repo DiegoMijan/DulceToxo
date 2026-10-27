@@ -1,5 +1,12 @@
 import { expect, test, type Page } from "@playwright/test"
-import { ADMIN_EMAIL, E2E_PASSWORD, USER_EMAIL, deleteE2eUsers, prepareE2eUsers } from "./localDb"
+import {
+  ADMIN_EMAIL,
+  E2E_PASSWORD,
+  FRONTEND_ORIGIN,
+  USER_EMAIL,
+  deleteE2eUsers,
+  prepareE2eUsers,
+} from "./localDb"
 
 const ARTIFACTS_DIR = "/opt/cursor/artifacts"
 
@@ -39,14 +46,14 @@ const LOCALES = [
   },
 ] as const
 
-let dbPath: string
+let dbPath: string | undefined
 
 test.beforeAll(async () => {
   dbPath = await prepareE2eUsers()
 })
 
 test.afterAll(() => {
-  deleteE2eUsers(dbPath)
+  if (dbPath) deleteE2eUsers(dbPath)
 })
 
 const setLocaleCookie = async (page: Page, locale: string) => {
@@ -54,7 +61,7 @@ const setLocaleCookie = async (page: Page, locale: string) => {
     {
       name: "i18n_redirected",
       value: locale,
-      url: "http://localhost:3000",
+      url: FRONTEND_ORIGIN,
     },
   ])
 }

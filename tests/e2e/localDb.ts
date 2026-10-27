@@ -7,7 +7,9 @@ export const USER_EMAIL = `user${E2E_EMAIL_SUFFIX}`
 export const ADMIN_EMAIL = `admin${E2E_EMAIL_SUFFIX}`
 export const E2E_PASSWORD = "RecipesAuth1a"
 const backendPort = process.env.BACKEND_PORT ?? "4000"
+const frontendPort = process.env.FRONTEND_PORT ?? "3000"
 export const BACKEND_URL = process.env.BACKEND_URL ?? `http://localhost:${backendPort}`
+export const FRONTEND_ORIGIN = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${frontendPort}`
 
 const tursoUrlFromPart = (part: string): string | null => {
   if (!part.startsWith("TURSO_URL=")) return null
@@ -90,7 +92,10 @@ export const promoteAdmin = (dbPath: string, email: string) => {
 export const signUp = async (email: string, name: string) => {
   const response = await fetch(`${BACKEND_URL}/auth/sign-up/email`, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      origin: FRONTEND_ORIGIN,
+    },
     body: JSON.stringify({
       email,
       password: E2E_PASSWORD,
