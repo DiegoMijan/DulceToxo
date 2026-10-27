@@ -8,6 +8,8 @@ export type RecipeStepContent = components["schemas"]["RecipeStepContent"]
 export type RecipeImageContent = components["schemas"]["RecipeImageContent"]
 export type RecipeDetail = components["schemas"]["RecipeDetail"]
 export type DeleteRecipeResponse = components["schemas"]["DeleteRecipeResponse"]
+export type RecipeRatingStats = components["schemas"]["RecipeRatingStats"]
+export type UpsertRecipeRatingRequest = components["schemas"]["UpsertRecipeRatingRequest"]
 
 export const useRecipes = defineStore("recipes", () => {
   const { locale } = useI18n()
@@ -83,6 +85,55 @@ export const useRecipes = defineStore("recipes", () => {
     return null
   }
 
+  const applyRatingStats = (recipeId: string, stats: RecipeRatingStats) => {
+    const detail = recipesCache.value.get(recipeId)
+    if (detail) {
+      detail.rating_avg = stats.rating_avg
+      detail.rating_count = stats.rating_count
+      detail.my_rating = stats.my_rating
+    }
+
+    const nextByCategory = new Map(recipesByCategory.value)
+    let listChanged = false
+    for (const [categoryId, list] of nextByCategory) {
+      const index = list.findIndex((recipe) => recipe.id === recipeId)
+      if (index === -1) continue
+      const nextList = [...list]
+      nextList[index] = {
+        ...nextList[index],
+        rating_avg: stats.rating_avg,
+        rating_count: stats.rating_count,
+      }
+      nextByCategory.set(categoryId, nextList)
+      listChanged = true
+    }
+    if (listChanged) {
+      recipesByCategory.value = nextByCategory
+    }
+  }
+
+  const upsertRating = async (recipeId: string, value: number) => {
+    const body: UpsertRecipeRatingRequest = { value }
+    const stats = await $fetch<RecipeRatingStats>(`/api/recipes/${recipeId}/rating`, {
+      method: "PUT",
+      body,
+    })
+    applyRatingStats(recipeId, stats)
+    return stats
+  }
+
+  const deleteRating = async (recipeId: string) => {
+    const stats = await $fetch<RecipeRatingStats>(`/api/recipes/${recipeId}/rating`, {
+      method: "DELETE",
+    })
+    applyRatingStats(recipeId, stats)
+    return stats
+  }
+
+  const clearDetailsCache = () => {
+    recipesCache.value = new Map()
+  }
+
   const removeRecipeFromCache = (recipeId: string, categoryId: string) => {
     recipesCache.value.delete(recipeId)
     const list = recipesByCategory.value.get(categoryId)
@@ -118,6 +169,10 @@ export const useRecipes = defineStore("recipes", () => {
     findRecipeIdBySlug,
     getRecipeSlugById,
     deleteRecipe,
+    upsertRating,
+    deleteRating,
+    applyRatingStats,
+    clearDetailsCache,
     clearCache,
   }
 })

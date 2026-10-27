@@ -7,6 +7,7 @@
 
   const categoriesStore = useCategories()
   const recipesStore = useRecipes()
+  const { user } = useAuth()
 
   const categoryUrlName = computed(() => String(route.params.category ?? ""))
   const recipeSlugParam = computed(() => {
@@ -33,13 +34,13 @@
       return
     }
 
-    await recipesStore.getRecipesByCategory(catId)
+    await recipesStore.getRecipesByCategory(catId, true)
 
     const recipeSlug = recipeSlugParam.value
     if (recipeSlug) {
       const recipeId = recipesStore.findRecipeIdBySlug(catId, recipeSlug)
       if (recipeId) {
-        recipeDetail.value = await recipesStore.getRecipeDetail(recipeId)
+        recipeDetail.value = await recipesStore.getRecipeDetail(recipeId, true)
       } else {
         recipeNotFound.value = true
       }
@@ -105,6 +106,16 @@
   watch(locale, () => {
     navigateToLocalizedCategory()
   })
+
+  watch(
+    () => user.value?.id,
+    async (nextUserId, previousUserId) => {
+      if (nextUserId === previousUserId) return
+      recipesStore.clearDetailsCache()
+      if (!recipeDetail.value) return
+      recipeDetail.value = await recipesStore.getRecipeDetail(recipeDetail.value.id, true)
+    },
+  )
 </script>
 
 <template>

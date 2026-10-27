@@ -209,9 +209,20 @@
       "updatedAt": "Update date",
       "difficulty": "Difficulty",
       "totalTime": "Total time",
+      "ratingAvg": "Best rated",
       "ascending": "ascending",
       "descending": "descending",
       "toggleDirection": "Change sort direction ({direction})"
+    },
+    "rating": {
+      "none": "No ratings",
+      "loginToRate": "Sign in to rate",
+      "yours": "Your rating",
+      "remove": "Remove rating",
+      "saveError": "Could not save the rating",
+      "averageAria": "Average rating: {avg} out of 5, {count} votes",
+      "yoursAria": "Your rating: {value} out of 5",
+      "yoursEmptyAria": "Your rating: you have not voted yet"
     },
     "difficultyTooltip": "Click to see the explanation of each difficulty level",
     "difficultyExplanationTitle": "Difficulty explanation",

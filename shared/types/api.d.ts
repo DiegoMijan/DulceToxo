@@ -82,7 +82,7 @@ export interface paths {
     }
     /**
      * List recipes by category
-     * @description Returns a lightweight list of recipes for a category with id, difficulty, times, timestamps, and slug and title per locale
+     * @description Returns a lightweight list of recipes for a category with id, difficulty, times, timestamps, rating stats, and slug and title per locale. rating_avg and rating_count are computed with a LEFT JOIN aggregate in the same query.
      */
     get: {
       parameters: {
@@ -175,7 +175,7 @@ export interface paths {
     }
     /**
      * Get recipe detail
-     * @description Returns full recipe with locales, ingredients, steps and images
+     * @description Returns full recipe with locales, ingredients, steps, images and rating stats. my_rating is the authenticated user vote when a session is present; otherwise null. Works without a session.
      */
     get: {
       parameters: {
@@ -340,6 +340,132 @@ export interface paths {
         }
         /** @description Admin access required */
         403: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Recipe not found */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/recipes/{id}/rating": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Create or update the current user rating for a recipe
+     * @description Upserts the authenticated user vote (1-5) for the recipe. Returns the updated average, vote count and the user rating.
+     */
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description Recipe ID */
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["UpsertRecipeRatingRequest"]
+        }
+      }
+      responses: {
+        /** @description Updated recipe rating stats */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["RecipeRatingStats"]
+          }
+        }
+        /** @description Recipe ID is required, or validation error. On validation failure, body `data` is the Valibot issues array from safeParse. */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Recipe not found */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+      }
+    }
+    post?: never
+    /**
+     * Remove the current user rating for a recipe
+     * @description Deletes the authenticated user vote for the recipe if it exists. Missing votes are a no-op. Returns the updated average, vote count and my_rating null.
+     */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description Recipe ID */
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Updated recipe rating stats after removing the vote */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["RecipeRatingStats"]
+          }
+        }
+        /** @description Recipe ID is required */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
           headers: {
             [name: string]: unknown
           }
@@ -881,6 +1007,9 @@ export interface components {
       created_at: number
       /** @description Unix timestamp in ms */
       updated_at: number
+      /** @description Average rounded to one decimal. Null when there are no votes. */
+      rating_avg: number | null
+      rating_count: number
       /** @description Title and slug keyed by locale. A key is omitted when that translation is missing in the database. */
       locale: {
         es?: components["schemas"]["RecipeListLocale"]
@@ -929,6 +1058,11 @@ export interface components {
       created_at: number
       /** @description Unix timestamp in ms */
       updated_at: number
+      /** @description Average rounded to one decimal. Null when there are no votes. */
+      rating_avg: number | null
+      rating_count: number
+      /** @description Current user vote when a session is present; otherwise null. */
+      my_rating: number | null
       /** @description Locale content keyed by language. A key is omitted when that translation is missing in the database. */
       locales: {
         es?: components["schemas"]["RecipeLocaleContent"]
@@ -973,6 +1107,16 @@ export interface components {
       /** @enum {boolean} */
       updated: true
       cloudinary: components["schemas"]["CloudinaryResult"]
+    }
+    UpsertRecipeRatingRequest: {
+      value: number
+    }
+    RecipeRatingStats: {
+      /** @description Average rounded to one decimal. Null when there are no votes. */
+      rating_avg: number | null
+      rating_count: number
+      /** @description Current user vote, or null when the user has not voted. */
+      my_rating: number | null
     }
     RecipeLocaleInput: {
       /** @enum {string} */

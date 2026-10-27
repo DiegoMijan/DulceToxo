@@ -51,8 +51,12 @@
       isLoading.value = true
       await signIn(values.email, values.password)
 
-      const redirectTo = (route.query.redirect as string) || "/dashboard"
-      await router.push(localePath(redirectTo))
+      const redirectTo = getSafeRedirectPath(route.query.redirect)
+      if (redirectTo) {
+        await navigateTo(redirectTo)
+      } else {
+        await router.push(localePath("/dashboard"))
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         error.value = err.message
