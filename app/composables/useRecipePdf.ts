@@ -15,6 +15,17 @@ const BRAND = {
 const PAGE = { width: 210, height: 297, margin: 16, footerReserve: 14 }
 const CONTENT_WIDTH = PAGE.width - PAGE.margin * 2
 const DESCRIPTION_LINE_HEIGHT = 5.2
+const PT_TO_MM = 25.4 / 72
+const HEADER = {
+  brandY: 11,
+  brandSize: 9,
+  titleY: 24,
+  titleSize: 24,
+  minHeight: 34,
+  titleBottomPadding: 7,
+  accentHeight: 1.4,
+  contentGap: 10,
+}
 // About half an A4 page under the title, without overflowing the body.
 const MAX_IMAGE_HEIGHT_MM = 128
 const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g
@@ -55,25 +66,41 @@ const ensureSpace = (doc: jsPDF, cursor: ColumnCursor, needed: number) => {
   getOrAddPage(doc, cursor.page)
 }
 
+const titleLineHeightMm = (doc: jsPDF, fontSizePt: number): number =>
+  fontSizePt * doc.getLineHeightFactor() * PT_TO_MM
+
+const wrapHeaderTitle = (doc: jsPDF, title: string): string[] => {
+  doc.setFont("times", "bold")
+  doc.setFontSize(HEADER.titleSize)
+  const lines = doc.splitTextToSize(title.trim() || " ", CONTENT_WIDTH)
+  return Array.isArray(lines) && lines.length > 0 ? lines : [""]
+}
+
+const headerHeightForTitleLines = (doc: jsPDF, lineCount: number): number => {
+  const extraLines = Math.max(lineCount - 1, 0)
+  const lastBaseline = HEADER.titleY + extraLines * titleLineHeightMm(doc, HEADER.titleSize)
+  return Math.max(HEADER.minHeight, lastBaseline + HEADER.titleBottomPadding)
+}
+
 const drawHeader = (doc: jsPDF, title: string) => {
-  const headerHeight = 34
+  const titleLines = wrapHeaderTitle(doc, title)
+  const headerHeight = headerHeightForTitleLines(doc, titleLines.length)
 
   doc.setFillColor(...BRAND.header)
   doc.rect(0, 0, PAGE.width, headerHeight, "F")
   doc.setFillColor(...BRAND.accent)
-  doc.rect(0, headerHeight, PAGE.width, 1.4, "F")
+  doc.rect(0, headerHeight, PAGE.width, HEADER.accentHeight, "F")
 
   doc.setTextColor(255, 255, 255)
   doc.setFont("helvetica", "bold")
-  doc.setFontSize(9)
-  doc.text("DULCE TOXO", PAGE.margin, 11)
+  doc.setFontSize(HEADER.brandSize)
+  doc.text("DULCE TOXO", PAGE.margin, HEADER.brandY)
 
   doc.setFont("times", "bold")
-  doc.setFontSize(24)
-  const titleLines = doc.splitTextToSize(title, PAGE.width - PAGE.margin * 2)
-  doc.text(titleLines, PAGE.margin, 24)
+  doc.setFontSize(HEADER.titleSize)
+  doc.text(titleLines, PAGE.margin, HEADER.titleY)
 
-  return headerHeight + 10
+  return headerHeight + HEADER.accentHeight + HEADER.contentGap
 }
 
 const drawMetaRow = (
