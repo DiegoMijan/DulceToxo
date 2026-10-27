@@ -60,11 +60,12 @@
   }>("uploadRef")
 
   const resolver = ref(valibotResolver(recipeFormSchema(t)))
-  const loading = ref(false)
+  const cachedRecipeDetail = recipeParam ? recipesStore.recipesCache.get(recipeParam) : undefined
+  const loading = ref(Boolean(recipeParam) && !cachedRecipeDetail)
   const loadingRecipes = ref(false)
   const saving = ref(false)
   const selectedRecipeId = ref<string>(recipeParam || NEW_RECIPE_ID)
-  const currentRecipe = ref<RecipeDetail | null>(null)
+  const currentRecipe = ref<RecipeDetail | null>(cachedRecipeDetail ?? null)
   const slugErrors = ref<Record<LocaleKey, string | null>>({ es: null, en: null, gl: null })
   const formKey = ref(0)
 
@@ -76,6 +77,26 @@
 
   const allRecipes = ref<RecipeListItem[]>([])
 
+  const listItemFromDetail = (detail: RecipeDetail): RecipeListItem => ({
+    id: detail.id,
+    difficulty: detail.difficulty,
+    prep_time: detail.prep_time,
+    cook_time: detail.cook_time,
+    created_at: detail.created_at,
+    updated_at: detail.updated_at,
+    locale: {
+      ...(detail.locales.es
+        ? { es: { slug: detail.locales.es.slug, title: detail.locales.es.title } }
+        : {}),
+      ...(detail.locales.en
+        ? { en: { slug: detail.locales.en.slug, title: detail.locales.en.title } }
+        : {}),
+      ...(detail.locales.gl
+        ? { gl: { slug: detail.locales.gl.slug, title: detail.locales.gl.title } }
+        : {}),
+    },
+  })
+
   const recipeOptions = computed<RecipeOption[]>(() => {
     const newOption: RecipeOption = {
       id: NEW_RECIPE_ID,
@@ -83,7 +104,15 @@
       isNew: true,
     }
 
-    const existingRecipes = allRecipes.value.map((r) => ({
+    const recipesById = new Map<string, RecipeListItem>()
+    for (const recipe of allRecipes.value) {
+      recipesById.set(recipe.id, recipe)
+    }
+    if (currentRecipe.value && !recipesById.has(currentRecipe.value.id)) {
+      recipesById.set(currentRecipe.value.id, listItemFromDetail(currentRecipe.value))
+    }
+
+    const existingRecipes = [...recipesById.values()].map((r) => ({
       id: r.id,
       title: r.locale[locale.value as LocaleKey]?.title || r.locale.gl?.title || r.id,
       isDirty: selectedRecipeId.value === r.id && formStates.value.isDirty,
@@ -134,7 +163,43 @@
     },
   })
 
-  const { reactiveForm: initialValues } = useForm<RecipeFormValues>(createInitialValues())
+  const mapLocaleFormData = (data: RecipeDetail, localeKey: LocaleKey): LocaleData => ({
+    slug: data.locales[localeKey]?.slug || "",
+    title: data.locales[localeKey]?.title || "",
+    description: data.locales[localeKey]?.description || "",
+    ingredients:
+      data.ingredients[localeKey]?.map((item) => ({
+        id: item.id,
+        order: item.order,
+        description: item.description,
+      })) || [],
+    instructions:
+      data.steps[localeKey]?.map((item) => ({
+        id: item.id,
+        order: item.order,
+        description: item.description,
+      })) || [],
+  })
+
+  const mapDetailToFormValues = (data: RecipeDetail): RecipeFormValues => ({
+    id: data.id,
+    category:
+      categories.value.find((c) => c.id === data.category_id)?.locale[locale.value as LocaleKey]
+        ?.url_name || "",
+    difficulty: data.difficulty as RecipeFormValues["difficulty"],
+    prepTime: data.prep_time,
+    cookTime: data.cook_time,
+    images: data.images.map((img) => img.public_id),
+    locales: {
+      es: mapLocaleFormData(data, "es"),
+      en: mapLocaleFormData(data, "en"),
+      gl: mapLocaleFormData(data, "gl"),
+    },
+  })
+
+  const { reactiveForm: initialValues } = useForm<RecipeFormValues>(
+    cachedRecipeDetail ? mapDetailToFormValues(cachedRecipeDetail) : createInitialValues(),
+  )
 
   const steps = ref<{ id: number; locale: LocaleKey; img: string }[]>([
     { id: 1, locale: "gl", img: gl },
@@ -144,105 +209,71 @@
 
   const activeStep = ref(1)
 
-  const loadAllRecipes = async () => {
+  const collectRecipesFromStore = (): RecipeListItem[] => {
+    const categoryList = Array.isArray(categories.value) ? categories.value : []
+    return categoryList.flatMap(
+      (category) => recipesStore.recipesByCategory.get(category.id) || [],
+    )
+  }
+
+  const loadAllRecipes = async (force = false) => {
     loadingRecipes.value = true
     try {
       await getCategories()
-      const allRecipesList: RecipeListItem[] = []
-
-      const categoryList = Array.isArray(categories.value) ? categories.value : []
-      for (const category of categoryList) {
-        const recipes = await recipesStore.getRecipesByCategory(category.id, true)
-        allRecipesList.push(...recipes)
+      if (!force) {
+        allRecipes.value = collectRecipesFromStore()
       }
 
-      allRecipes.value = allRecipesList
+      const categoryList = Array.isArray(categories.value) ? categories.value : []
+      const lists = await Promise.all(
+        categoryList.map((category) => recipesStore.getRecipesByCategory(category.id, force)),
+      )
+      allRecipes.value = lists.flat()
     } finally {
       loadingRecipes.value = false
     }
   }
 
-  const loadRecipeDetail = async (recipeId: string) => {
+  const applyLoadedRecipe = (data: RecipeDetail) => {
+    currentRecipe.value = data
+    applyFormValues(mapDetailToFormValues(data))
+    loading.value = false
+  }
+
+  const loadRecipeDetail = async (recipeId: string, options: { force?: boolean } = {}) => {
+    const force = options.force ?? false
+
     if (recipeId === NEW_RECIPE_ID) {
       currentRecipe.value = null
+      loading.value = false
       applyFormValues(createInitialValues())
       return
     }
 
-    loading.value = true
     slugErrors.value = { es: null, en: null, gl: null }
+    await getCategories()
+
+    if (!force) {
+      const cached =
+        recipesStore.recipesCache.get(recipeId) ??
+        (currentRecipe.value?.id === recipeId ? currentRecipe.value : undefined)
+      if (cached) {
+        if (currentRecipe.value?.id === recipeId && !loading.value) {
+          return
+        }
+        applyLoadedRecipe(cached)
+        return
+      }
+    }
+
+    loading.value = true
 
     try {
-      const data = await $fetch<RecipeDetail>(`/api/recipes/${recipeId}`)
-      currentRecipe.value = data
-
-      const categoryUrlName =
-        categories.value.find((c) => c.id === data.category_id)?.locale[locale.value as LocaleKey]
-          ?.url_name || ""
-
-      const newValues: RecipeFormValues = {
-        id: data.id,
-        category: categoryUrlName,
-        difficulty: data.difficulty as RecipeFormValues["difficulty"],
-        prepTime: data.prep_time,
-        cookTime: data.cook_time,
-        images: data.images.map((img) => img.public_id),
-        locales: {
-          es: {
-            slug: data.locales.es?.slug || "",
-            title: data.locales.es?.title || "",
-            description: data.locales.es?.description || "",
-            ingredients:
-              data.ingredients.es?.map((i) => ({
-                id: i.id,
-                order: i.order,
-                description: i.description,
-              })) || [],
-            instructions:
-              data.steps.es?.map((s) => ({
-                id: s.id,
-                order: s.order,
-                description: s.description,
-              })) || [],
-          },
-          en: {
-            slug: data.locales.en?.slug || "",
-            title: data.locales.en?.title || "",
-            description: data.locales.en?.description || "",
-            ingredients:
-              data.ingredients.en?.map((i) => ({
-                id: i.id,
-                order: i.order,
-                description: i.description,
-              })) || [],
-            instructions:
-              data.steps.en?.map((s) => ({
-                id: s.id,
-                order: s.order,
-                description: s.description,
-              })) || [],
-          },
-          gl: {
-            slug: data.locales.gl?.slug || "",
-            title: data.locales.gl?.title || "",
-            description: data.locales.gl?.description || "",
-            ingredients:
-              data.ingredients.gl?.map((i) => ({
-                id: i.id,
-                order: i.order,
-                description: i.description,
-              })) || [],
-            instructions:
-              data.steps.gl?.map((s) => ({
-                id: s.id,
-                order: s.order,
-                description: s.description,
-              })) || [],
-          },
-        },
+      const data = await recipesStore.getRecipeDetail(recipeId, force)
+      if (!data) {
+        throw new Error("Failed to load recipe")
       }
-
-      applyFormValues(newValues)
+      applyLoadedRecipe(data)
     } catch (error) {
       toast.add({
         severity: "error",
@@ -250,7 +281,6 @@
         life: 5000,
       })
       console.error("Failed to load recipe:", error)
-    } finally {
       loading.value = false
     }
   }
@@ -351,10 +381,10 @@
         })
 
         uploadRef.value?.markSessionPersisted()
-        await loadAllRecipes()
+        await loadAllRecipes(true)
         selectedRecipeId.value = result.id
         await navigateTo(localePath(`/edit/${result.id}`))
-        await loadRecipeDetail(result.id)
+        await loadRecipeDetail(result.id, { force: true })
       } else {
         await $fetch<components["schemas"]["UpdateRecipeResponse"]>(
           `/api/recipes/${selectedRecipeId.value}`,
@@ -371,8 +401,8 @@
         })
 
         uploadRef.value?.markSessionPersisted()
-        await loadAllRecipes()
-        await loadRecipeDetail(selectedRecipeId.value)
+        await loadAllRecipes(true)
+        await loadRecipeDetail(selectedRecipeId.value, { force: true })
       }
     } catch (error: unknown) {
       if (getFetchStatus(error) === 409) {
@@ -418,7 +448,7 @@
     slugErrors.value = { es: null, en: null, gl: null }
     await uploadRef.value?.discardSessionUploads()
     if (currentRecipe.value) {
-      loadRecipeDetail(currentRecipe.value.id)
+      applyLoadedRecipe(currentRecipe.value)
     } else {
       applyFormValues(createInitialValues())
     }
@@ -457,14 +487,16 @@
     fieldState.pristine = false
   }
 
-  onMounted(async () => {
-    await loadAllRecipes()
+  onMounted(() => {
+    void loadAllRecipes()
+
     if (recipeParam) {
       selectedRecipeId.value = recipeParam
-      await loadRecipeDetail(recipeParam)
+      void loadRecipeDetail(recipeParam)
       return
     }
 
+    loading.value = false
     if (preselectedCategoryQuery.value) {
       applyFormValues(createInitialValues())
     }
@@ -478,7 +510,7 @@
     :resolver
     :initialValues
     class="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col flex-1 overflow-hidden"
-    :aria-busy="saving"
+    :aria-busy="saving || loading || loadingRecipes"
     @submit="onSubmit"
   >
     <fieldset
@@ -581,15 +613,7 @@
         </div>
       </div>
 
-      <div
-        v-if="loading"
-        class="flex justify-center items-center py-16"
-      >
-        <ProgressSpinner
-          style="width: 50px; height: 50px"
-          stroke-width="4"
-        />
-      </div>
+      <RecipeEditFormSkeleton v-if="loading" />
 
       <div
         v-else
