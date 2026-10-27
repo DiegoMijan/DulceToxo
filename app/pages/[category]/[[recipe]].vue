@@ -120,7 +120,7 @@
     await initializeData()
   })
 
-  const navigateToLocalizedCategory = () => {
+  const navigateToLocalizedCategory = async () => {
     if (!categoryId.value) return
 
     const newCategoryUrlName = categoriesStore.getCategoryUrlNameById(categoryId.value)
@@ -130,18 +130,25 @@
       const newSlug = recipesStore.getRecipeSlugById(categoryId.value, recipeDetail.value.id)
       if (newSlug) {
         selectedSlug.value = newSlug
-        navigateTo(localePath(`/${newCategoryUrlName}/${newSlug}`), { replace: true })
+        const targetPath = localePath(`/${newCategoryUrlName}/${newSlug}`)
+        if (route.path !== targetPath) {
+          await navigateTo(targetPath, { replace: true })
+        }
         return
       }
     }
 
     if (newCategoryUrlName !== categoryUrlName.value) {
-      navigateTo(localePath(`/${newCategoryUrlName}`), { replace: true })
+      const targetPath = localePath(`/${newCategoryUrlName}`)
+      if (route.path !== targetPath) {
+        await navigateTo(targetPath, { replace: true })
+      }
     }
   }
 
-  watch(locale, () => {
-    navigateToLocalizedCategory()
+  watch(locale, async () => {
+    await nextTick()
+    await navigateToLocalizedCategory()
   })
 
   watch(
