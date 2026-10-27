@@ -35,7 +35,7 @@ onMounted(() => {
     >
       <LandingProfileImage
         show-gradient
-        class="button cursor-pointer"
+        class="button cursor-pointer lg:h-[110px] lg:w-[110px]"
       />
     </button>
   </div>
