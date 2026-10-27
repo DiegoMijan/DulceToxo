@@ -102,7 +102,7 @@ const translateCards = computed(() =>
     <div class="max-w-[100ch] lg:max-w-6xl flex flex-col gap-7 lg:gap-4">
       <LazyLandingProfile @toggle-modal="isModalOpen = $event as boolean" />
       <div
-        class="grid gap-10 px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:gap-5 lg:px-0 md:[&>:last-child:nth-child(odd)]:col-span-2 md:[&>:last-child:nth-child(odd)]:w-[calc((100%-2.5rem)/2)] md:[&>:last-child:nth-child(odd)]:justify-self-center lg:[&>:last-child:nth-child(odd)]:col-span-1 lg:[&>:last-child:nth-child(odd)]:w-auto lg:[&>:last-child:nth-child(odd)]:justify-self-auto"
+        class="grid items-stretch gap-10 px-4 sm:grid-cols-1 md:grid-cols-2 md:auto-rows-[1fr] md:[&>*]:h-full lg:grid-cols-3 lg:gap-5 lg:px-0 md:[&>:last-child:nth-child(odd)]:col-span-2 md:[&>:last-child:nth-child(odd)]:w-[calc((100%-2.5rem)/2)] md:[&>:last-child:nth-child(odd)]:justify-self-center md:[&>:last-child:nth-child(odd)]:self-stretch lg:[&>:last-child:nth-child(odd)]:col-span-1 lg:[&>:last-child:nth-child(odd)]:w-auto lg:[&>:last-child:nth-child(odd)]:justify-self-auto lg:[&>:last-child:nth-child(odd)]:self-auto"
       >
         <LandingCard
           v-for="{ description, icon, title, darkIcon, isImage, key, urlName } in translateCards"

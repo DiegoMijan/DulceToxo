@@ -42,24 +42,26 @@ watchEffect(() => {
 })
 
 const categoryPath = computed(() => (urlName ? localePath(`/${urlName}`) : undefined))
+
+const cardPt = {
+  root: { class: "h-full flex flex-col" },
+  body: { class: "flex flex-1 flex-col" },
+  content: { class: "content flex-1" },
+}
 </script>
 
 <template>
   <NuxtLink
     v-if="categoryPath"
     :to="categoryPath"
-    class="block no-underline text-inherit"
+    class="block h-full no-underline text-inherit"
     :aria-label="title"
   >
     <Card
       ref="cardRef"
-      class="cursor-pointer card-container"
+      class="cursor-pointer card-container h-full"
       :style="{ transform: transformStyle }"
-      :pt="{
-        content: {
-          class: 'content',
-        },
-      }"
+      :pt="cardPt"
     >
       <template #header>
         <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
@@ -79,13 +81,9 @@ const categoryPath = computed(() => (urlName ? localePath(`/${urlName}`) : undef
   <Card
     v-else
     ref="cardRef"
-    class="card-container"
+    class="card-container h-full"
     :style="{ transform: transformStyle }"
-    :pt="{
-      content: {
-        class: 'content',
-      },
-    }"
+    :pt="cardPt"
   >
     <template #header>
       <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
@@ -105,6 +103,7 @@ const categoryPath = computed(() => (urlName ? localePath(`/${urlName}`) : undef
 
 <style scoped>
 .card-container {
+  height: 100%;
   transform-style: preserve-3d;
   will-change: transform;
   transition: transform 0.35s ease;
