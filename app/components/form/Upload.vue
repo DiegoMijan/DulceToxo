@@ -1,45 +1,88 @@
 <script setup lang="ts">
-  import type { FileUploadSelectEvent } from "primevue/fileupload"
+  import type { FileUploadUploaderEvent } from "primevue/fileupload"
+  import { RECIPE_UPLOAD_ACCEPT, RECIPE_UPLOAD_MAX_BYTES } from "~/composables/useRecipeUploads"
 
   const emit = defineEmits<{
     change: []
   }>()
 
-  const listSrcs = defineModel<string[]>("listSrcs", { required: true })
+  const publicIds = defineModel<string[]>("publicIds", { required: true })
+
+  const { persistedPublicIds = [] } = defineProps<{
+    persistedPublicIds?: string[]
+  }>()
 
   const confirm = useConfirm()
   const { t } = useI18n()
-  const carouselKey = ref(0)
+  const { uploadImage, deleteUpload } = useRecipeUploads()
+  const fileUploadRef = useTemplateRef<{ clear: () => void }>("fileUploadRef")
+  const uploading = ref(false)
+  const sessionPublicIds = ref<string[]>([])
 
-  const onFileSelect = (event: FileUploadSelectEvent) => {
-    const files = event.files as File[]
+  const carouselImages = computed(() =>
+    publicIds.value.map((publicId, index) => ({
+      key: publicId,
+      publicId,
+      alt: t("upload.imageAlt", { n: index + 1 }),
+    })),
+  )
 
-    files.forEach((file) => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        if (!listSrcs.value.includes(result)) {
-          listSrcs.value.push(result)
-          emit("change")
-        }
-      }
-      reader.readAsDataURL(file)
-    })
+  const isSessionUpload = (publicId: string) =>
+    sessionPublicIds.value.includes(publicId) && !persistedPublicIds.includes(publicId)
+
+  const markSessionPersisted = () => {
+    sessionPublicIds.value = []
   }
 
-  const removeImage = async (index: number) => {
-    listSrcs.value = listSrcs.value.filter((_, i) => i !== index)
+  const discardSessionUploads = async () => {
+    const ids = [...sessionPublicIds.value]
+    sessionPublicIds.value = []
+    await Promise.all(ids.map((id) => deleteUpload(id)))
+  }
+
+  const addUploadedImage = (publicId: string) => {
+    if (publicIds.value.includes(publicId)) return
+    publicIds.value = [...publicIds.value, publicId]
+    sessionPublicIds.value = [...sessionPublicIds.value, publicId]
     emit("change")
-    carouselKey.value++
-    if (listSrcs.value.length === 1) {
-      carouselKey.value++
+  }
+
+  const uploadSelectedFiles = async (files: File[]) => {
+    for (const file of files) {
+      const result = await uploadImage(file)
+      if (result) addUploadedImage(result.public_id)
     }
   }
 
-  const confirmDelete = (event: Event, index: number, fullRemove = false) => {
+  const handleUploader = async (event: FileUploadUploaderEvent) => {
+    const files = Array.isArray(event.files) ? event.files : [event.files]
+    uploading.value = true
+
+    try {
+      await uploadSelectedFiles(files)
+    } finally {
+      uploading.value = false
+      fileUploadRef.value?.clear()
+    }
+  }
+
+  const removeAt = async (index: number) => {
+    const publicId = publicIds.value[index]
+    if (!publicId) return
+
+    publicIds.value = publicIds.value.filter((_, i) => i !== index)
+    emit("change")
+
+    if (!isSessionUpload(publicId)) return
+
+    sessionPublicIds.value = sessionPublicIds.value.filter((id) => id !== publicId)
+    await deleteUpload(publicId)
+  }
+
+  const handleRemove = (index: number, event: Event) => {
     confirm.require({
       target: event.currentTarget as HTMLElement,
-      message: fullRemove ? t("upload.confirmDeleteAll") : t("upload.confirmDelete"),
+      message: t("upload.confirmDelete"),
       icon: "pi pi-info-circle",
       rejectProps: {
         label: t("common.cancel"),
@@ -51,85 +94,93 @@
         severity: "danger",
       },
       accept: () => {
-        if (fullRemove) {
-          listSrcs.value = []
-          carouselKey.value++
-          return
-        }
-        removeImage(index)
+        void removeAt(index)
       },
     })
   }
+
+  const handleRemoveAll = (event: Event) => {
+    confirm.require({
+      target: event.currentTarget as HTMLElement,
+      message: t("upload.confirmDeleteAll"),
+      icon: "pi pi-info-circle",
+      rejectProps: {
+        label: t("common.cancel"),
+        severity: "secondary",
+        outlined: true,
+      },
+      acceptProps: {
+        label: t("common.delete"),
+        severity: "danger",
+      },
+      accept: () => {
+        void removeAllImages()
+      },
+    })
+  }
+
+  const removeAllImages = async () => {
+    const idsToDelete = publicIds.value.filter((id) => isSessionUpload(id))
+    publicIds.value = []
+    sessionPublicIds.value = []
+    emit("change")
+    await Promise.all(idsToDelete.map((id) => deleteUpload(id)))
+  }
+
+  onBeforeUnmount(() => {
+    void discardSessionUploads()
+  })
+
+  defineExpose({
+    discardSessionUploads,
+    markSessionPersisted,
+  })
 </script>
+
 <template>
   <div
-    class="card flex flex-col "
-    :class="{ 'gap-4': listSrcs.length > 0 }"
+    class="card flex flex-col"
+    :class="{ 'gap-4': publicIds.length > 0 }"
   >
     <div class="flex flex-wrap gap-3">
       <FileUpload
+        ref="fileUploadRef"
         mode="basic"
         custom-upload
         auto
         :multiple="true"
         severity="secondary"
         class="p-button-outlined [&_.p-button]:whitespace-nowrap"
-        :max-file-size="5242880"
-        :accept="'.jpg, .jpeg, .png, .gif, .bmp, .webp'"
+        :max-file-size="RECIPE_UPLOAD_MAX_BYTES"
+        :accept="RECIPE_UPLOAD_ACCEPT"
         :choose-label="t('upload.chooseImages')"
-        @select="onFileSelect"
+        :disabled="uploading"
+        :invalid-file-type-message="t('upload.invalidType')"
+        :invalid-file-size-message="t('upload.tooLarge')"
+        @uploader="handleUploader"
       />
       <Button
-        :disabled="listSrcs.length === 0"
+        type="button"
+        :disabled="publicIds.length === 0 || uploading"
         severity="danger"
         outlined
         class="whitespace-nowrap"
-        @click="confirmDelete($event, 0, true)"
+        @click="handleRemoveAll($event)"
       >
         <i class="pi pi-trash mr-2" />
         {{ t('upload.removeAllImages') }}
       </Button>
     </div>
-    <Carousel
-      :key="carouselKey"
-      :value="listSrcs"
-      :num-visible="1"
-      :num-scroll="1"
-      orientation="horizontal"
-      class="px-4"
-      circular
-      :show-navigators="listSrcs.length > 1"
+    <p
+      v-if="uploading"
+      class="text-sm text-surface-500"
     >
-      <template #item="{ data, index }">
-        <Image
-          :src="data"
-          :alt="`Image ${listSrcs.indexOf(data) + 1}`"
-          class="rounded w-full"
-          preview
-        >
-          <template #image>
-            <div class="relative h-full w-full">
-              <Button
-                v-tooltip.top="t('upload.removeImage')"
-                rounded
-                class="absolute! z-9999 bottom-2 right-2"
-                @click="confirmDelete($event, index)"
-              >
-                <i class="pi pi-trash" />
-              </Button>
-              <NuxtImg
-                :src="data"
-                :alt="`Image ${listSrcs.indexOf(data) + 1}`"
-                class="rounded w-full shadow-md"
-                style="height: 300px !important; object-fit: cover;"
-              />
-            </div>
-          </template>
-        </Image>
-      </template>
-      <template #empty>
-        {{  }}
-      </template>
-    </Carousel>
+      {{ t('upload.uploading') }}
+    </p>
+    <RecipeImageCarousel
+      :images="carouselImages"
+      show-remove
+      @remove="handleRemove"
+    />
   </div>
 </template>

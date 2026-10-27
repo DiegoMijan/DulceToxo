@@ -214,6 +214,15 @@
     "confirmDelete": "¿Desexa eliminar esta imaxe?",
     "confirmDeleteAll": "¿Desexa eliminar todas as imaxes?",
     "chooseImages": "Escoller imaxes",
-    "removeAllImages": "Eliminar todas as imaxes"
+    "removeAllImages": "Eliminar todas as imaxes",
+    "success": "Imaxe subida correctamente",
+    "error": "Non se puido subir a imaxe",
+    "invalidType": "Só se permiten imaxes JPEG, PNG e WebP",
+    "tooLarge": "A imaxe debe pesar 10 MB ou menos",
+    "uploading": "Subindo imaxe...",
+    "imageAlt": "Imaxe da receita {n}",
+    "imageFallback": "Imaxe da receita",
+    "previousImage": "Imaxe anterior",
+    "nextImage": "Imaxe seguinte"
   }
 }
