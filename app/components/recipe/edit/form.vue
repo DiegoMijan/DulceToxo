@@ -60,6 +60,13 @@
   const selectedRecipeId = ref<string>(recipeParam || NEW_RECIPE_ID)
   const currentRecipe = ref<RecipeDetail | null>(null)
   const slugErrors = ref<Record<LocaleKey, string | null>>({ es: null, en: null, gl: null })
+  const formKey = ref(0)
+
+  const applyFormValues = (values: RecipeFormValues) => {
+    initialValues.value = values
+    formKey.value += 1
+    activeStep.value = 1
+  }
 
   const allRecipes = ref<RecipeListItem[]>([])
 
@@ -134,8 +141,7 @@
   const loadRecipeDetail = async (recipeId: string) => {
     if (recipeId === NEW_RECIPE_ID) {
       currentRecipe.value = null
-      initialValues.value = createInitialValues()
-      resetForm()
+      applyFormValues(createInitialValues())
       return
     }
 
@@ -206,8 +212,7 @@
         },
       }
 
-      initialValues.value = newValues
-      resetForm()
+      applyFormValues(newValues)
     } catch (error) {
       toast.add({
         severity: "error",
@@ -377,8 +382,7 @@
     if (currentRecipe.value) {
       loadRecipeDetail(currentRecipe.value.id)
     } else {
-      initialValues.value = createInitialValues()
-      resetForm()
+      applyFormValues(createInitialValues())
     }
   }
 
@@ -430,6 +434,7 @@
 <template>
   <Form
     v-slot="$form"
+    :key="formKey"
     ref="form"
     :resolver
     :initialValues
