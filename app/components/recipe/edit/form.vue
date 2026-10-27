@@ -44,7 +44,7 @@
   const localePath = useLocalePath()
   const { t, locale } = useI18n()
   const toast = useToast()
-  const { formStates, resetForm, form } = useStateForm("form")
+  const { formStates, form } = useStateForm("form")
   const categoriesStore = useCategories()
   const { categories, categoriesByLocale } = storeToRefs(categoriesStore)
   const { getCategories } = categoriesStore
