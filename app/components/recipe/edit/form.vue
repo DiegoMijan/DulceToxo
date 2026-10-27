@@ -7,71 +7,112 @@
   import gl from "@/../public/img/es-ga.svg"
   import en from "@/../public/img/gb.svg"
   import { FormField as PrimeVueFormField } from "@primevue/forms"
+  import type { RecipeDetail, RecipeListItem } from "~/stores/recipes"
+
+  type LocaleKey = "es" | "en" | "gl"
+
+  interface RecipeOption {
+    id: string
+    title: string
+    isNew?: boolean
+    isDirty?: boolean
+  }
+
+  interface LocaleData {
+    slug: string
+    title: string
+    description: string
+    ingredients: { id: string; order: number; description: string }[]
+    instructions: { id: string; order: number; description: string }[]
+  }
+
+  interface RecipeFormValues {
+    id: string
+    category: string
+    difficulty: 1 | 2 | 3 | 4 | 5
+    prepTime: number
+    cookTime: number
+    images: string[]
+    locales: Record<LocaleKey, LocaleData>
+  }
+
+  const NEW_RECIPE_ID = "__new__"
 
   const route = useRoute()
-  const { recipe } = route.params as {
-    recipe?: string
-  }
+  const { recipe: recipeParam } = route.params as { recipe?: string }
 
   const localePath = useLocalePath()
-  const { t } = useI18n()
-  const { formStates, resetForm, form } = useStateForm("form")
-  const { categoriesByLocale } = useCategories()
+  const { t, locale } = useI18n()
+  const toast = useToast()
+  const { formStates, form } = useStateForm("form")
+  const categoriesStore = useCategories()
+  const { categories, categoriesByLocale } = storeToRefs(categoriesStore)
+  const { getCategories } = categoriesStore
+  const recipesStore = useRecipes()
+
+  const runtimeConfig = useRuntimeConfig()
+  const cloudinaryBaseUrl = runtimeConfig.public.cloudinaryBaseUrl as string
+
   const resolver = ref(valibotResolver(recipeFormSchema(t)))
+  const loading = ref(false)
+  const loadingRecipes = ref(false)
+  const saving = ref(false)
+  const selectedRecipeId = ref<string>(recipeParam || NEW_RECIPE_ID)
+  const currentRecipe = ref<RecipeDetail | null>(null)
+  const slugErrors = ref<Record<LocaleKey, string | null>>({ es: null, en: null, gl: null })
+  const formKey = ref(0)
 
-  const options = ref<{ id: string; title: string; noSave?: boolean }[]>([
-    { id: "chocolateCupcake", title: "Cupcake de chocolate" },
-    { id: "kinderBuenoCupcake", title: "Cupcake de kinder bueno" },
-    { id: "tiramisuCupcake", title: "Cupcake de tiramisú" },
-    { id: "chipsAhoyCupcake", title: "Cupcake de chips ahoy" },
-    { id: "oreoCupcake", title: "Cupcake de oreo" },
-    { id: "cheeseCupcake", title: "Chesse Cupcake" },
-    { id: "operaCupcake", title: "Cupcake opera" },
-    { id: "cheeseCreamCupcake", title: "Cupcake con crema de queso" },
-    { id: "chocoLotusCupcake", title: "Cupcake de choco-lotus" },
-  ])
-
-  const locales = {
-    es: {
-      id: "",
-      title: "",
-      description: "",
-      ingredients: [],
-      instructions: [],
-    },
-    en: {
-      id: "",
-      title: "",
-      description: "",
-      ingredients: [],
-      instructions: [],
-    },
-    gl: {
-      id: getInitialRecipe().id || "",
-      title: getInitialRecipe().title || "",
-      description: "",
-      ingredients: [],
-      instructions: [],
-    },
+  const applyFormValues = (values: RecipeFormValues) => {
+    initialValues.value = values
+    formKey.value += 1
+    activeStep.value = 1
   }
 
-  const { reactiveForm: initialValues } = useForm<Recipe>({
-    id: recipe || "",
+  const allRecipes = ref<RecipeListItem[]>([])
+
+  const recipeOptions = computed<RecipeOption[]>(() => {
+    const newOption: RecipeOption = {
+      id: NEW_RECIPE_ID,
+      title: t("recipe.edit.newRecipe"),
+      isNew: true,
+    }
+
+    const existingRecipes = allRecipes.value.map((r) => ({
+      id: r.id,
+      title: r.locale[locale.value as LocaleKey]?.title || r.locale.gl?.title || r.id,
+      isDirty: selectedRecipeId.value === r.id && formStates.value.isDirty,
+    }))
+
+    return [newOption, ...existingRecipes]
+  })
+
+  const isNewRecipe = computed(() => selectedRecipeId.value === NEW_RECIPE_ID)
+
+  const createEmptyLocaleData = (): LocaleData => ({
+    slug: "",
     title: "",
     description: "",
     ingredients: [],
     instructions: [],
-    images: [],
+  })
+
+  const createInitialValues = (): RecipeFormValues => ({
+    id: "",
+    category: "",
     difficulty: 2,
     prepTime: 1,
     cookTime: 1,
-    createdAt: new Date(),
-    updatedAt: null,
-    category: "",
-    locales: structuredClone(locales),
+    images: [],
+    locales: {
+      es: createEmptyLocaleData(),
+      en: createEmptyLocaleData(),
+      gl: createEmptyLocaleData(),
+    },
   })
 
-  const steps = ref<{ id: number; locale: "es" | "en" | "gl"; img: string }[]>([
+  const { reactiveForm: initialValues } = useForm<RecipeFormValues>(createInitialValues())
+
+  const steps = ref<{ id: number; locale: LocaleKey; img: string }[]>([
     { id: 1, locale: "gl", img: gl },
     { id: 2, locale: "es", img: es },
     { id: 3, locale: "en", img: en },
@@ -79,48 +120,281 @@
 
   const activeStep = ref(1)
 
-  watch(formStates, () => {
-    if (formStates.value.isDirty) {
-      setOptionNoSave(true)
-    }
-  })
+  const loadAllRecipes = async () => {
+    loadingRecipes.value = true
+    try {
+      await getCategories()
+      const allRecipesList: RecipeListItem[] = []
 
-  function setOptionNoSave(noSave: boolean) {
-    const option = options.value.find((option) => option.id === recipe)
-    if (option) {
-      option.noSave = noSave
+      const categoryList = Array.isArray(categories.value) ? categories.value : []
+      for (const category of categoryList) {
+        const recipes = await recipesStore.getRecipesByCategory(category.id, true)
+        allRecipesList.push(...recipes)
+      }
+
+      allRecipes.value = allRecipesList
+    } finally {
+      loadingRecipes.value = false
     }
   }
 
-  const onSubmit = (valuesForm: FormSubmitEvent<Recipe>) => {
-    const { valid } = valuesForm
+  const loadRecipeDetail = async (recipeId: string) => {
+    if (recipeId === NEW_RECIPE_ID) {
+      currentRecipe.value = null
+      applyFormValues(createInitialValues())
+      return
+    }
+
+    loading.value = true
+    slugErrors.value = { es: null, en: null, gl: null }
+
+    try {
+      const data = await $fetch<RecipeDetail>(`/api/recipes/${recipeId}`)
+      currentRecipe.value = data
+
+      const categoryUrlName = categories.value
+        .find((c) => c.id === data.category_id)
+        ?.locale[locale.value as LocaleKey]?.url_name || ""
+
+      const newValues: RecipeFormValues = {
+        id: data.id,
+        category: categoryUrlName,
+        difficulty: data.difficulty,
+        prepTime: data.prep_time,
+        cookTime: data.cook_time,
+        images: data.images.map((img) => `${cloudinaryBaseUrl}${img.public_id}`),
+        locales: {
+          es: {
+            slug: data.locales.es?.slug || "",
+            title: data.locales.es?.title || "",
+            description: data.locales.es?.description || "",
+            ingredients: data.ingredients.es?.map((i) => ({
+              id: i.id,
+              order: i.order,
+              description: i.description,
+            })) || [],
+            instructions: data.steps.es?.map((s) => ({
+              id: s.id,
+              order: s.order,
+              description: s.description,
+            })) || [],
+          },
+          en: {
+            slug: data.locales.en?.slug || "",
+            title: data.locales.en?.title || "",
+            description: data.locales.en?.description || "",
+            ingredients: data.ingredients.en?.map((i) => ({
+              id: i.id,
+              order: i.order,
+              description: i.description,
+            })) || [],
+            instructions: data.steps.en?.map((s) => ({
+              id: s.id,
+              order: s.order,
+              description: s.description,
+            })) || [],
+          },
+          gl: {
+            slug: data.locales.gl?.slug || "",
+            title: data.locales.gl?.title || "",
+            description: data.locales.gl?.description || "",
+            ingredients: data.ingredients.gl?.map((i) => ({
+              id: i.id,
+              order: i.order,
+              description: i.description,
+            })) || [],
+            instructions: data.steps.gl?.map((s) => ({
+              id: s.id,
+              order: s.order,
+              description: s.description,
+            })) || [],
+          },
+        },
+      }
+
+      applyFormValues(newValues)
+    } catch (error) {
+      toast.add({
+        severity: "error",
+        summary: t("recipe.edit.error.loadFailed"),
+        life: 5000,
+      })
+      console.error("Failed to load recipe:", error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const buildRequestBody = (values: RecipeFormValues) => {
+    const categoryId = categories.value.find((c) =>
+      Object.values(c.locale).some((l) => l.url_name === values.category),
+    )?.id
+
+    const locales = (["es", "en", "gl"] as const).map((loc) => ({
+      locale: loc,
+      slug: values.locales[loc].slug,
+      title: values.locales[loc].title,
+      description: values.locales[loc].description,
+    }))
+
+    const ingredients = (["es", "en", "gl"] as const).flatMap((loc) =>
+      values.locales[loc].ingredients.map((ing) => ({
+        locale: loc,
+        order: ing.order,
+        description: ing.description,
+      })),
+    )
+
+    const steps = (["es", "en", "gl"] as const).flatMap((loc) =>
+      values.locales[loc].instructions.map((step) => ({
+        locale: loc,
+        order: step.order,
+        description: step.description,
+      })),
+    )
+
+    const images = values.images
+      .filter((url) => !url.startsWith("data:") && !url.startsWith("blob:"))
+      .map((url, index) => {
+        const match = url.match(/\/upload\/(?:v\d+\/)?(.+)$/)
+        const publicId = match ? match[1].replace(/\.[^.]+$/, "") : url
+        return { public_id: publicId, order: index + 1 }
+      })
+
+    return {
+      category_id: categoryId,
+      difficulty: values.difficulty,
+      prep_time: values.prepTime,
+      cook_time: values.cookTime,
+      locales,
+      ingredients,
+      steps,
+      images,
+    }
+  }
+
+  const getFetchStatus = (error: unknown): number | undefined => {
+    if (!error || typeof error !== "object") return undefined
+    const fetchError = error as {
+      statusCode?: number
+      status?: number
+      data?: { statusCode?: number }
+    }
+    return fetchError.statusCode ?? fetchError.status ?? fetchError.data?.statusCode
+  }
+
+  const getFetchMessage = (error: unknown): string => {
+    if (!error || typeof error !== "object") return ""
+    const fetchError = error as { data?: { message?: string }; message?: string }
+    return fetchError.data?.message || fetchError.message || ""
+  }
+
+  const handleSlugConflict = (errorMessage: string) => {
+    const localeMatch = errorMessage.match(/locale "(\w+)"/)
+    if (localeMatch) {
+      const conflictLocale = localeMatch[1] as LocaleKey
+      slugErrors.value[conflictLocale] = t("recipe.edit.error.slugConflict")
+      const stepIndex = steps.value.findIndex((s) => s.locale === conflictLocale)
+      if (stepIndex !== -1) {
+        activeStep.value = stepIndex + 1
+      }
+    }
+  }
+
+  const onSubmit = async (formEvent: FormSubmitEvent<RecipeFormValues>) => {
+    const { valid, values } = formEvent
     if (!valid) return
+
+    saving.value = true
+    slugErrors.value = { es: null, en: null, gl: null }
+
+    try {
+      const body = buildRequestBody(values)
+
+      if (isNewRecipe.value) {
+        const result = await $fetch<{ id: string }>("/api/recipes", {
+          method: "POST",
+          body,
+        })
+
+        toast.add({
+          severity: "success",
+          summary: t("recipe.edit.success.created"),
+          life: 3000,
+        })
+
+        await loadAllRecipes()
+        selectedRecipeId.value = result.id
+        await navigateTo(localePath(`/edit/${result.id}`))
+        await loadRecipeDetail(result.id)
+      } else {
+        await $fetch(`/api/recipes/${selectedRecipeId.value}`, {
+          method: "PUT",
+          body,
+        })
+
+        toast.add({
+          severity: "success",
+          summary: t("recipe.edit.success.updated"),
+          life: 3000,
+        })
+
+        await loadAllRecipes()
+        await loadRecipeDetail(selectedRecipeId.value)
+      }
+    } catch (error: unknown) {
+      if (getFetchStatus(error) === 409) {
+        const errorMessage = getFetchMessage(error)
+        handleSlugConflict(errorMessage)
+        toast.add({
+          severity: "error",
+          summary: t("recipe.edit.error.slugConflict"),
+          life: 5000,
+        })
+      } else {
+        toast.add({
+          severity: "error",
+          summary: t("recipe.edit.error.saveFailed"),
+          life: 5000,
+        })
+      }
+      console.error("Failed to save recipe:", error)
+    } finally {
+      saving.value = false
+    }
   }
 
-  const handleChange = (event: SelectChangeEvent) => {
-    navigateTo(localePath(`/edit/${event.value}`))
+  const handleRecipeChange = async (event: SelectChangeEvent) => {
+    const newId = event.value as string
+    selectedRecipeId.value = newId
+
+    if (newId === NEW_RECIPE_ID) {
+      navigateTo(localePath("/edit"))
+    } else {
+      navigateTo(localePath(`/edit/${newId}`))
+    }
+
+    await loadRecipeDetail(newId)
   }
 
   const onCancel = () => {
-    if (form.value?.states?.images) {
-      form.value.states.images.value = []
-      initialValues.value.images = []
+    slugErrors.value = { es: null, en: null, gl: null }
+    if (currentRecipe.value) {
+      loadRecipeDetail(currentRecipe.value.id)
+    } else {
+      applyFormValues(createInitialValues())
     }
-    initialValues.value.locales = structuredClone(locales)
-    setOptionNoSave(false)
-    resetForm()
   }
 
   const onBack = () => {
-    const category = form.value?.states?.category?.value as string | undefined
-    const id = form.value?.states?.id?.value as string | undefined
-    if (!category || !id) return
-    navigateTo(localePath(`/${category}/${id}`))
-  }
-
-  function getInitialRecipe() {
-    const { title, id } = options.value.find((option) => option.id === recipe) || {}
-    return { title, id }
+    if (!currentRecipe.value) return
+    const categoryUrlName = categories.value
+      .find((c) => c.id === currentRecipe.value!.category_id)
+      ?.locale[locale.value as LocaleKey]?.url_name
+    const recipeSlug = currentRecipe.value.locales[locale.value as LocaleKey]?.slug
+    if (categoryUrlName && recipeSlug) {
+      navigateTo(localePath(`/${categoryUrlName}/${recipeSlug}`))
+    }
   }
 
   const triggerImagesChange = () => {
@@ -131,25 +405,36 @@
   }
 
   const triggerLocalesChange = (
-    locale: "es" | "en" | "gl",
+    localeKey: LocaleKey,
     type: "ingredients" | "instructions",
   ) => {
+    slugErrors.value[localeKey] = null
+
     const localesStates = form.value?.states?.locales as
-      | Record<"es" | "en" | "gl", { ingredients?: FormFieldState; instructions?: FormFieldState }>
+      | Record<LocaleKey, { ingredients?: FormFieldState; instructions?: FormFieldState }>
       | undefined
 
     if (!localesStates) return
 
-    const fieldState = localesStates[locale]?.[type]
+    const fieldState = localesStates[localeKey]?.[type]
     if (!fieldState) return
 
     fieldState.dirty = true
     fieldState.pristine = false
   }
+
+  onMounted(async () => {
+    await loadAllRecipes()
+    if (recipeParam) {
+      selectedRecipeId.value = recipeParam
+      await loadRecipeDetail(recipeParam)
+    }
+  })
 </script>
 <template>
   <Form
     v-slot="$form"
+    :key="formKey"
     ref="form"
     :resolver
     :initialValues
@@ -167,21 +452,28 @@
           <Select
             filter
             name="id"
-            :options
+            :modelValue="selectedRecipeId"
+            :options="recipeOptions"
             option-value="id"
             option-label="title"
             :placeholder="t('recipe.edit.recipeSelected')"
+            :loading="loadingRecipes"
             class="w-full"
-            @change="handleChange"
+            @change="handleRecipeChange"
           >
             <template #value="slotProps">
               <div
                 v-if="slotProps.value"
                 class="flex items-center gap-2"
               >
-                <div>{{ options.find((option) => option.id === slotProps.value)?.title }}</div>
                 <NuxtIcon
-                  v-if="options.find((option) => option.id === slotProps.value)?.noSave"
+                  v-if="recipeOptions.find((o) => o.id === slotProps.value)?.isNew"
+                  name="line-md:plus"
+                  class="text-xl text-green-500"
+                />
+                <div>{{ recipeOptions.find((o) => o.id === slotProps.value)?.title }}</div>
+                <NuxtIcon
+                  v-if="recipeOptions.find((o) => o.id === slotProps.value)?.isDirty"
                   name="line-md:pencil-twotone"
                   class="text-xl text-amber-300"
                 />
@@ -193,11 +485,23 @@
             <template #option="slotProps">
               <div class="flex items-center gap-2">
                 <NuxtIcon
-                  v-if="slotProps.option.noSave"
+                  v-if="slotProps.option.isNew"
+                  name="line-md:plus"
+                  class="text-xl text-green-500"
+                />
+                <NuxtIcon
+                  v-else-if="slotProps.option.isDirty"
                   name="line-md:pencil-twotone"
                   class="text-xl text-amber-300"
                 />
-                <div :class="{ 'ml-7': !slotProps.option.noSave }">{{ slotProps.option.title }}</div>
+                <div :class="{ 'ml-7': !slotProps.option.isNew && !slotProps.option.isDirty }">
+                  {{ slotProps.option.title }}
+                </div>
+              </div>
+            </template>
+            <template #empty>
+              <div class="p-4 text-center text-gray-500">
+                {{ loadingRecipes ? t('recipe.edit.loadingRecipes') : t('recipe.edit.noRecipesYet') }}
               </div>
             </template>
           </Select>
@@ -226,14 +530,25 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-8 p-6 md:p-8">
+    <div
+      v-if="loading"
+      class="flex justify-center items-center py-16"
+    >
+      <ProgressSpinner
+        style="width: 50px; height: 50px"
+        stroke-width="4"
+      />
+    </div>
+
+    <div
+      v-else
+      class="flex flex-col gap-8 p-6 md:p-8"
+    >
       <section>
         <h2 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300 mb-3">
           {{ t('upload.title') }}
         </h2>
-        <PrimeVueFormField
-          name="images"
-        >
+        <PrimeVueFormField name="images">
           <template v-if="$form.images?.value">
             <FormUpload
               v-model:listSrcs="$form.images.value"
@@ -269,7 +584,8 @@
                   <span
                     :class="[
                       'rounded-full border-2 w-12 h-12 inline-flex items-center justify-center transition-colors',
-                      { 'border-fuchsia-600 border-primary bg-fuchsia-50 dark:bg-fuchsia-950': Number(value) === activeStep, 'border-french-lilac-200 dark:border-gray-600': Number(value) !== activeStep }
+                      { 'border-fuchsia-600 border-primary bg-fuchsia-50 dark:bg-fuchsia-950': Number(value) === activeStep, 'border-french-lilac-200 dark:border-gray-600': Number(value) !== activeStep },
+                      { 'ring-2 ring-red-500': slugErrors[step.locale] }
                     ]"
                   >
                     <img
@@ -297,6 +613,7 @@
                 v-model:form="$form.locales"
                 :locale="step.locale"
                 :formInstance="$form"
+                :slug-error="slugErrors[step.locale]"
                 @change="triggerLocalesChange"
               />
             </StepPanel>
@@ -363,6 +680,7 @@
 
     <div class="flex flex-wrap justify-end gap-3 px-6 md:px-8 py-5 bg-french-lilac-50 dark:bg-gray-900/40 border-t border-french-lilac-100 dark:border-gray-700">
       <Button
+        v-if="!isNewRecipe && currentRecipe"
         type="button"
         severity="secondary"
         text
@@ -384,11 +702,15 @@
       </Button>
       <Button
         type="submit"
-        :disabled="!formStates.isDirty"
+        :disabled="!formStates.isDirty || saving"
+        :loading="saving"
       >
-        <i class="pi pi-save mr-2" />
+        <i
+          v-if="!saving"
+          class="pi pi-save mr-2"
+        />
         {{ t('recipe.edit.save') }}
       </Button>
     </div>
-  </form>
+  </Form>
 </template>

@@ -127,6 +127,8 @@
     }
   },
   "recipe": {
+    "notFound": "Receta no encontrada",
+    "notFoundDescription": "La receta que buscas no existe o ha sido eliminada.",
     "edit": {
       "button": "Editar receta",
       "save": "Guardar",
@@ -135,6 +137,13 @@
       "recipeSelected": "Selecciona una receta",
       "categorySelected": "Selecciona una categoría",
       "category": "Categoría",
+      "newRecipe": "Nueva receta",
+      "loadingRecipes": "Cargando recetas...",
+      "noRecipesYet": "Aún no hay recetas",
+      "success": {
+        "created": "Receta creada correctamente",
+        "updated": "Receta actualizada correctamente"
+      },
       "error": {
         "titleRequired": "El título es obligatorio",
         "descriptionRequired": "La descripción es obligatoria",
@@ -144,7 +153,11 @@
         "prepTimeRequired": "El tiempo de preparación es obligatorio",
         "cookTimeRequired": "El tiempo de cocción es obligatorio",
         "categoryRequired": "La categoría es obligatoria",
-        "idRequired": "El ID es obligatorio"
+        "idRequired": "El ID es obligatorio",
+        "slugConflict": "Este slug ya está en uso",
+        "loadFailed": "Error al cargar la receta",
+        "saveFailed": "Error al guardar la receta",
+        "generic": "Ha ocurrido un error inesperado"
       },
       "form": {
         "confirmDelete": "¿Desea eliminar este elemento?",
@@ -156,7 +169,8 @@
         "prepTime": "Tiempo de preparación",
         "cookTime": "Tiempo de cocción",
         "order": "Orden",
-        "id": "ID (para mostrar en la URL)"
+        "id": "ID (para mostrar en la URL)",
+        "slug": "Slug (URL)"
       }
     },
     "prepTime": "Tiempo de preparación: {time} min",

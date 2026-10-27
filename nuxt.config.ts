@@ -158,6 +158,8 @@ export default defineNuxtConfig({
       // Clave de la Community License de PrimeUI (PrimeVue 5).
       // Se define en .env como NUXT_PUBLIC_PRIMEUI_LICENSE
       PRIMEUI_LICENSE: "",
+      // Base URL for Cloudinary image uploads (public cloud name, not a secret)
+      cloudinaryBaseUrl: "https://res.cloudinary.com/dulcetoxo/image/upload/", // pragma: allowlist secret
     },
   },
   primevue: {
