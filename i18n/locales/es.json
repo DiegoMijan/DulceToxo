@@ -129,6 +129,13 @@
   "recipe": {
     "notFound": "Receta no encontrada",
     "notFoundDescription": "La receta que buscas no existe o ha sido eliminada.",
+    "delete": {
+      "button": "Eliminar receta",
+      "confirmHeader": "Eliminar receta",
+      "confirmMessage": "¿Seguro que quieres eliminar \"{title}\"?",
+      "success": "Receta eliminada correctamente",
+      "error": "No se pudo eliminar la receta"
+    },
     "edit": {
       "button": "Editar receta",
       "save": "Guardar",
@@ -223,6 +230,8 @@
     "imageAlt": "Imagen de la receta {n}",
     "imageFallback": "Imagen de la receta",
     "previousImage": "Imagen anterior",
-    "nextImage": "Imagen siguiente"
+    "nextImage": "Imagen siguiente",
+    "expandImage": "Ampliar imagen",
+    "collapseImage": "Cerrar imagen"
   }
 }

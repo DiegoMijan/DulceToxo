@@ -129,6 +129,13 @@
   "recipe": {
     "notFound": "Recipe not found",
     "notFoundDescription": "The recipe you are looking for does not exist or has been deleted.",
+    "delete": {
+      "button": "Delete recipe",
+      "confirmHeader": "Delete recipe",
+      "confirmMessage": "Are you sure you want to delete \"{title}\"?",
+      "success": "Recipe deleted successfully",
+      "error": "Could not delete the recipe"
+    },
     "edit": {
       "button": "Edit recipe",
       "save": "Save",
@@ -223,6 +230,8 @@
     "imageAlt": "Recipe image {n}",
     "imageFallback": "Recipe image",
     "previousImage": "Previous image",
-    "nextImage": "Next image"
+    "nextImage": "Next image",
+    "expandImage": "Expand image",
+    "collapseImage": "Close image"
   }
 }

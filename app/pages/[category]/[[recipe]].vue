@@ -63,6 +63,18 @@
     navigateTo(localePath(`/${categoryUrlName}/${newSlug}`))
   })
 
+  watch(
+    () => route.params.recipe as string | undefined,
+    (recipeSlug) => {
+      if (recipeSlug === selectedSlug.value) return
+      selectedSlug.value = recipeSlug
+      if (!recipeSlug) {
+        recipeDetail.value = null
+        recipeNotFound.value = false
+      }
+    },
+  )
+
   watch(locale, async () => {
     if (!categoryId.value || !recipeDetail.value) return
 
