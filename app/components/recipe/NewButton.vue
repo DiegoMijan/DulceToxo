@@ -7,11 +7,13 @@
   const localePath = useLocalePath()
   const { t } = useI18n()
 
-  const handleCreateRecipe = () => {
-    navigateTo({
-      path: localePath("/edit"),
-      query: { category: categoryId },
-    })
+  const handleCreateRecipe = async () => {
+    await navigateTo(
+      localePath({
+        path: "/edit",
+        query: { category: categoryId },
+      }),
+    )
   }
 </script>
 
