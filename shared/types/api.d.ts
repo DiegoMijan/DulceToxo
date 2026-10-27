@@ -82,7 +82,7 @@ export interface paths {
     }
     /**
      * List recipes by category
-     * @description Returns a lightweight list of recipes for a category with id, slug and title per locale
+     * @description Returns a lightweight list of recipes for a category with id, difficulty, times, timestamps, and slug and title per locale
      */
     get: {
       parameters: {
@@ -784,6 +784,15 @@ export interface components {
     }
     RecipeListItem: {
       id: string
+      difficulty: number
+      /** @description Preparation time in minutes */
+      prep_time: number
+      /** @description Cooking time in minutes */
+      cook_time: number
+      /** @description Unix timestamp in ms */
+      created_at: number
+      /** @description Unix timestamp in ms */
+      updated_at: number
       /** @description Title and slug keyed by locale. A key is omitted when that translation is missing in the database. */
       locale: {
         es?: components["schemas"]["RecipeListLocale"]

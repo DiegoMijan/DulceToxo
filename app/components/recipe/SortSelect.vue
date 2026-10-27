@@ -1,41 +1,42 @@
 <script setup lang="ts">
-import { useStorage } from "@vueuse/core"
+  const { t } = useI18n()
+  const {
+    sortCode,
+    sortDirection,
+    sortOptions,
+    selectedSortOption,
+    setSortCode,
+    toggleSortDirection,
+  } = useRecipeSort()
 
-const selectedSort = useStorage("sort", null, localStorage, {
-  mergeDefaults: true,
-  serializer: {
-    read: (v: null | string) => (v ? JSON.parse(v) : null),
-    write: (v: null | SelectOption) => JSON.stringify(v),
-  },
-})
+  const pt = {
+    overlay: {
+      class: "dark:bg-french-lilac-950!",
+    },
+  }
 
-const sortOptions = ref<SelectOption[]>([
-  { name: "Nombre", code: "name", icon: "line-md:cake-twotone" },
-  { name: "Fecha de publicación", code: "date", icon: "line-md:calendar" },
-  { name: "Fecha de actualización", code: "update", icon: "line-md:bell-twotone-loop" },
-  { name: "Popularidad", code: "popularity", icon: "line-md:emoji-grin-twotone" },
-  { name: "Puntuación", code: "score", icon: "line-md:star-twotone" },
-  { name: "Dificultad", code: "difficulty", icon: "icon-park-twotone:chef-hat-one" },
-])
-
-const pt = {
-  overlay: {
-    class: "dark:bg-french-lilac-950!",
-  },
-}
+  const directionLabel = computed(() =>
+    t("recipe.sort.toggleDirection", {
+      direction: t(
+        sortDirection.value === "asc" ? "recipe.sort.ascending" : "recipe.sort.descending",
+      ),
+    }),
+  )
 </script>
 
 <template>
-  <div>
+  <div class="flex items-center gap-2 w-full">
     <Select
-      v-model="selectedSort"
+      :model-value="sortCode"
       :options="sortOptions"
       option-label="name"
-      :placeholder="$t('recipe.sortBy')"
+      option-value="code"
+      :placeholder="t('recipe.sortBy')"
+      :aria-label="t('recipe.sortBy')"
       class="w-full"
       size="small"
       :pt
-      show-clear
+      @update:model-value="setSortCode"
     >
       <template #dropdownicon>
         <NuxtIcon name="tabler:arrows-down-up" />
@@ -51,23 +52,35 @@ const pt = {
       </template>
       <template #value="slotProps">
         <div
-          v-if="slotProps.value"
+          v-if="selectedSortOption && slotProps.value"
           class="flex items-center"
         >
           <NuxtIcon
-            :name="slotProps.value.icon"
+            :name="selectedSortOption.icon"
             class="mr-2 text-xl"
           />
-          <div>{{ slotProps.value.name }}</div>
+          <div>{{ selectedSortOption.name }}</div>
         </div>
         <span v-else>
           {{ slotProps.placeholder }}
         </span>
       </template>
     </Select>
+    <Button
+      type="button"
+      severity="secondary"
+      text
+      rounded
+      size="small"
+      class="shrink-0"
+      :aria-label="directionLabel"
+      :title="directionLabel"
+      @click="toggleSortDirection"
+    >
+      <NuxtIcon
+        :name="sortDirection === 'asc' ? 'tabler:sort-ascending' : 'tabler:sort-descending'"
+        class="text-xl"
+      />
+    </Button>
   </div>
 </template>
-
-<style scoped lang="scss"> 
-
-</style>
