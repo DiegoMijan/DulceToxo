@@ -1,6 +1,6 @@
 const localeFormSchema = (t: (key: string) => string) =>
   v.object({
-    id: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.idRequired"))),
+    slug: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.idRequired"))),
     title: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.titleRequired"))),
     description: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.descriptionRequired"))),
     ingredients: v.array(v.any()),
@@ -9,13 +9,11 @@ const localeFormSchema = (t: (key: string) => string) =>
 
 export const recipeFormSchema = (t: (key: string) => string) =>
   v.object({
-    title: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.titleRequired"))),
-    description: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.descriptionRequired"))),
-    ingredients: v.array(v.string()),
-    instructions: v.array(v.string()),
+    id: v.optional(v.string()),
     difficulty: v.number(),
     prepTime: v.pipe(v.number(t("recipe.edit.error.prepTimeRequired"))),
     cookTime: v.pipe(v.number(t("recipe.edit.error.cookTimeRequired"))),
+    images: v.array(v.string()),
     category: v.pipe(
       v.any(),
       v.check(

@@ -13,9 +13,10 @@
     }
   }
 
-  const { locale, formInstance } = defineProps<{
+  const { locale, formInstance, slugError } = defineProps<{
     locale: "es" | "en" | "gl"
     formInstance: FormInstance
+    slugError?: string | null
   }>()
 
   const emit = defineEmits<{
@@ -145,23 +146,30 @@
           />
         </template>
       </FormField>
-      <FormField
-        :fieldName="`locales.${locale}.id`"
-        :label="t('recipe.edit.form.id')"
-        :form="formInstance"
-        class="grow basis-64"
-      >
-        <template #field>
-          <InputText
-            :name="`locales.${locale}.id`"
-            :placeholder="t('recipe.edit.form.id')"
-            :maxlength="200"
-            :value="form?.[locale]?.id?.value"
-            class="w-full"
-            @blur="handleBlur"
-          />
-        </template>
-      </FormField>
+      <div class="grow basis-64 flex flex-col gap-1">
+        <label
+          :for="`locales.${locale}.slug`"
+          class="text-sm font-medium text-french-lilac-600"
+        >
+          {{ t('recipe.edit.form.slug') }}
+        </label>
+        <InputText
+          :id="`locales.${locale}.slug`"
+          :name="`locales.${locale}.slug`"
+          :placeholder="t('recipe.edit.form.slug')"
+          :maxlength="200"
+          :value="form?.[locale]?.slug?.value"
+          class="w-full"
+          :class="{ 'p-invalid': slugError }"
+          @blur="handleBlur"
+        />
+        <small
+          v-if="slugError"
+          class="text-red-500"
+        >
+          {{ slugError }}
+        </small>
+      </div>
     </div>
     <div class="w-full">
       <div class="flex justify-between items-center mb-2">

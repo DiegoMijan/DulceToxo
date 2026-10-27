@@ -8,6 +8,7 @@
 
 <template>
   <div id="app">
+    <Toast position="top-right" />
     <HeaderContainer />
     <NuxtPage />
   </div>

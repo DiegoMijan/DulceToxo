@@ -9,6 +9,8 @@
   const { t, locale } = useI18n()
   const localePath = useLocalePath()
   const { isAdmin } = useAuth()
+  const runtimeConfig = useRuntimeConfig()
+  const cloudinaryBaseUrl = runtimeConfig.public.cloudinaryBaseUrl as string
 
   const currentLocale = computed(() => locale.value as LocaleKey)
 
@@ -23,7 +25,7 @@
       return [{ src: "/img/ejemplo_receta.jpg", alt: localeData.value?.title || "Recipe" }]
     }
     return recipe.images.map((img) => ({
-      src: `https://res.cloudinary.com/dulcetoxo/image/upload/${img.public_id}`,
+      src: `${cloudinaryBaseUrl}${img.public_id}`,
       alt: localeData.value?.title || "Recipe",
     }))
   })

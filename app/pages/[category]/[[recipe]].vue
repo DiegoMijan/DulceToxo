@@ -2,7 +2,7 @@
   import type { RecipeDetail } from "~/stores/recipes"
 
   const route = useRoute()
-  const { locale } = useI18n()
+  const { locale, t } = useI18n()
   const localePath = useLocalePath()
 
   const categoriesStore = useCategories()
@@ -18,9 +18,11 @@
   const selectedSlug = ref<string | undefined>(recipeSlugParam)
   const recipeDetail = ref<RecipeDetail | null>(null)
   const loading = ref(true)
+  const recipeNotFound = ref(false)
 
   const initializeData = async () => {
     loading.value = true
+    recipeNotFound.value = false
 
     await categoriesStore.getCategories()
 
@@ -36,6 +38,8 @@
       const recipeId = recipesStore.findRecipeIdBySlug(catId, recipeSlugParam)
       if (recipeId) {
         recipeDetail.value = await recipesStore.getRecipeDetail(recipeId)
+      } else {
+        recipeNotFound.value = true
       }
     }
 
@@ -47,9 +51,13 @@
   watch(selectedSlug, async (newSlug) => {
     if (!newSlug || !categoryId.value) return
 
+    recipeNotFound.value = false
     const recipeId = recipesStore.findRecipeIdBySlug(categoryId.value, newSlug)
     if (recipeId) {
       recipeDetail.value = await recipesStore.getRecipeDetail(recipeId)
+    } else {
+      recipeDetail.value = null
+      recipeNotFound.value = true
     }
 
     navigateTo(localePath(`/${categoryUrlName}/${newSlug}`))
@@ -103,6 +111,18 @@
           style="width: 60px; height: 60px"
           stroke-width="4"
         />
+      </div>
+      <div
+        v-else-if="recipeNotFound"
+        class="flex flex-col justify-center items-center h-full gap-4 text-center px-4"
+      >
+        <i class="pi pi-search text-6xl text-french-lilac-300 dark:text-french-lilac-600" />
+        <h2 class="text-2xl font-semibold text-french-lilac-700 dark:text-french-lilac-300">
+          {{ t('recipe.notFound') }}
+        </h2>
+        <p class="text-gray-500 dark:text-gray-400 max-w-md">
+          {{ t('recipe.notFoundDescription') }}
+        </p>
       </div>
       <RecipeContent
         v-else-if="recipeDetail"
