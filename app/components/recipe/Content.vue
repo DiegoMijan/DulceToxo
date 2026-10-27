@@ -160,7 +160,14 @@
               name="emojione-v1:sparkles"
               class="text-xl shrink-0"
             />
-            <span :class="['text-md', { 'font-bold': ingredient.is_heading }]">
+            <span
+              :class="[
+                'text-md',
+                ingredient.is_heading
+                  ? 'font-bold italic uppercase text-french-lilac-700 dark:text-french-lilac-300'
+                  : '',
+              ]"
+            >
               {{ ingredient.description }}
             </span>
           </div>

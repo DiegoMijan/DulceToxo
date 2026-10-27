@@ -150,11 +150,12 @@ const drawColumn = (
       cursor.y += 3
     }
 
-    const fontStyle = isHeading ? "bold" : "normal"
+    const fontStyle = isHeading ? "bolditalic" : "normal"
     const indent = isHeading ? 0 : textIndent
+    const description = isHeading ? item.description.toLocaleUpperCase() : item.description
     doc.setFont("helvetica", fontStyle)
     doc.setFontSize(10.5)
-    const lines = doc.splitTextToSize(item.description, columnWidth - indent)
+    const lines = doc.splitTextToSize(description, columnWidth - indent)
     const blockHeight = Math.max(lines.length * 5, 6) + 3
 
     ensureSpace(doc, cursor, blockHeight)
@@ -163,7 +164,7 @@ const drawColumn = (
       drawMarker(doc, x, cursor.y, index)
     }
 
-    doc.setTextColor(...BRAND.text)
+    doc.setTextColor(...(isHeading ? BRAND.heading : BRAND.text))
     doc.setFont("helvetica", fontStyle)
     doc.setFontSize(10.5)
     doc.text(lines, x + indent, cursor.y)
