@@ -99,10 +99,10 @@ const translateCards = computed(() =>
 
 <template>
   <main class="flex justify-center py-8">
-    <div class="max-w-[100ch] flex flex-col gap-7">
+    <div class="max-w-[100ch] lg:max-w-6xl flex flex-col gap-7">
       <LazyLandingProfile @toggle-modal="isModalOpen = $event as boolean" />
       <div
-        class="grid gap-10 px-4 sm:grid-cols-1 md:grid-cols-2 lg:px-0 md:[&>:last-child:nth-child(odd)]:col-span-2 md:[&>:last-child:nth-child(odd)]:w-[calc((100%-2.5rem)/2)] md:[&>:last-child:nth-child(odd)]:justify-self-center"
+        class="grid gap-10 px-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:px-0 md:[&>:last-child:nth-child(odd)]:col-span-2 md:[&>:last-child:nth-child(odd)]:w-[calc((100%-2.5rem)/2)] md:[&>:last-child:nth-child(odd)]:justify-self-center lg:[&>:last-child:nth-child(odd)]:col-span-1 lg:[&>:last-child:nth-child(odd)]:w-auto lg:[&>:last-child:nth-child(odd)]:justify-self-auto"
       >
         <LandingCard
           v-for="{ description, icon, title, darkIcon, isImage, key, urlName } in translateCards"
