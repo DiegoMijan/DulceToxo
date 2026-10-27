@@ -44,6 +44,8 @@
       categoriesByLocale.value.find((category) => category.id === recipe.category_id)?.name ?? "",
   )
 
+  const paddedStepNumber = (index: number): string => String(index + 1).padStart(2, "0")
+
   const downloadPdf = async () => {
     const recipeForPdf = {
       id: recipe.id,
@@ -150,73 +152,70 @@
         :images="images"
       />
     </section>
-    <section class="flex gap-4">
-      <div class="flex flex-1 flex-col gap-4">
-        <h2 class="title text-3xl text-left">
-          {{ t("recipe.edit.form.ingredients") }}
-        </h2>
-        <div
+    <section class="flex flex-col gap-10 lg:flex-row lg:gap-12">
+      <div class="flex min-w-0 flex-1 flex-col">
+        <RecipeSectionTitle :title="t('recipe.edit.form.ingredients')" />
+        <p
           v-if="ingredients.length === 0"
-          class="text-surface-500 text-left"
+          class="content text-left text-surface-500"
         >
           {{ t("common.empty") }}
-        </div>
-        <div
+        </p>
+        <ul
           v-else
-          class="flex flex-col gap-4"
+          class="flex flex-col gap-[10px]"
         >
-          <div
+          <li
             v-for="(ingredient, index) in ingredients"
             :key="ingredient.id"
             :class="[
-              'flex flex-row gap-2 items-start text-left',
-              { 'mt-4': ingredient.is_heading && index > 0 },
+              'flex flex-row items-start gap-2.5 text-left',
+              { 'mt-3': ingredient.is_heading && index > 0 },
             ]"
           >
             <NuxtIcon
               v-if="!ingredient.is_heading"
               name="emojione-v1:sparkles"
-              class="text-xl shrink-0"
+              class="mt-0.5 shrink-0 text-sm"
             />
             <span
-              :class="[
-                'text-md',
+              :class="
                 ingredient.is_heading
-                  ? 'font-caveat font-semibold text-[1.5rem] leading-snug tracking-wide uppercase text-french-lilac-700 dark:text-french-lilac-300'
-                  : '',
-              ]"
+                  ? 'font-caveat font-semibold text-[20px] leading-snug tracking-wide uppercase text-french-lilac-700 dark:text-french-lilac-300'
+                  : 'sub-title text-[15px] leading-relaxed'
+              "
             >
               {{ ingredient.description }}
             </span>
-          </div>
-        </div>
+          </li>
+        </ul>
       </div>
-      <div class="flex flex-2 flex-col gap-4">
-        <h2 class="title text-3xl text-left">
-          {{ t("recipe.edit.form.instructions") }}
-        </h2>
-        <div
+      <div class="flex min-w-0 flex-2 flex-col">
+        <RecipeSectionTitle :title="t('recipe.edit.form.instructions')" />
+        <p
           v-if="steps.length === 0"
-          class="text-surface-500 text-left"
+          class="content text-left text-surface-500"
         >
           {{ t("common.empty") }}
-        </div>
-        <div
+        </p>
+        <ol
           v-else
-          class="flex flex-col gap-4"
+          class="flex list-none flex-col gap-5"
         >
-          <div
+          <li
             v-for="(step, index) in steps"
             :key="step.id"
-            class="flex flex-row gap-3 items-start text-left"
+            class="flex flex-row items-start gap-4 text-left"
           >
-            <Badge
-              :value="index + 1"
-              class="shrink-0 mt-0.5"
-            />
-            <span class="text-md">{{ step.description }}</span>
-          </div>
-        </div>
+            <span
+              class="title w-10 shrink-0 text-2xl leading-none text-french-lilac-500 dark:text-french-lilac-400"
+              aria-hidden="true"
+            >
+              {{ paddedStepNumber(index) }}
+            </span>
+            <span class="sub-title pt-1 text-[15px] leading-relaxed">{{ step.description }}</span>
+          </li>
+        </ol>
       </div>
     </section>
     <RecipeDifficultyDrawer

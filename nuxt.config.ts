@@ -104,6 +104,8 @@ export default defineNuxtConfig({
       {
         name: "Pacifico",
         provider: "google",
+        weights: [400],
+        styles: ["normal"],
       },
       {
         name: "Caveat",
