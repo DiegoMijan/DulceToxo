@@ -187,11 +187,109 @@ const drawFooters = (doc: jsPDF) => {
   }
 }
 
+const CONTENT_WIDTH = PAGE.width - PAGE.margin * 2
+const DESCRIPTION_LINE_HEIGHT = 5.2
+const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g
+// Maps to Cloudinary `f_jpg,q_80,w_1000,c_limit` via @nuxt/image.
+const RECIPE_PDF_IMAGE_MODIFIERS = {
+  format: "jpg",
+  quality: 80,
+  width: 1000,
+  fit: "coverLimit",
+} as const
+
+export interface RecipePdfImage {
+  public_id: string
+  order: number
+}
+
+export const recipePdfFileName = (title: string): string => {
+  const sanitized = title.replace(INVALID_FILENAME_CHARS, "").trim()
+  return `${sanitized || "recipe"}.pdf`
+}
+
+export const getMainRecipeImage = (images: RecipePdfImage[]): RecipePdfImage | undefined => {
+  if (images.length === 0) return undefined
+  return images.reduce((lowest, image) => (image.order < lowest.order ? image : lowest))
+}
+
+const blobToDataUrl = (blob: Blob): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(reader.error ?? new Error("Failed to read image"))
+    reader.readAsDataURL(blob)
+  })
+
+const loadImageAsDataUrl = async (url: string): Promise<string | null> => {
+  try {
+    const response = await fetch(url)
+    if (!response.ok) return null
+    const blob = await response.blob()
+    if (!blob.size) return null
+    return await blobToDataUrl(blob)
+  } catch {
+    return null
+  }
+}
+
+export const loadRecipeImageAsDataUrl = async (imageUrl: string): Promise<string | null> => {
+  if (!imageUrl) return null
+  return loadImageAsDataUrl(imageUrl)
+}
+
+const drawDescription = (doc: jsPDF, y: number, description: string): number => {
+  const trimmed = description.trim()
+  if (!trimmed) return y
+
+  doc.setTextColor(...BRAND.text)
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(11)
+  const lines = doc.splitTextToSize(trimmed, CONTENT_WIDTH)
+  doc.text(lines, PAGE.margin, y)
+  return y + lines.length * DESCRIPTION_LINE_HEIGHT + 6
+}
+
+const drawMainImage = (doc: jsPDF, y: number, imageDataUrl: string): number => {
+  try {
+    const properties = doc.getImageProperties(imageDataUrl)
+    const pageBottom = PAGE.height - PAGE.margin - PAGE.footerReserve
+    let availableHeight = pageBottom - y
+    if (availableHeight < 30) {
+      doc.addPage()
+      y = PAGE.margin
+      availableHeight = pageBottom - y
+    }
+
+    const ratio = properties.width / properties.height
+    let width = CONTENT_WIDTH
+    let height = width / ratio
+    if (height > availableHeight) {
+      height = availableHeight
+      width = height * ratio
+    }
+
+    const format = imageDataUrl.startsWith("data:image/png") ? "PNG" : "JPEG"
+    doc.addImage(imageDataUrl, format, PAGE.margin, y, width, height)
+    return y + height + 8
+  } catch {
+    return y
+  }
+}
+
 // Separado de la descarga para poder probar la paginación (doc.output(...)) sin DOM.
-export const buildRecipePdf = (recipe: Recipe, labels: PdfLabels): jsPDF => {
+export const buildRecipePdf = (
+  recipe: Recipe,
+  labels: PdfLabels,
+  imageDataUrl?: string | null,
+): jsPDF => {
   const doc = new jsPDF({ unit: "mm", format: "a4" })
 
   let y = drawHeader(doc, recipe.title)
+  y = drawDescription(doc, y, recipe.description)
+  if (imageDataUrl) {
+    y = drawMainImage(doc, y, imageDataUrl)
+  }
   y = drawMetaRow(doc, y, recipe.prepTime, recipe.cookTime, recipe.difficulty, labels)
 
   const gutter = 10
@@ -232,10 +330,20 @@ export const buildRecipePdf = (recipe: Recipe, labels: PdfLabels): jsPDF => {
 }
 
 export const useRecipePdf = () => {
-  const downloadRecipePdf = (recipe: Recipe, labels: PdfLabels) => {
-    const doc = buildRecipePdf(recipe, labels)
-    const fileName = `${recipe.id || recipe.title || "receta"}.pdf`.replace(/\s+/g, "-").toLowerCase()
-    doc.save(fileName)
+  const img = useImage()
+
+  const downloadRecipePdf = async (
+    recipe: Recipe,
+    labels: PdfLabels,
+    images: RecipePdfImage[] = [],
+  ) => {
+    const mainImage = getMainRecipeImage(images)
+    const imageUrl = mainImage
+      ? img(mainImage.public_id, RECIPE_PDF_IMAGE_MODIFIERS, { provider: "cloudinary" })
+      : null
+    const imageDataUrl = imageUrl ? await loadRecipeImageAsDataUrl(imageUrl) : null
+    const doc = buildRecipePdf(recipe, labels, imageDataUrl)
+    doc.save(recipePdfFileName(recipe.title))
   }
 
   return { downloadRecipePdf }
