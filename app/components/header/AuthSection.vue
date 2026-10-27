@@ -42,6 +42,7 @@
       <button
         class="flex items-center space-x-2 px-3 py-2 rounded-lg text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20"
         :aria-label="$t('auth.profile.title')"
+        data-testid="header-profile-menu"
         @click="isDropdownOpen = !isDropdownOpen"
       >
         <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
@@ -107,6 +108,7 @@
             <button
               :disabled="isSigningOut"
               class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              data-testid="header-sign-out"
               @click="handleSignOut"
             >
               <NuxtIcon 

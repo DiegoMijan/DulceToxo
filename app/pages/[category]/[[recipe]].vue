@@ -3,6 +3,7 @@
 
   definePageMeta({
     key: (route) => String(route.params.category),
+    middleware: "auth",
   })
 
   const route = useRoute()
@@ -161,6 +162,10 @@
     () => user.value?.id,
     async (nextUserId, previousUserId) => {
       if (nextUserId === previousUserId) return
+      if (!nextUserId) {
+        recipeDetail.value = null
+        return
+      }
       recipesStore.clearDetailsCache()
       if (!recipeDetail.value) return
       recipeDetail.value = await recipesStore.getRecipeDetail(recipeDetail.value.id, true)

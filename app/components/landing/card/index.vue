@@ -56,6 +56,7 @@ const cardPt = {
     :to="categoryPath"
     class="block h-full no-underline text-inherit"
     :aria-label="title"
+    data-testid="landing-category-card"
   >
     <Card
       ref="cardRef"

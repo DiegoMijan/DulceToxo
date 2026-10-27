@@ -25,6 +25,7 @@ export const useRecipes = defineStore("recipes", () => {
   const loadingDetail = ref(false)
   const pendingLists = new Map<string, Promise<RecipeListItem[]>>()
   const pendingDetails = new Map<string, Promise<RecipeDetail | null>>()
+  let cacheGeneration = 0
 
   const trackPending = <T>(
     pending: Map<string, Promise<T>>,
@@ -40,6 +41,37 @@ export const useRecipes = defineStore("recipes", () => {
     })
   }
 
+  const clearCache = () => {
+    cacheGeneration += 1
+    pendingLists.clear()
+    pendingDetails.clear()
+    recipesByCategory.value = new Map()
+    recipesCache.value = new Map()
+  }
+
+  const handleUnauthorized = async (error: unknown): Promise<boolean> => {
+    if (!isUnauthorizedError(error)) return false
+    clearCache()
+    await redirectToLogin()
+    return true
+  }
+
+  const rememberList = (
+    generation: number,
+    categoryId: string,
+    data: RecipeListItem[],
+  ): RecipeListItem[] => {
+    if (generation !== cacheGeneration) return []
+    recipesByCategory.value.set(categoryId, data)
+    return data
+  }
+
+  const rememberDetail = (generation: number, data: RecipeDetail | null): RecipeDetail | null => {
+    if (generation !== cacheGeneration) return null
+    if (data) recipesCache.value.set(data.id, data)
+    return data
+  }
+
   const getRecipesByCategory = async (categoryId: string, force = false) => {
     if (!force && recipesByCategory.value.has(categoryId)) {
       return recipesByCategory.value.get(categoryId) || []
@@ -51,12 +83,13 @@ export const useRecipes = defineStore("recipes", () => {
     }
 
     return trackPending(pendingLists, categoryId, async () => {
+      const generation = cacheGeneration
       loadingList.value = true
       try {
         const data = await $fetch<RecipeListItem[]>(`/api/categories/${categoryId}/recipes`)
-        recipesByCategory.value.set(categoryId, data || [])
-        return data || []
-      } catch {
+        return rememberList(generation, categoryId, data || [])
+      } catch (error) {
+        if (await handleUnauthorized(error)) return []
         return recipesByCategory.value.get(categoryId) || []
       } finally {
         loadingList.value = false
@@ -75,14 +108,13 @@ export const useRecipes = defineStore("recipes", () => {
     }
 
     return trackPending(pendingDetails, recipeId, async () => {
+      const generation = cacheGeneration
       loadingDetail.value = true
       try {
         const data = await $fetch<RecipeDetail>(`/api/recipes/${recipeId}`)
-        if (data) {
-          recipesCache.value.set(recipeId, data)
-        }
-        return data || null
-      } catch {
+        return rememberDetail(generation, data || null)
+      } catch (error) {
+        if (await handleUnauthorized(error)) return null
         return recipesCache.value.get(recipeId) || null
       } finally {
         loadingDetail.value = false
@@ -149,20 +181,30 @@ export const useRecipes = defineStore("recipes", () => {
 
   const upsertRating = async (recipeId: string, value: number) => {
     const body: UpsertRecipeRatingRequest = { value }
-    const stats = await $fetch<RecipeRatingStats>(`/api/recipes/${recipeId}/rating`, {
-      method: "PUT",
-      body,
-    })
-    applyRatingStats(recipeId, stats)
-    return stats
+    try {
+      const stats = await $fetch<RecipeRatingStats>(`/api/recipes/${recipeId}/rating`, {
+        method: "PUT",
+        body,
+      })
+      applyRatingStats(recipeId, stats)
+      return stats
+    } catch (error) {
+      await handleUnauthorized(error)
+      throw error
+    }
   }
 
   const deleteRating = async (recipeId: string) => {
-    const stats = await $fetch<RecipeRatingStats>(`/api/recipes/${recipeId}/rating`, {
-      method: "DELETE",
-    })
-    applyRatingStats(recipeId, stats)
-    return stats
+    try {
+      const stats = await $fetch<RecipeRatingStats>(`/api/recipes/${recipeId}/rating`, {
+        method: "DELETE",
+      })
+      applyRatingStats(recipeId, stats)
+      return stats
+    } catch (error) {
+      await handleUnauthorized(error)
+      throw error
+    }
   }
 
   const clearDetailsCache = () => {
@@ -181,16 +223,16 @@ export const useRecipes = defineStore("recipes", () => {
   }
 
   const deleteRecipe = async (recipeId: string, categoryId: string) => {
-    const data = await $fetch<DeleteRecipeResponse>(`/api/recipes/${recipeId}`, {
-      method: "DELETE",
-    })
-    removeRecipeFromCache(recipeId, categoryId)
-    return data
-  }
-
-  const clearCache = () => {
-    recipesByCategory.value.clear()
-    recipesCache.value.clear()
+    try {
+      const data = await $fetch<DeleteRecipeResponse>(`/api/recipes/${recipeId}`, {
+        method: "DELETE",
+      })
+      removeRecipeFromCache(recipeId, categoryId)
+      return data
+    } catch (error) {
+      await handleUnauthorized(error)
+      throw error
+    }
   }
 
   return {

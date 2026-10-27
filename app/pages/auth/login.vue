@@ -117,6 +117,7 @@
           type="submit"
           :disabled="isLoading"
           class="w-full"
+          data-testid="login-submit"
         >
           {{ $t('auth.login.button') }}
         </Button>
