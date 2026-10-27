@@ -18,10 +18,11 @@
 
   const handleRemove = (event: Event, index: number) => {
     if (disabled) return
-
-    event.preventDefault()
-    event.stopPropagation()
     emit("remove", index, event)
+  }
+
+  const handleRemovePointerDown = (event: PointerEvent) => {
+    event.stopPropagation()
   }
 </script>
 
@@ -39,6 +40,7 @@
       class="absolute! z-10 bottom-2 right-2"
       :aria-label="t('upload.removeImage')"
       :disabled="disabled"
+      @pointerdown="handleRemovePointerDown"
       @click="handleRemove($event, 0)"
     >
       <i class="pi pi-trash" />
@@ -65,6 +67,7 @@
             class="absolute! z-10 bottom-2 right-2"
             :aria-label="t('upload.removeImage')"
             :disabled="disabled"
+            @pointerdown="handleRemovePointerDown"
             @click="handleRemove($event, index)"
           >
             <i class="pi pi-trash" />
