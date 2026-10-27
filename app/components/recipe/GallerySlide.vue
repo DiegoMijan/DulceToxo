@@ -11,10 +11,37 @@
   }>()
 
   const { t } = useI18n()
+
+  // Cloudinary `effect` maps to `e_` (https://image.nuxt.com/providers/cloudinary).
+  // `effect: "blur:2000"` becomes `e_blur:2000` (blur strength 1-2000).
+  const backdropModifiers = { effect: "blur:2000" }
 </script>
 
 <template>
   <Gallery class="relative h-80 w-full overflow-hidden rounded">
+    <div
+      v-if="image.publicId || image.src"
+      class="gallery-slide-backdrop pointer-events-none absolute inset-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      <NuxtImg
+        v-if="image.publicId"
+        provider="cloudinary"
+        :src="image.publicId"
+        alt=""
+        width="400"
+        :modifiers="backdropModifiers"
+        class="absolute inset-0 h-full w-full scale-110 object-cover"
+      />
+      <NuxtImg
+        v-else-if="image.src"
+        :src="image.src"
+        alt=""
+        width="400"
+        class="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl"
+      />
+      <div class="absolute inset-0 bg-black/40" />
+    </div>
     <GalleryContent class="h-80 w-full">
       <GalleryItem>
         <NuxtImg
@@ -24,7 +51,7 @@
           :alt="image.alt"
           width="1600"
           fit="coverLimit"
-          class="max-h-80 h-80 w-full rounded object-cover"
+          class="max-h-80 h-80 w-full rounded object-contain"
         />
         <NuxtImg
           v-else-if="image.src"
@@ -32,8 +59,8 @@
           :alt="image.alt"
           width="800"
           height="320"
-          fit="cover"
-          class="max-h-80 h-80 w-full rounded object-cover"
+          fit="contain"
+          class="max-h-80 h-80 w-full rounded object-contain"
         />
       </GalleryItem>
     </GalleryContent>
@@ -69,12 +96,17 @@
     width: 100% !important;
     height: 100% !important;
     max-height: none !important;
-    object-fit: cover;
+    object-fit: contain;
   }
 
   /* En pantalla completa, la foto entera y centrada */
   .p-gallery[data-fullscreen] :deep(.p-gallery-item > *) {
     object-fit: contain;
     border-radius: 0;
+  }
+
+  /* Backdrop stays outside .p-gallery-item so Gallery zoom does not transform it. */
+  .p-gallery[data-fullscreen] .gallery-slide-backdrop {
+    display: none;
   }
 </style>
