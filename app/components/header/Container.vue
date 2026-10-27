@@ -3,6 +3,10 @@
 
   const { y } = useWindowScroll()
   const localePath = useLocalePath()
+  const colorMode = useColorMode()
+
+  // En tema claro, al hacer scroll la cabecera es translucida sobre fondo claro: textos e iconos en morado
+  const onLightBackground = computed(() => isScrolled.value && colorMode.value !== "dark")
 
   watch(y, () => {
     isScrolled.value = y.value > 0
@@ -21,6 +25,7 @@
       isScrolled
         ? 'dark:bg-french-lilac-950/80! backdrop-blur-sm'
         : ' bg-french-lilac-700 dark:bg-french-lilac-950! header-border-width border-gradient-to-r',
+      { 'header-on-light': onLightBackground },
     ]"
   >
     <NuxtImg
@@ -46,6 +51,16 @@
 
 .header-border-width {
     border-bottom-width: 0.15rem;
+}
+.header-on-light :deep(.text-white:not(.theme-toggle)) {
+  color: var(--color-french-lilac-700);
+  transition: color 0.2s ease;
+}
+.header-on-light :deep(.bg-white\/20) {
+  background-color: color-mix(in srgb, var(--color-french-lilac-700) 15%, transparent);
+}
+.header-on-light :deep(.hover\:bg-white\/10:hover) {
+  background-color: color-mix(in srgb, var(--color-french-lilac-700) 10%, transparent);
 }
 .border-gradient-to-r {
   border-image: linear-gradient(to right, transparent, var(--color-yellow-300), transparent) 1;
