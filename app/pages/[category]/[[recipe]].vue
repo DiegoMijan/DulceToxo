@@ -8,14 +8,15 @@
   const categoriesStore = useCategories()
   const recipesStore = useRecipes()
 
-  const { category: categoryUrlName, recipe: recipeSlugParam } = route.params as {
-    category: string
-    recipe?: string
-  }
+  const categoryUrlName = computed(() => String(route.params.category ?? ""))
+  const recipeSlugParam = computed(() => {
+    const value = route.params.recipe
+    return typeof value === "string" ? value : undefined
+  })
 
-  const categoryId = computed(() => categoriesStore.getCategoryIdByUrlName(categoryUrlName))
+  const categoryId = computed(() => categoriesStore.getCategoryIdByUrlName(categoryUrlName.value))
 
-  const selectedSlug = ref<string | undefined>(recipeSlugParam)
+  const selectedSlug = ref<string | undefined>(recipeSlugParam.value)
   const recipeDetail = ref<RecipeDetail | null>(null)
   const loading = ref(true)
   const recipeNotFound = ref(false)
@@ -34,8 +35,9 @@
 
     await recipesStore.getRecipesByCategory(catId)
 
-    if (recipeSlugParam) {
-      const recipeId = recipesStore.findRecipeIdBySlug(catId, recipeSlugParam)
+    const recipeSlug = recipeSlugParam.value
+    if (recipeSlug) {
+      const recipeId = recipesStore.findRecipeIdBySlug(catId, recipeSlug)
       if (recipeId) {
         recipeDetail.value = await recipesStore.getRecipeDetail(recipeId)
       } else {
@@ -60,11 +62,11 @@
       recipeNotFound.value = true
     }
 
-    navigateTo(localePath(`/${categoryUrlName}/${newSlug}`))
+    navigateTo(localePath(`/${categoryUrlName.value}/${newSlug}`))
   })
 
   watch(
-    () => route.params.recipe as string | undefined,
+    () => recipeSlugParam.value,
     (recipeSlug) => {
       if (recipeSlug === selectedSlug.value) return
       selectedSlug.value = recipeSlug
@@ -75,18 +77,33 @@
     },
   )
 
-  watch(locale, async () => {
-    if (!categoryId.value || !recipeDetail.value) return
+  watch(categoryUrlName, async (newUrlName, oldUrlName) => {
+    if (newUrlName === oldUrlName) return
+    await initializeData()
+  })
 
-    const newSlug = recipesStore.getRecipeSlugById(categoryId.value, recipeDetail.value.id)
-    if (newSlug && newSlug !== selectedSlug.value) {
-      selectedSlug.value = newSlug
+  const navigateToLocalizedCategory = () => {
+    if (!categoryId.value) return
 
-      const newCategoryUrlName = categoriesStore.getCategoryUrlNameById(categoryId.value)
-      if (newCategoryUrlName) {
+    const newCategoryUrlName = categoriesStore.getCategoryUrlNameById(categoryId.value)
+    if (!newCategoryUrlName) return
+
+    if (recipeDetail.value) {
+      const newSlug = recipesStore.getRecipeSlugById(categoryId.value, recipeDetail.value.id)
+      if (newSlug) {
+        selectedSlug.value = newSlug
         navigateTo(localePath(`/${newCategoryUrlName}/${newSlug}`), { replace: true })
+        return
       }
     }
+
+    if (newCategoryUrlName !== categoryUrlName.value) {
+      navigateTo(localePath(`/${newCategoryUrlName}`), { replace: true })
+    }
+  }
+
+  watch(locale, () => {
+    navigateToLocalizedCategory()
   })
 </script>
 
@@ -138,6 +155,18 @@
         </h2>
         <p class="text-gray-500 dark:text-gray-400 max-w-md">
           {{ t('recipe.notFoundDescription') }}
+        </p>
+      </div>
+      <div
+        v-else-if="!categoryId"
+        class="flex flex-col justify-center items-center h-full gap-4 text-center px-4"
+      >
+        <i class="pi pi-search text-6xl text-french-lilac-300 dark:text-french-lilac-600" />
+        <h2 class="text-2xl font-semibold text-french-lilac-700 dark:text-french-lilac-300">
+          {{ t('category.notFound') }}
+        </h2>
+        <p class="text-gray-500 dark:text-gray-400 max-w-md">
+          {{ t('category.notFoundDescription') }}
         </p>
       </div>
       <RecipeContent

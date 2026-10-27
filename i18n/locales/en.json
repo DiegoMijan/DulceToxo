@@ -126,6 +126,10 @@
       "signOutSuccess": "Successfully signed out"
     }
   },
+  "category": {
+    "notFound": "Category not found",
+    "notFoundDescription": "The category you are looking for does not exist."
+  },
   "recipe": {
     "notFound": "Recipe not found",
     "notFoundDescription": "The recipe you are looking for does not exist or has been deleted.",

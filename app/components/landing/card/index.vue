@@ -3,18 +3,18 @@ interface Props {
   icon: string
   title: string
   description: string
+  urlName?: string
   darkIcon?: string
   isModalOpen?: boolean
 }
 
-const { description, icon, title, darkIcon, isModalOpen } = defineProps<Props>()
+const { icon, title, urlName, darkIcon, isModalOpen } = defineProps<Props>()
 
 const localePath = useLocalePath()
 const colorMode = useColorMode()
 
 const cardRef = ref<HTMLElement | null>(null)
 const transformStyle = ref("rotateX(0deg) rotateY(0deg) scale(1)")
-const hasPrefetched = ref(false)
 
 const { elementX, elementY, isOutside } = useMouseInElement(cardRef)
 const { width, height } = useElementBounding(cardRef)
@@ -41,31 +41,51 @@ watchEffect(() => {
   transformStyle.value = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`
 })
 
-const goToCategory = () => {
-  navigateTo(localePath(`/${title.toLowerCase()}`))
-}
-
-const handleMouseEnter = () => {
-  if (!hasPrefetched.value) {
-    const targetRoute = `/${title.toLowerCase()}`
-    preloadRouteComponents(targetRoute)
-    hasPrefetched.value = true
-  }
-}
+const categoryPath = computed(() => (urlName ? localePath(`/${urlName}`) : undefined))
 </script>
 
 <template>
+  <NuxtLink
+    v-if="categoryPath"
+    :to="categoryPath"
+    class="block no-underline text-inherit"
+    :aria-label="title"
+  >
+    <Card
+      ref="cardRef"
+      class="cursor-pointer card-container"
+      :style="{ transform: transformStyle }"
+      :pt="{
+        content: {
+          class: 'content',
+        },
+      }"
+    >
+      <template #header>
+        <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
+          <slot
+            name="icon"
+            :calculated-icon
+          />
+          <span>{{ title }}</span>
+        </h3>
+      </template>
+      <p>{{ description }}</p>
+      <template #content>
+        {{ description }}
+      </template>
+    </Card>
+  </NuxtLink>
   <Card
+    v-else
     ref="cardRef"
-    class="cursor-pointer card-container"
+    class="card-container"
     :style="{ transform: transformStyle }"
     :pt="{
       content: {
         class: 'content',
       },
     }"
-    @mouseenter="handleMouseEnter"
-    @click="goToCategory"
   >
     <template #header>
       <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">

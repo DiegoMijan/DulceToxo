@@ -126,6 +126,10 @@
       "signOutSuccess": "Sesión pechada correctamente"
     }
   },
+  "category": {
+    "notFound": "Categoría non atopada",
+    "notFoundDescription": "A categoría que buscas non existe."
+  },
   "recipe": {
     "notFound": "Receita non atopada",
     "notFoundDescription": "A receita que buscas non existe ou foi eliminada.",
