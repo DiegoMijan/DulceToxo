@@ -54,8 +54,13 @@
       {{ t("recipe.rating.yours") }}
     </span>
     <div class="flex flex-row items-center gap-2">
+      <!--
+        La key incluye recipeId: el Rating de PrimeVue guarda un estado de hover
+        interno que puede quedarse con el valor del último voto. Como la página no
+        se remonta al cambiar de receta, sin esto se vería el voto de la anterior.
+      -->
       <RecipeRatingStars
-        :key="ratingKey"
+        :key="`${recipeId}-${ratingKey}`"
         :model-value="myRating"
         :disabled="saving"
         :aria-label="voteAriaLabel"
