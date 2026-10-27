@@ -90,15 +90,25 @@
     const selected = container?.querySelector<HTMLElement>("[data-p-selected='true']")
     if (!container || !selected) return false
 
-    const pageX = window.scrollX
-    const pageY = window.scrollY
-    allowOptionScrollIntoView = true
-    selected.scrollIntoView({ block: "nearest", inline: "nearest" })
-    allowOptionScrollIntoView = false
-    if (window.scrollX !== pageX || window.scrollY !== pageY) {
-      window.scrollTo(pageX, pageY)
+    // block: "nearest" inside the list container only. Element.scrollIntoView
+    // would also scroll the page, so adjust the container's scrollTop instead.
+    const containerRect = container.getBoundingClientRect()
+    const selectedRect = selected.getBoundingClientRect()
+    if (selectedRect.bottom > containerRect.bottom) {
+      container.scrollTop += selectedRect.bottom - containerRect.bottom
+    } else if (selectedRect.top < containerRect.top) {
+      container.scrollTop -= containerRect.top - selectedRect.top
     }
     return true
+  }
+
+  const isSelectedInView = () => {
+    const container = getScrollContainer()
+    const selected = container?.querySelector<HTMLElement>("[data-p-selected='true']")
+    if (!container || !selected) return false
+    const containerRect = container.getBoundingClientRect()
+    const selectedRect = selected.getBoundingClientRect()
+    return selectedRect.top >= containerRect.top - 1 && selectedRect.bottom <= containerRect.bottom + 1
   }
 
   const restoreScroll = () => {
@@ -119,7 +129,9 @@
     measureListViewport()
     await nextTick()
     if (mode === "align" || pendingAlignSelected) {
-      if (scrollSelectedIntoView()) {
+      if (!listScrollHeight.value) return
+      scrollSelectedIntoView()
+      if (isSelectedInView()) {
         pendingAlignSelected = false
       }
       return
