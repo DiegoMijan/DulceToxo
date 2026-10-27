@@ -77,11 +77,21 @@
     }
   }
 
+  const waitForFrame = () =>
+    new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve())
+    })
+
   const syncListViewport = async () => {
     if (loading.value || options.value.length === 0) return
     await nextTick()
     measureListViewport()
-    if (!pendingAlignSelected) return
+    if (!measured.value) {
+      await waitForFrame()
+      await waitForFrame()
+      measureListViewport()
+    }
+    if (!pendingAlignSelected || !measured.value) return
     alignActiveIntoView()
     pendingAlignSelected = false
   }
@@ -95,6 +105,10 @@
       }
     },
   )
+
+  watch(scroller, (element) => {
+    if (element) void syncListViewport()
+  })
 
   watch(
     [options, loading],
