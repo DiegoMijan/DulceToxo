@@ -23,7 +23,7 @@
       return [{ src: "/img/ejemplo_receta.jpg", alt: localeData.value?.title || "Recipe" }]
     }
     return recipe.images.map((img) => ({
-      src: `https://res.cloudinary.com/dulce-toxo/image/upload/${img.public_id}`,
+      src: `https://res.cloudinary.com/dulcetoxo/image/upload/${img.public_id}`,
       alt: localeData.value?.title || "Recipe",
     }))
   })
