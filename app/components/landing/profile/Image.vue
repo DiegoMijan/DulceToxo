@@ -8,13 +8,9 @@ const { size = "150px", showGradient = false } = defineProps<{
 <template>
   <div
     :class="[
-      'mx-auto rounded-full mb-3!',
+      'mx-auto mb-3! h-[150px] w-[150px] rounded-full',
       showGradient ? 'p-[4px] relative overflow-hidden gradient-border' : '',
     ]"
-    :style="{
-      width: size,
-      height: size,
-    }"
   >
     <NuxtImg
       src="/img/lucia.jpg"
