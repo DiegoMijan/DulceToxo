@@ -24,3 +24,11 @@ Web de recetas de reposteria en gallego, castellano e ingles. Backend en el repo
 - Seguir las reglas de `.cursor/rules` (componentes, CSS, HTML, i18n, commits).
 - Trabajar en ramas y abrir PR. No hacer push a main.
 - No leer ni modificar `.env`.
+
+## Cursor Cloud specific instructions
+
+- Bun queda en `/usr/local/bin/bun`. Las shells de login no cargan `~/.bashrc`.
+- El arranque del entorno deja `bun run dev` en `http://localhost:3000` y el backend en el puerto 4000. `BACKEND_URL` por defecto es `http://localhost:4000`.
+- No arranques Nuxt con `--host 0.0.0.0`: pide confirmación interactiva y no escucha. Comprueba la web con `curl http://localhost:3000/`, no con `127.0.0.1`.
+- `/api/categories` tiene que devolver las categorías del backend. Sin `NUXT_PUBLIC_PRIMEUI_LICENSE` aparece un aviso de licencia PrimeUI y la página sigue usable.
+- Lint: `bun run lint`. No hay suite de tests.
