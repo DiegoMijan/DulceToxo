@@ -1,49 +1,13 @@
 import type { LocaleKey } from "~/../../shared/types/Recipe.d.ts"
+import type { components } from "#shared/types/api"
 
-export interface RecipeListItem {
-  id: string
-  locale: Record<LocaleKey, { slug: string; title: string }>
-}
-
-export interface RecipeLocaleContent {
-  id: string
-  slug: string
-  title: string
-  description: string
-}
-
-export interface RecipeIngredientContent {
-  id: string
-  order: number
-  description: string
-}
-
-export interface RecipeStepContent {
-  id: string
-  order: number
-  description: string
-}
-
-export interface RecipeImageContent {
-  id: string
-  public_id: string
-  order: number
-}
-
-export interface RecipeDetail {
-  id: string
-  category_id: string
-  difficulty: 1 | 2 | 3 | 4 | 5
-  prep_time: number
-  cook_time: number
-  author_id: string | null
-  created_at: number
-  updated_at: number
-  locales: Record<LocaleKey, RecipeLocaleContent>
-  ingredients: Record<LocaleKey, RecipeIngredientContent[]>
-  steps: Record<LocaleKey, RecipeStepContent[]>
-  images: RecipeImageContent[]
-}
+export type RecipeListItem = components["schemas"]["RecipeListItem"]
+export type RecipeLocaleContent = components["schemas"]["RecipeLocaleContent"]
+export type RecipeIngredientContent = components["schemas"]["RecipeIngredientContent"]
+export type RecipeStepContent = components["schemas"]["RecipeStepContent"]
+export type RecipeImageContent = components["schemas"]["RecipeImageContent"]
+export type RecipeDetail = components["schemas"]["RecipeDetail"]
+export type DeleteRecipeResponse = components["schemas"]["DeleteRecipeResponse"]
 
 export const useRecipes = defineStore("recipes", () => {
   const { locale } = useI18n()
@@ -131,7 +95,7 @@ export const useRecipes = defineStore("recipes", () => {
   }
 
   const deleteRecipe = async (recipeId: string, categoryId: string) => {
-    const data = await $fetch<{ deleted: boolean; id: string }>(`/api/recipes/${recipeId}`, {
+    const data = await $fetch<DeleteRecipeResponse>(`/api/recipes/${recipeId}`, {
       method: "DELETE",
     })
     removeRecipeFromCache(recipeId, categoryId)

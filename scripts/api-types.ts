@@ -13,12 +13,28 @@ if (!BACKEND_URL) {
 const OPENAPI_URL = `${BACKEND_URL}/_openapi.json`
 const OUTPUT_PATH = path.resolve(import.meta.dirname, "../shared/types/api.d.ts")
 
+const redactGeneratedDocs = (contents: string): string => {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME
+  let redacted = contents
+  if (cloudName) {
+    redacted = redacted.split(cloudName).join("<cloud>")
+  }
+
+  return redacted
+    .replace(/in the \S+\/recipes folder/g, "in the recipes folder")
+    .replace(/Only images in the \S+\/ folder/g, "Only images in the Cloudinary folder")
+    .replace(
+      /must start with \S+\/, e\.g\. \S+\/recipes\/[^)]+\)/g,
+      "must start with the configured Cloudinary prefix, e.g. recipes/abc123)",
+    )
+}
+
 async function main() {
   console.log(`Fetching OpenAPI spec from ${OPENAPI_URL}...`)
 
   try {
     const ast = await openapiTS(new URL(OPENAPI_URL))
-    const contents = astToString(ast)
+    const contents = redactGeneratedDocs(astToString(ast))
 
     await fs.mkdir(path.dirname(OUTPUT_PATH), { recursive: true })
     await fs.writeFile(OUTPUT_PATH, contents, "utf-8")

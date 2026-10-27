@@ -1,3 +1,5 @@
+import type { components } from "./api"
+
 export interface State {
   isEdited?: boolean
   isDeleted?: boolean
@@ -76,16 +78,6 @@ export type RecipeLocaleForm = {
   }
 }
 
-export interface LocaleContent {
-  id: string
-  name: string
-  url_name: string
-}
-
-export type LocaleKey = "es" | "gl" | "en"
-
-export interface CategoryWithLocales {
-  id: string
-  created_at: string
-  locale: Record<LocaleKey, LocaleContent>
-}
+export type LocaleContent = components["schemas"]["CategoryLocale"]
+export type LocaleKey = NonNullable<components["schemas"]["RecipeLocaleInput"]["locale"]>
+export type CategoryWithLocales = components["schemas"]["Category"]
