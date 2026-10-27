@@ -150,6 +150,7 @@
       "category": "Category",
       "newRecipe": "New recipe",
       "loadingRecipes": "Loading recipes...",
+      "loadingForm": "Loading form...",
       "noRecipesYet": "No recipes yet",
       "success": {
         "created": "Recipe created successfully",

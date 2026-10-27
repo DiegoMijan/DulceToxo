@@ -150,6 +150,7 @@
       "category": "Categoría",
       "newRecipe": "Nova receita",
       "loadingRecipes": "Cargando receitas...",
+      "loadingForm": "Cargando o formulario...",
       "noRecipesYet": "Aínda non hai receitas",
       "success": {
         "created": "Receita creada correctamente",
