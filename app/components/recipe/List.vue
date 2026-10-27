@@ -129,11 +129,14 @@
     }
   }
 
-  watch(categoryId, (nextId, previousId) => {
-    if (previousId && nextId !== previousId) {
-      pendingAlignSelected = true
-    }
-  })
+  watch(
+    () => categoryId,
+    (nextId, previousId) => {
+      if (previousId && nextId !== previousId) {
+        pendingAlignSelected = true
+      }
+    },
+  )
 
   watch(options, () => {
     preservedScrollTop = getScrollContainer()?.scrollTop ?? preservedScrollTop
