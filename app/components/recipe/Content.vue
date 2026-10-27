@@ -36,7 +36,7 @@
 
   const { downloadRecipePdf } = useRecipePdf()
 
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     const recipeForPdf = {
       id: recipe.id,
       title: localeData.value?.title || "",
@@ -58,13 +58,17 @@
       updatedAt: new Date(recipe.updated_at),
       category: recipe.category_id,
     }
-    downloadRecipePdf(recipeForPdf, {
-      prepTime: t("recipe.prepTime", { time: recipe.prep_time }),
-      cookTime: t("recipe.cookTime", { time: recipe.cook_time }),
-      difficulty: t("recipe.difficulty"),
-      ingredients: t("recipe.edit.form.ingredients"),
-      instructions: t("recipe.edit.form.instructions"),
-    })
+    await downloadRecipePdf(
+      recipeForPdf,
+      {
+        prepTime: t("recipe.prepTime", { time: recipe.prep_time }),
+        cookTime: t("recipe.cookTime", { time: recipe.cook_time }),
+        difficulty: t("recipe.difficulty"),
+        ingredients: t("recipe.edit.form.ingredients"),
+        instructions: t("recipe.edit.form.instructions"),
+      },
+      recipe.images,
+    )
   }
 </script>
 
