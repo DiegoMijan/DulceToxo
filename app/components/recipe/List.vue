@@ -40,6 +40,41 @@
     option.scrollIntoView = (() => {}) as HTMLElement["scrollIntoView"]
   }
 
+  let pointerLockedScrollTop: number | null = null
+
+  const attachClickScrollLock = () => {
+    const container = getScrollContainer()
+    if (!container || container.dataset.scrollLock === "true") return
+    container.dataset.scrollLock = "true"
+    container.addEventListener(
+      "pointerdown",
+      (event) => {
+        const target = event.target
+        if (!(target instanceof Element) || !target.closest(".p-listbox-option")) {
+          pointerLockedScrollTop = null
+          return
+        }
+        pointerLockedScrollTop = container.scrollTop
+      },
+      true,
+    )
+    container.addEventListener("scroll", () => {
+      if (pendingAlignSelected || pointerLockedScrollTop == null) return
+      if (container.scrollTop !== pointerLockedScrollTop) {
+        container.scrollTop = pointerLockedScrollTop
+      }
+    })
+    container.addEventListener(
+      "pointerup",
+      () => {
+        window.setTimeout(() => {
+          pointerLockedScrollTop = null
+        }, 100)
+      },
+      true,
+    )
+  }
+
   const measureListViewport = () => {
     const root = listRoot.value
     if (!root) return
@@ -48,6 +83,7 @@
     const list = root.querySelector<HTMLElement>(".p-listbox-list")
     if (optionEls.length === 0 || !list) return
     optionEls.forEach(guardOptionScrollIntoView)
+    attachClickScrollLock()
 
     const itemHeight = optionEls[0].getBoundingClientRect().height
     if (itemHeight <= 0) return
