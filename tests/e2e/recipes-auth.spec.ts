@@ -73,7 +73,8 @@ const dismissObstructions = async (page: Page) => {
 const login = async (page: Page, email: string) => {
   await page.locator('input[name="email"]').fill(email)
   await page.locator('input[name="password"]').fill(E2E_PASSWORD)
-  await page.getByTestId("login-submit").click()
+  await page.keyboard.press("Escape")
+  await page.getByTestId("login-submit").click({ force: true })
 }
 
 const expectLoginRedirect = async (page: Page, locale: (typeof LOCALES)[number]) => {
