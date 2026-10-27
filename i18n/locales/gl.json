@@ -58,6 +58,18 @@
     "coldCakes": {
       "title": "Tortas frías",
       "description": "Refrescante e cremosa, perfecta para calquera ocasión. Con combinacións irresistibles de sabores e texturas que te namorarán."
+    },
+    "layerCakes": {
+      "title": "Layer cakes",
+      "description": "Tortas de varios pisos con bolo esponxoso e cremas entre capa e capa. Espectaculares por fóra e deliciosas en cada porción."
+    },
+    "iceCream": {
+      "title": "Xeados",
+      "description": "Xeados caseiros sen máquina, cremosos e cheos de sabor. Perfectos para refrescar os días de calor."
+    },
+    "classics": {
+      "title": "Clásicos e outros",
+      "description": "As receitas de sempre: filloas, orellas, leite frito e moito máis. O sabor da casa de toda a vida."
     }
   },
   "auth": {

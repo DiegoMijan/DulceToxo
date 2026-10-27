@@ -58,6 +58,18 @@
     "coldCakes": {
       "title": "Cold Cakes",
       "description": "Refreshing and creamy, perfect for any occasion. With irresistible combinations of flavors and textures that will make you fall in love."
+    },
+    "layerCakes": {
+      "title": "Layer Cakes",
+      "description": "Multi-tiered cakes with fluffy sponge and cream between every layer. Stunning on the outside and delicious in every slice."
+    },
+    "iceCream": {
+      "title": "Ice Cream",
+      "description": "Homemade no-churn ice cream, creamy and full of flavour. Perfect for cooling down on hot days."
+    },
+    "classics": {
+      "title": "Classics & More",
+      "description": "The timeless recipes: filloas, orellas, fried milk and much more. The taste of home, just like always."
     }
   },
   "auth": {

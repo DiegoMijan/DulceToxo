@@ -58,6 +58,18 @@
     "coldCakes": {
       "title": "Tartas frías",
       "description": "Refrescantes y cremosas, perfectas para cualquier ocasión. Con combinaciones irresistibles de sabores y texturas que te enamorarán."
+    },
+    "layerCakes": {
+      "title": "Layer cakes",
+      "description": "Tartas de varios pisos con bizcocho esponjoso y cremas entre capa y capa. Espectaculares por fuera y deliciosas en cada porción."
+    },
+    "iceCream": {
+      "title": "Helados",
+      "description": "Helados caseros sin máquina, cremosos y llenos de sabor. Perfectos para refrescar los días de calor."
+    },
+    "classics": {
+      "title": "Clásicos y otros",
+      "description": "Las recetas de siempre: filloas, orejas, leche frita y mucho más. El sabor de casa de toda la vida."
     }
   },
   "auth": {
