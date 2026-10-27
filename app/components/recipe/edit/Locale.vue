@@ -13,7 +13,12 @@
     }
   }
 
-  const { locale, formInstance, slugError, disabled = false } = defineProps<{
+  const {
+    locale,
+    formInstance,
+    slugError,
+    disabled = false,
+  } = defineProps<{
     locale: "es" | "en" | "gl"
     formInstance: FormInstance
     slugError?: string | null
@@ -56,8 +61,26 @@
     if (disabled) return
 
     const { data, newValue, field } = event
-    data[field] = newValue ? newValue.trim() : ""
+    if (field !== "description" || typeof newValue !== "string") return
+    data[field] = newValue.trim()
     emit("change", locale, type)
+  }
+
+  const handleHeadingChange = (data: Ingredient, value: boolean) => {
+    if (disabled || locale !== "gl") return
+
+    data.is_heading = value
+
+    ;(["es", "en"] as const).forEach((otherLocale) => {
+      const match = form.value[otherLocale]?.ingredients?.value?.find(
+        (item: Ingredient) => item.order === data.order,
+      )
+      if (match) {
+        match.is_heading = value
+      }
+    })
+
+    emit("change", locale, "ingredients")
   }
 
   const addItem = (type: "ingredients" | "instructions") => {
@@ -69,6 +92,7 @@
         id: newId,
         description: "",
         order: form.value[locale]?.[type]?.value.length + 1,
+        ...(type === "ingredients" ? { is_heading: false } : {}),
       } as Ingredient | Step
 
       form.value[locale]?.[type]?.value.push({ ...newItem })
@@ -255,6 +279,22 @@
           :header="t('recipe.edit.form.order')"
           class="w-1/12"
         />
+        <Column
+          :header="t('recipe.edit.form.heading')"
+          headerStyle="width: 6rem; text-align: center"
+          bodyStyle="text-align: center"
+        >
+          <template #body="{ data }">
+            <Checkbox
+              :modelValue="Boolean((data as Ingredient).is_heading)"
+              binary
+              :disabled="disabled || locale !== 'gl'"
+              :aria-label="t('recipe.edit.form.heading')"
+              @click.stop
+              @update:model-value="(value: boolean) => handleHeadingChange(data as Ingredient, value)"
+            />
+          </template>
+        </Column>
         <Column
           field="description"
           :header="t('recipe.edit.form.description')"

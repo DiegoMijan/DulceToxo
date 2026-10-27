@@ -451,6 +451,94 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/translate": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Translate recipe editor texts
+     * @description Translates an array of texts from a source locale into one or two target locales. Empty strings are returned empty and are not sent to the provider. Requires admin authentication.
+     */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["TranslateRequest"]
+        }
+      }
+      responses: {
+        /** @description Translations keyed by target locale, same order as input texts */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["TranslateResponse"]
+          }
+        }
+        /** @description Validation error. Body `data` is the Valibot issues array from safeParse. */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Admin access required */
+        403: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Translation provider failed */
+        502: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description GOOGLE_TRANSLATE_API_KEY is not configured */
+        503: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/uploads": {
     parameters: {
       query?: never
@@ -816,6 +904,7 @@ export interface components {
       id: string
       order: number
       description: string
+      is_heading: boolean
     }
     RecipeStepContent: {
       id: string
@@ -897,6 +986,11 @@ export interface components {
       locale: "es" | "en" | "gl"
       order: number
       description: string
+      /**
+       * @description When true, this row is a section heading rather than an ingredient line
+       * @default false
+       */
+      is_heading: boolean
     }
     RecipeStepInput: {
       /** @enum {string} */
@@ -926,6 +1020,22 @@ export interface components {
     }
     CreateRecipeResponse: {
       id: string
+    }
+    TranslateRequest: {
+      /** @enum {string} */
+      source: "es" | "en" | "gl"
+      /** @description Must not include source */
+      targets: ("es" | "en" | "gl")[]
+      /** @description Each item at most 5000 characters; total at most 30000 characters */
+      texts: string[]
+    }
+    TranslateResponse: {
+      /** @description One key per requested target. Each array matches the input texts order and length. */
+      translations: {
+        es?: string[]
+        en?: string[]
+        gl?: string[]
+      }
     }
     UploadResult: {
       /** @description Cloudinary public ID */

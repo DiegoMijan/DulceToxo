@@ -45,6 +45,7 @@
         id: ing.id,
         description: ing.description,
         order: ing.order,
+        is_heading: ing.is_heading ?? false,
       })),
       instructions: steps.value.map((step) => ({
         id: step.id,
@@ -147,15 +148,28 @@
           class="flex flex-col gap-4"
         >
           <div
-            v-for="ingredient in ingredients"
+            v-for="(ingredient, index) in ingredients"
             :key="ingredient.id"
-            class="flex flex-row gap-2 items-start text-left"
+            :class="[
+              'flex flex-row gap-2 items-start text-left',
+              { 'mt-4': ingredient.is_heading && index > 0 },
+            ]"
           >
             <NuxtIcon
+              v-if="!ingredient.is_heading"
               name="emojione-v1:sparkles"
               class="text-xl shrink-0"
             />
-            <span class="text-md">{{ ingredient.description }}</span>
+            <span
+              :class="[
+                'text-md',
+                ingredient.is_heading
+                  ? 'font-bold italic uppercase text-french-lilac-700 dark:text-french-lilac-300'
+                  : '',
+              ]"
+            >
+              {{ ingredient.description }}
+            </span>
           </div>
         </div>
       </div>

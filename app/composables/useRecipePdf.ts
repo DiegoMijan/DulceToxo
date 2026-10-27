@@ -125,9 +125,14 @@ const drawColumnTitle = (doc: jsPDF, x: number, y: number, text: string) => {
 // Dibuja una columna (ingredientes o instrucciones) partiendo item a item, saltando
 // de página cuando hace falta sin tocar la otra columna. `drawMarker` pinta la viñeta
 // o el número de paso; `textIndent` es el hueco que le deja al texto.
+interface ColumnItem {
+  description: string
+  isHeading?: boolean
+}
+
 const drawColumn = (
   doc: jsPDF,
-  descriptions: string[],
+  items: ColumnItem[],
   x: number,
   columnWidth: number,
   startPage: number,
@@ -138,20 +143,31 @@ const drawColumn = (
   const cursor: ColumnCursor = { page: startPage, y: startY }
   getOrAddPage(doc, cursor.page)
 
-  descriptions.forEach((description, index) => {
-    doc.setFont("helvetica", "normal")
+  items.forEach((item, index) => {
+    const isHeading = Boolean(item.isHeading)
+    if (isHeading && index > 0) {
+      ensureSpace(doc, cursor, 4)
+      cursor.y += 3
+    }
+
+    const fontStyle = isHeading ? "bolditalic" : "normal"
+    const indent = isHeading ? 0 : textIndent
+    const description = isHeading ? item.description.toLocaleUpperCase() : item.description
+    doc.setFont("helvetica", fontStyle)
     doc.setFontSize(10.5)
-    const lines = doc.splitTextToSize(description, columnWidth - textIndent)
+    const lines = doc.splitTextToSize(description, columnWidth - indent)
     const blockHeight = Math.max(lines.length * 5, 6) + 3
 
     ensureSpace(doc, cursor, blockHeight)
 
-    drawMarker(doc, x, cursor.y, index)
+    if (!isHeading) {
+      drawMarker(doc, x, cursor.y, index)
+    }
 
-    doc.setTextColor(...BRAND.text)
-    doc.setFont("helvetica", "normal")
+    doc.setTextColor(...(isHeading ? BRAND.heading : BRAND.text))
+    doc.setFont("helvetica", fontStyle)
     doc.setFontSize(10.5)
-    doc.text(lines, x + textIndent, cursor.y)
+    doc.text(lines, x + indent, cursor.y)
     cursor.y += blockHeight
   })
 
@@ -183,7 +199,9 @@ const drawFooters = (doc: jsPDF) => {
     doc.setFont("helvetica", "normal")
     doc.setFontSize(8)
     doc.text("Dulce Toxo • Recetario", PAGE.margin, PAGE.height - 9)
-    doc.text(`${page} / ${pageCount}`, PAGE.width - PAGE.margin, PAGE.height - 9, { align: "right" })
+    doc.text(`${page} / ${pageCount}`, PAGE.width - PAGE.margin, PAGE.height - 9, {
+      align: "right",
+    })
   }
 }
 
@@ -305,7 +323,10 @@ export const buildRecipePdf = (
 
   drawColumn(
     doc,
-    recipe.ingredients.map((ingredient) => ingredient.description),
+    recipe.ingredients.map((ingredient) => ({
+      description: ingredient.description,
+      isHeading: ingredient.is_heading,
+    })),
     PAGE.margin,
     leftWidth,
     firstPage,
@@ -315,7 +336,9 @@ export const buildRecipePdf = (
   )
   drawColumn(
     doc,
-    recipe.instructions.map((instruction) => instruction.description),
+    recipe.instructions.map((instruction) => ({
+      description: instruction.description,
+    })),
     rightX,
     rightWidth,
     firstPage,
