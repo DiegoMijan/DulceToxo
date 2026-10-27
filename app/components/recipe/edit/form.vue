@@ -55,7 +55,7 @@
   const loading = ref(false)
   const loadingRecipes = ref(false)
   const saving = ref(false)
-  const selectedRecipeId = ref<string | null>(recipeParam || null)
+  const selectedRecipeId = ref<string>(recipeParam || NEW_RECIPE_ID)
   const currentRecipe = ref<RecipeDetail | null>(null)
   const slugErrors = ref<Record<LocaleKey, string | null>>({ es: null, en: null, gl: null })
 
@@ -245,11 +245,13 @@
       })),
     )
 
-    const images = values.images.map((url, index) => {
-      const match = url.match(/\/upload\/(?:v\d+\/)?(.+)$/)
-      const publicId = match ? match[1].replace(/\.[^.]+$/, "") : url
-      return { public_id: publicId, order: index + 1 }
-    })
+    const images = values.images
+      .filter((url) => !url.startsWith("data:") && !url.startsWith("blob:"))
+      .map((url, index) => {
+        const match = url.match(/\/upload\/(?:v\d+\/)?(.+)$/)
+        const publicId = match ? match[1].replace(/\.[^.]+$/, "") : url
+        return { public_id: publicId, order: index + 1 }
+      })
 
     return {
       category_id: categoryId,
@@ -261,6 +263,22 @@
       steps,
       images,
     }
+  }
+
+  const getFetchStatus = (error: unknown): number | undefined => {
+    if (!error || typeof error !== "object") return undefined
+    const fetchError = error as {
+      statusCode?: number
+      status?: number
+      data?: { statusCode?: number }
+    }
+    return fetchError.statusCode ?? fetchError.status ?? fetchError.data?.statusCode
+  }
+
+  const getFetchMessage = (error: unknown): string => {
+    if (!error || typeof error !== "object") return ""
+    const fetchError = error as { data?: { message?: string }; message?: string }
+    return fetchError.data?.message || fetchError.message || ""
   }
 
   const handleSlugConflict = (errorMessage: string) => {
@@ -299,7 +317,8 @@
 
         await loadAllRecipes()
         selectedRecipeId.value = result.id
-        navigateTo(localePath(`/edit/${result.id}`))
+        await navigateTo(localePath(`/edit/${result.id}`))
+        await loadRecipeDetail(result.id)
       } else {
         await $fetch(`/api/recipes/${selectedRecipeId.value}`, {
           method: "PUT",
@@ -313,13 +332,11 @@
         })
 
         await loadAllRecipes()
-        await loadRecipeDetail(selectedRecipeId.value!)
+        await loadRecipeDetail(selectedRecipeId.value)
       }
     } catch (error: unknown) {
-      const fetchError = error as { statusCode?: number; data?: { message?: string } }
-
-      if (fetchError.statusCode === 409) {
-        const errorMessage = fetchError.data?.message || ""
+      if (getFetchStatus(error) === 409) {
+        const errorMessage = getFetchMessage(error)
         handleSlugConflict(errorMessage)
         toast.add({
           severity: "error",

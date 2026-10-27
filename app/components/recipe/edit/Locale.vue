@@ -146,31 +146,55 @@
           />
         </template>
       </FormField>
-      <div class="grow basis-64 flex flex-col gap-1">
-        <label
-          :for="`locales.${locale}.slug`"
-          class="text-sm font-medium text-french-lilac-600"
+      <FormField
+        :fieldName="`locales.${locale}.slug`"
+        :label="t('recipe.edit.form.slug')"
+        :form="formInstance"
+        class="grow basis-64"
+      >
+        <template #field>
+          <InputText
+            :id="`locales.${locale}.slug`"
+            :name="`locales.${locale}.slug`"
+            :placeholder="t('recipe.edit.form.slug')"
+            :maxlength="200"
+            :value="form?.[locale]?.slug?.value"
+            class="w-full"
+            :class="{ 'p-invalid': slugError }"
+            @blur="handleBlur"
+          />
+        </template>
+        <template
+          v-if="slugError"
+          #error
         >
-          {{ t('recipe.edit.form.slug') }}
-        </label>
-        <InputText
-          :id="`locales.${locale}.slug`"
-          :name="`locales.${locale}.slug`"
-          :placeholder="t('recipe.edit.form.slug')"
-          :maxlength="200"
-          :value="form?.[locale]?.slug?.value"
+          <Message
+            severity="error"
+            size="small"
+            variant="simple"
+          >
+            {{ slugError }}
+          </Message>
+        </template>
+      </FormField>
+    </div>
+    <FormField
+      :fieldName="`locales.${locale}.description`"
+      :label="t('recipe.edit.form.description')"
+      :form="formInstance"
+      class="w-full"
+    >
+      <template #field>
+        <Textarea
+          :name="`locales.${locale}.description`"
+          :placeholder="t('recipe.edit.form.description')"
+          :value="form?.[locale]?.description?.value"
           class="w-full"
-          :class="{ 'p-invalid': slugError }"
+          rows="3"
           @blur="handleBlur"
         />
-        <small
-          v-if="slugError"
-          class="text-red-500"
-        >
-          {{ slugError }}
-        </small>
-      </div>
-    </div>
+      </template>
+    </FormField>
     <div class="w-full">
       <div class="flex justify-between items-center mb-2">
         <h1 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300">{{ t('recipe.edit.form.ingredients') }}</h1>

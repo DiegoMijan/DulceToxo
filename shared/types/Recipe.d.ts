@@ -38,7 +38,7 @@ export interface Ingredient extends State {
 export interface Step extends State, Ingredient {}
 
 export type RecipeLocaleForm = {
-  id: {
+  slug: {
     invalid: boolean
     error: {
       message: string | null
@@ -46,6 +46,13 @@ export type RecipeLocaleForm = {
     value: string
   }
   title: {
+    invalid: boolean
+    error: {
+      message: string | null
+    }
+    value: string
+  }
+  description: {
     invalid: boolean
     error: {
       message: string | null
