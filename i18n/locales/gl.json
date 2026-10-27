@@ -209,9 +209,20 @@
       "updatedAt": "Data de actualización",
       "difficulty": "Dificultade",
       "totalTime": "Tempo total",
+      "ratingAvg": "Mellor valoradas",
       "ascending": "ascendente",
       "descending": "descendente",
       "toggleDirection": "Cambiar a dirección da ordenación ({direction})"
+    },
+    "rating": {
+      "none": "Sen valoracións",
+      "loginToRate": "Inicia sesión para valorar",
+      "yours": "A túa valoración",
+      "remove": "Quitar valoración",
+      "saveError": "Non se puido gardar a valoración",
+      "averageAria": "Valoración media: {avg} de 5, {count} votos",
+      "yoursAria": "A túa valoración: {value} de 5",
+      "yoursEmptyAria": "A túa valoración: aínda non votaches"
     },
     "difficultyTooltip": "Fai clic para ver a explicación de cada nivel de dificultade",
     "difficultyExplanationTitle": "Explicación da dificultade",

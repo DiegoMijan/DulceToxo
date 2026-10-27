@@ -15,6 +15,7 @@
   const steps = computed(() => recipe.steps[currentLocale.value] || [])
 
   const difficultyDrawerVisible = ref(false)
+  const { isLoggedIn } = useAuth()
 
   const images = computed(() => {
     const title = localeData.value?.title || t("upload.imageFallback")
@@ -85,7 +86,7 @@
       >
         {{ localeData.description }}
       </p>
-      <p class="sub-title flex flex-row gap-3 text-sm justify-center">
+      <div class="sub-title flex flex-row flex-wrap gap-3 text-sm justify-center items-center">
         <span class="separator-right pr-3">
           {{ t("recipe.prepTime", { time: recipe.prep_time }) }}
         </span>
@@ -94,7 +95,7 @@
         </span>
         <span
           v-tooltip.top="$t('recipe.difficultyTooltip')"
-          class="flex flex-row gap-2 justify-center cursor-pointer"
+          class="separator-right pr-3 flex flex-row gap-2 justify-center cursor-pointer"
           @click="difficultyDrawerVisible = true"
         >
           {{ t("recipe.difficulty") }}
@@ -116,7 +117,17 @@
             </template>
           </Rating>
         </span>
-      </p>
+        <RecipeRatingSummary
+          :rating-avg="recipe.rating_avg"
+          :rating-count="recipe.rating_count"
+          :prompt-login="!isLoggedIn"
+        />
+      </div>
+      <RecipeRatingVote
+        v-if="isLoggedIn"
+        :recipe-id="recipe.id"
+        :my-rating="recipe.my_rating"
+      />
       <Button
         severity="secondary"
         outlined

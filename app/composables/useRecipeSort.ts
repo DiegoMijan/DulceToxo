@@ -11,6 +11,7 @@ export const RECIPE_SORT_CODES = [
   "updatedAt",
   "difficulty",
   "totalTime",
+  "ratingAvg",
 ] as const
 
 export type RecipeSortCode = (typeof RECIPE_SORT_CODES)[number]
@@ -22,6 +23,7 @@ export const RECIPE_SORT_DEFAULT_DIRECTION: Record<RecipeSortCode, RecipeSortDir
   updatedAt: "desc",
   difficulty: "asc",
   totalTime: "asc",
+  ratingAvg: "desc",
 }
 
 const RECIPE_SORT_ICONS: Record<RecipeSortCode, string> = {
@@ -30,6 +32,7 @@ const RECIPE_SORT_ICONS: Record<RecipeSortCode, string> = {
   updatedAt: "line-md:bell-twotone-loop",
   difficulty: "icon-park-twotone:chef-hat-one",
   totalTime: "tabler:clock",
+  ratingAvg: "line-md:star-filled",
 }
 
 const LEGACY_SORT_CODES: Record<string, RecipeSortCode> = {
@@ -84,7 +87,29 @@ const getSortValue = (
       return recipe.difficulty
     case "totalTime":
       return recipe.prep_time + recipe.cook_time
+    case "ratingAvg":
+      return recipe.rating_avg ?? 0
   }
+}
+
+const isRatedRecipe = (recipe: RecipeListItem): boolean =>
+  hasRecipeVotes(recipe.rating_avg, recipe.rating_count)
+
+const compareRating = (
+  left: RecipeListItem,
+  right: RecipeListItem,
+  direction: RecipeSortDirection,
+): number => {
+  const leftRated = isRatedRecipe(left)
+  const rightRated = isRatedRecipe(right)
+  if (leftRated !== rightRated) return leftRated ? -1 : 1
+  if (!leftRated) return 0
+
+  const factor = direction === "asc" ? 1 : -1
+  const avgComparison = ((left.rating_avg ?? 0) - (right.rating_avg ?? 0)) * factor
+  if (avgComparison !== 0) return avgComparison
+
+  return (left.rating_count - right.rating_count) * factor
 }
 
 const compareSortValues = (
@@ -108,12 +133,19 @@ export const sortRecipeListBy = (
   const factor = direction === "asc" ? 1 : -1
 
   return [...recipes].sort((left, right) => {
+    if (code === "ratingAvg") {
+      const ratingComparison = compareRating(left, right, direction)
+      if (ratingComparison !== 0) return ratingComparison
+    }
+
     const comparison =
-      compareSortValues(
-        getSortValue(left, locale, code),
-        getSortValue(right, locale, code),
-        locale,
-      ) * factor
+      code === "ratingAvg"
+        ? 0
+        : compareSortValues(
+            getSortValue(left, locale, code),
+            getSortValue(right, locale, code),
+            locale,
+          ) * factor
 
     if (comparison !== 0) return comparison
 

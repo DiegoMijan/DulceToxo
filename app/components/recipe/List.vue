@@ -20,6 +20,8 @@
       id: item.id,
       slug: item.locale[localeKey]?.slug || item.id,
       title: item.locale[localeKey]?.title || "",
+      ratingAvg: item.rating_avg,
+      ratingCount: item.rating_count,
     }))
   })
 </script>
@@ -47,5 +49,16 @@
     option-value="slug"
     class="flex-1"
     list-style="max-height: 100% !important;"
-  />
+  >
+    <template #option="{ option }">
+      <div class="flex flex-col gap-0.5 min-w-0 py-0.5">
+        <span class="truncate">{{ option.title }}</span>
+        <RecipeRatingSummary
+          :rating-avg="option.ratingAvg"
+          :rating-count="option.ratingCount"
+          compact
+        />
+      </div>
+    </template>
+  </ListBox>
 </template>
