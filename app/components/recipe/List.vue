@@ -51,7 +51,7 @@
     list-style="max-height: 100% !important;"
   >
     <template #option="{ option }">
-      <div class="flex flex-col gap-0.5 min-w-0 py-0.5">
+      <div class="flex flex-col gap-0.5 min-w-0 py-0.5 w-full">
         <span class="truncate">{{ option.title }}</span>
         <RecipeRatingSummary
           :rating-avg="option.ratingAvg"

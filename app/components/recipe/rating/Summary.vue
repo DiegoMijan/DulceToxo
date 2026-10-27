@@ -40,8 +40,8 @@
     :class="{ 'items-start! gap-0.5': compact }"
   >
     <div
-      class="flex flex-row items-center gap-2"
-      :class="{ 'gap-1': compact }"
+      class="flex items-center gap-2"
+      :class="compact ? 'flex-col items-start gap-0.5' : 'flex-row'"
     >
       <NuxtLink
         v-if="promptLogin"
@@ -69,8 +69,8 @@
         :aria-label="averageAriaLabel"
       />
       <span
-        class="text-sm text-stone-600 dark:text-stone-300"
-        :class="{ 'text-xs': compact }"
+        class="text-stone-600 dark:text-stone-300"
+        :class="compact ? 'text-[0.7rem] leading-tight break-words' : 'text-sm'"
       >
         {{ summaryText }}
       </span>

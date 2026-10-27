@@ -1,11 +1,11 @@
 export const hasRecipeVotes = (ratingAvg: number | null, ratingCount: number): boolean =>
   ratingAvg != null && ratingCount > 0
 
-export const formatRatingAverage = (ratingAvg: number, locale: string): string =>
-  new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  }).format(ratingAvg)
+export const formatRatingAverage = (ratingAvg: number, locale: string): string => {
+  const [integer, fraction] = ratingAvg.toFixed(1).split(".")
+  const decimal = locale === "en" ? "." : ","
+  return `${integer}${decimal}${fraction}`
+}
 
 export const formatRatingSummary = (
   ratingAvg: number,
