@@ -87,9 +87,13 @@
     }
   }
 
+  let syncQueued = false
   const syncListViewport = async () => {
-    if (loading.value || options.value.length === 0) return
+    if (syncQueued) return
+    syncQueued = true
     await nextTick()
+    syncQueued = false
+    if (loading.value || options.value.length === 0) return
     measureListViewport()
     await nextTick()
     scrollSelectedIntoView()
@@ -135,7 +139,7 @@
       option-label="title"
       option-value="slug"
       class="w-full"
-      :scroll-height="listScrollHeight || undefined"
+      :scroll-height="listScrollHeight || 'none'"
       :auto-option-focus="false"
       :focus-on-hover="false"
       :pt="{
