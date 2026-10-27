@@ -79,6 +79,7 @@ export default defineNuxtConfig({
   3."Pacifico" - Para acentos y elementos decorativos
   4."Merriweather" - Para subtítulos o texto destacado
   5."Roboto" - Como fuente de respaldo y para elementos de interfaz
+  6."Caveat" - Títulos de sección de ingredientes
   */
   fonts: {
     // @nuxt/fonts v1: mantener el comportamiento de v0.x
@@ -103,6 +104,12 @@ export default defineNuxtConfig({
       {
         name: "Pacifico",
         provider: "google",
+      },
+      {
+        name: "Caveat",
+        provider: "google",
+        weights: [600],
+        styles: ["normal"],
       },
       {
         name: "Merriweather",
