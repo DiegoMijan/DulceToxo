@@ -33,28 +33,35 @@
     const root = listRoot.value
     if (!root) return
 
-    const option = root.querySelector<HTMLElement>(".p-listbox-option")
+    const optionEls = [...root.querySelectorAll<HTMLElement>(".p-listbox-option")]
     const list = root.querySelector<HTMLElement>(".p-listbox-list")
-    if (!option || !list) return
+    if (optionEls.length === 0 || !list) return
 
-    const itemHeight = option.getBoundingClientRect().height
+    const itemHeight = optionEls[0].getBoundingClientRect().height
     if (itemHeight <= 0) return
 
     const listStyles = getComputedStyle(list)
     const gap = Number.parseFloat(listStyles.rowGap || listStyles.gap || "0") || 0
-    const paddingBlock =
-      (Number.parseFloat(listStyles.paddingTop) || 0) +
-      (Number.parseFloat(listStyles.paddingBottom) || 0)
+    const paddingTop = Number.parseFloat(listStyles.paddingTop) || 0
+    const paddingBottom = Number.parseFloat(listStyles.paddingBottom) || 0
+    const visibleCount = Math.min(RECIPE_LIST_VISIBLE_ITEMS, optionEls.length)
+    let itemsSpan = 0
+    for (let index = 0; index < visibleCount; index += 1) {
+      const height = optionEls[index].getBoundingClientRect().height
+      if (height <= 0) return
+      itemsSpan += height
+      if (index < visibleCount - 1) itemsSpan += gap
+    }
+    const maxHeight = paddingTop + itemsSpan + paddingBottom
+
+    if (maxHeight <= 0) return
 
     root.style.setProperty("--recipe-list-item-height", `${itemHeight}px`)
     root.style.setProperty("--recipe-list-item-gap", `${gap}px`)
-    root.style.setProperty("--recipe-list-padding-block", `${paddingBlock}px`)
+    root.style.setProperty("--recipe-list-padding-block", `${paddingTop + paddingBottom}px`)
     root.style.setProperty("--recipe-list-visible-items", String(RECIPE_LIST_VISIBLE_ITEMS))
+    root.style.setProperty("--recipe-list-max-height", `${maxHeight}px`)
 
-    const maxHeight =
-      RECIPE_LIST_VISIBLE_ITEMS * itemHeight +
-      Math.max(RECIPE_LIST_VISIBLE_ITEMS - 1, 0) * gap +
-      paddingBlock
     const nextHeight = `${maxHeight}px`
     if (listScrollHeight.value !== nextHeight) {
       listScrollHeight.value = nextHeight
@@ -69,6 +76,8 @@
     const selected = container?.querySelector<HTMLElement>("[data-p-selected='true']")
     if (!container || !selected) return
 
+    // block: "nearest" inside the list container only — do not use
+    // Element.scrollIntoView, which would also scroll the page.
     const containerRect = container.getBoundingClientRect()
     const selectedRect = selected.getBoundingClientRect()
     if (selectedRect.bottom > containerRect.bottom) {
@@ -127,6 +136,8 @@
       option-value="slug"
       class="w-full"
       :scroll-height="listScrollHeight || undefined"
+      :auto-option-focus="false"
+      :focus-on-hover="false"
       :pt="{
         listContainer: { class: 'recipe-list-scroll' },
         option: { class: 'min-w-0' },
@@ -184,16 +195,19 @@
   .recipe-list :deep(.recipe-list-scroll) {
     overflow-x: hidden;
     overflow-y: auto;
+    overscroll-behavior: contain;
     scrollbar-width: thin;
     scrollbar-color: var(--color-french-lilac-400) var(--color-french-lilac-100);
   }
 
+  .recipe-list--measured {
+    max-height: var(--recipe-list-max-height);
+    overflow: hidden;
+  }
+
+  .recipe-list--measured :deep(.p-listbox),
   .recipe-list--measured :deep(.recipe-list-scroll) {
-    max-height: calc(
-      var(--recipe-list-visible-items) * var(--recipe-list-item-height) +
-        (var(--recipe-list-visible-items) - 1) * var(--recipe-list-item-gap) +
-        var(--recipe-list-padding-block)
-    );
+    max-height: var(--recipe-list-max-height);
   }
 
   .dark .recipe-list :deep(.recipe-list-scroll) {
