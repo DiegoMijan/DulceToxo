@@ -45,7 +45,9 @@
   const { t, locale } = useI18n()
   const toast = useToast()
   const { formStates, resetForm, form } = useStateForm("form")
-  const { categories, categoriesByLocale, getCategories } = useCategories()
+  const categoriesStore = useCategories()
+  const { categories, categoriesByLocale } = storeToRefs(categoriesStore)
+  const { getCategories } = categoriesStore
   const recipesStore = useRecipes()
 
   const runtimeConfig = useRuntimeConfig()
@@ -117,7 +119,8 @@
       await getCategories()
       const allRecipesList: RecipeListItem[] = []
 
-      for (const category of categories.value) {
+      const categoryList = Array.isArray(categories.value) ? categories.value : []
+      for (const category of categoryList) {
         const recipes = await recipesStore.getRecipesByCategory(category.id, true)
         allRecipesList.push(...recipes)
       }
