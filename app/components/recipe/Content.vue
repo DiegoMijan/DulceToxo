@@ -164,7 +164,7 @@
               :class="[
                 'text-md',
                 ingredient.is_heading
-                  ? 'font-bold italic uppercase text-french-lilac-700 dark:text-french-lilac-300'
+                  ? 'font-caveat font-semibold text-[1.7rem] leading-snug text-french-lilac-700 dark:text-french-lilac-300'
                   : '',
               ]"
             >

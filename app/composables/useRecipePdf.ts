@@ -150,13 +150,15 @@ const drawColumn = (
       cursor.y += 3
     }
 
+    const fontFamily = isHeading ? "times" : "helvetica"
     const fontStyle = isHeading ? "bolditalic" : "normal"
+    const fontSize = isHeading ? 12.5 : 10.5
     const indent = isHeading ? 0 : textIndent
-    const description = isHeading ? item.description.toLocaleUpperCase() : item.description
-    doc.setFont("helvetica", fontStyle)
-    doc.setFontSize(10.5)
+    const description = item.description
+    doc.setFont(fontFamily, fontStyle)
+    doc.setFontSize(fontSize)
     const lines = doc.splitTextToSize(description, columnWidth - indent)
-    const blockHeight = Math.max(lines.length * 5, 6) + 3
+    const blockHeight = Math.max(lines.length * (isHeading ? 5.5 : 5), 6) + 3
 
     ensureSpace(doc, cursor, blockHeight)
 
@@ -165,8 +167,8 @@ const drawColumn = (
     }
 
     doc.setTextColor(...(isHeading ? BRAND.heading : BRAND.text))
-    doc.setFont("helvetica", fontStyle)
-    doc.setFontSize(10.5)
+    doc.setFont(fontFamily, fontStyle)
+    doc.setFontSize(fontSize)
     doc.text(lines, x + indent, cursor.y)
     cursor.y += blockHeight
   })
