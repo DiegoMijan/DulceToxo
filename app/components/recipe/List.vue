@@ -22,6 +22,7 @@
       title: item.locale[localeKey]?.title || "",
       ratingAvg: item.rating_avg,
       ratingCount: item.rating_count,
+      hasVotes: hasRecipeVotes(item.rating_avg, item.rating_count),
     }))
   })
 </script>
@@ -49,14 +50,18 @@
     option-value="slug"
     class="flex-1"
     list-style="max-height: 100% !important;"
+    :pt="{ option: { class: 'items-start! overflow-visible! whitespace-normal!' } }"
   >
     <template #option="{ option }">
-      <div class="flex flex-col gap-0.5 min-w-0 py-0.5 w-full">
-        <span class="truncate">{{ option.title }}</span>
+      <div class="flex min-w-0 w-full flex-col py-0.5">
+        <span class="whitespace-normal break-words leading-snug">{{ option.title }}</span>
         <RecipeRatingSummary
+          v-if="option.hasVotes"
+          class="mt-0.5"
           :rating-avg="option.ratingAvg"
           :rating-count="option.ratingCount"
           compact
+          hide-when-empty
         />
       </div>
     </template>

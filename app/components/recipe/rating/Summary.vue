@@ -4,11 +4,13 @@
     ratingCount,
     compact = false,
     promptLogin = false,
+    hideWhenEmpty = false,
   } = defineProps<{
     ratingAvg: number | null
     ratingCount: number
     compact?: boolean
     promptLogin?: boolean
+    hideWhenEmpty?: boolean
   }>()
 
   const { t, locale } = useI18n()
@@ -19,6 +21,7 @@
   const starsValue = computed(() => ratingStarsValue(ratingAvg))
   const summaryText = computed(() => {
     if (!hasVotes.value || ratingAvg == null) return t("recipe.rating.none")
+    if (compact) return formatRatingAverage(ratingAvg, locale.value)
     return formatRatingSummary(ratingAvg, ratingCount, locale.value)
   })
   const averageAriaLabel = computed(() => {
@@ -36,12 +39,13 @@
 
 <template>
   <div
+    v-if="!hideWhenEmpty || hasVotes"
     class="flex flex-col items-center gap-1"
     :class="{ 'items-start! gap-0.5': compact }"
   >
     <div
       class="flex items-center gap-2"
-      :class="compact ? 'flex-col items-start gap-0.5' : 'flex-row'"
+      :class="compact ? 'flex-row items-center gap-1' : 'flex-row'"
     >
       <NuxtLink
         v-if="promptLogin"
