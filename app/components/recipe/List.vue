@@ -281,13 +281,7 @@
 </template>
 <style scoped>
   .recipe-list {
-    --font-recipe-title-nunito: "Nunito", ui-sans-serif, sans-serif;
-    --font-recipe-title-quicksand: "Quicksand", ui-sans-serif, sans-serif;
-    --font-recipe-title-lora: "Lora", ui-serif, serif;
-    --font-recipe-title-fraunces: "Fraunces", ui-serif, serif;
-    --font-recipe-title-cormorant: "Cormorant Garamond", ui-serif, serif;
-    /* Switch list titles by changing only the next line. */
-    --font-recipe-title: var(--font-recipe-title-nunito);
+    --font-recipe-title: "Quicksand", ui-sans-serif, sans-serif;
     --recipe-list-title-gap: 0.375rem;
     --recipe-list-visible-items: 10;
   }
