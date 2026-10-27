@@ -8,14 +8,13 @@ interface Props {
   isModalOpen?: boolean
 }
 
-const { description, icon, title, urlName, darkIcon, isModalOpen } = defineProps<Props>()
+const { icon, title, urlName, darkIcon, isModalOpen } = defineProps<Props>()
 
 const localePath = useLocalePath()
 const colorMode = useColorMode()
 
 const cardRef = ref<HTMLElement | null>(null)
 const transformStyle = ref("rotateX(0deg) rotateY(0deg) scale(1)")
-const hasPrefetched = ref(false)
 
 const { elementX, elementY, isOutside } = useMouseInElement(cardRef)
 const { width, height } = useElementBounding(cardRef)
@@ -42,44 +41,51 @@ watchEffect(() => {
   transformStyle.value = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`
 })
 
-const categoryPath = computed(() => (urlName ? localePath(`/${urlName}`) : null))
-
-const goToCategory = () => {
-  if (!categoryPath.value) return
-  navigateTo(categoryPath.value)
-}
-
-const handleMouseEnter = () => {
-  if (!hasPrefetched.value && categoryPath.value) {
-    preloadRouteComponents(categoryPath.value)
-    hasPrefetched.value = true
-  }
-}
-
-const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault()
-    goToCategory()
-  }
-}
+const categoryPath = computed(() => (urlName ? localePath(`/${urlName}`) : undefined))
 </script>
 
 <template>
-  <Card
-    ref="cardRef"
-    class="cursor-pointer card-container"
-    :style="{ transform: transformStyle }"
-    role="link"
-    tabindex="0"
+  <NuxtLink
+    v-if="categoryPath"
+    :to="categoryPath"
+    class="block no-underline text-inherit"
     :aria-label="title"
+  >
+    <Card
+      ref="cardRef"
+      class="cursor-pointer card-container"
+      :style="{ transform: transformStyle }"
+      :pt="{
+        content: {
+          class: 'content',
+        },
+      }"
+    >
+      <template #header>
+        <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
+          <slot
+            name="icon"
+            :calculated-icon
+          />
+          <span>{{ title }}</span>
+        </h3>
+      </template>
+      <p>{{ description }}</p>
+      <template #content>
+        {{ description }}
+      </template>
+    </Card>
+  </NuxtLink>
+  <Card
+    v-else
+    ref="cardRef"
+    class="card-container"
+    :style="{ transform: transformStyle }"
     :pt="{
       content: {
         class: 'content',
       },
     }"
-    @mouseenter="handleMouseEnter"
-    @click="goToCategory"
-    @keydown="handleKeyDown"
   >
     <template #header>
       <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
