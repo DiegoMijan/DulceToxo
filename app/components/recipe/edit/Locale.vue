@@ -61,7 +61,8 @@
     if (disabled) return
 
     const { data, newValue, field } = event
-    data[field] = newValue ? newValue.trim() : ""
+    if (field !== "description" || typeof newValue !== "string") return
+    data[field] = newValue.trim()
     emit("change", locale, type)
   }
 
@@ -279,7 +280,6 @@
           class="w-1/12"
         />
         <Column
-          field="is_heading"
           :header="t('recipe.edit.form.heading')"
           headerStyle="width: 6rem; text-align: center"
           bodyStyle="text-align: center"
