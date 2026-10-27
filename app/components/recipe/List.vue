@@ -15,6 +15,10 @@
   const loading = computed(() => recipesStore.loadingList)
   const listRoot = useTemplateRef<HTMLElement>("listRoot")
   const listScrollHeight = shallowRef("")
+  const nativeScrollIntoView = HTMLElement.prototype.scrollIntoView
+  let pendingAlignSelected = true
+  let allowOptionScrollIntoView = false
+  let preservedScrollTop = 0
 
   const options = computed(() => {
     const recipes = sortRecipeList(recipesStore.recipesByCategory.get(categoryId) ?? [])
@@ -29,6 +33,18 @@
     }))
   })
 
+  const getScrollContainer = () =>
+    listRoot.value?.querySelector<HTMLElement>(".p-listbox-list-container") ?? null
+
+  const guardOptionScrollIntoView = (option: HTMLElement) => {
+    if (option.dataset.scrollGuard === "true") return
+    option.dataset.scrollGuard = "true"
+    option.scrollIntoView = ((arg?: boolean | ScrollIntoViewOptions) => {
+      if (!allowOptionScrollIntoView) return
+      nativeScrollIntoView.call(option, arg as boolean | ScrollIntoViewOptions)
+    }) as HTMLElement["scrollIntoView"]
+  }
+
   const measureListViewport = () => {
     const root = listRoot.value
     if (!root) return
@@ -36,6 +52,7 @@
     const optionEls = [...root.querySelectorAll<HTMLElement>(".p-listbox-option")]
     const list = root.querySelector<HTMLElement>(".p-listbox-list")
     if (optionEls.length === 0 || !list) return
+    optionEls.forEach(guardOptionScrollIntoView)
 
     const itemHeight = optionEls[0].getBoundingClientRect().height
     if (itemHeight <= 0) return
@@ -68,27 +85,32 @@
     }
   }
 
-  const scrollSelectedIntoView = () => {
-    const root = listRoot.value
-    if (!root) return
-
-    const container = root.querySelector<HTMLElement>(".p-listbox-list-container")
+  const scrollSelectedIntoView = (): boolean => {
+    const container = getScrollContainer()
     const selected = container?.querySelector<HTMLElement>("[data-p-selected='true']")
-    if (!container || !selected) return
+    if (!container || !selected) return false
 
-    // block: "nearest" inside the list container only — do not use
-    // Element.scrollIntoView, which would also scroll the page.
-    const containerRect = container.getBoundingClientRect()
-    const selectedRect = selected.getBoundingClientRect()
-    if (selectedRect.bottom > containerRect.bottom) {
-      container.scrollTop += selectedRect.bottom - containerRect.bottom
-    } else if (selectedRect.top < containerRect.top) {
-      container.scrollTop -= containerRect.top - selectedRect.top
+    const pageX = window.scrollX
+    const pageY = window.scrollY
+    allowOptionScrollIntoView = true
+    selected.scrollIntoView({ block: "nearest", inline: "nearest" })
+    allowOptionScrollIntoView = false
+    if (window.scrollX !== pageX || window.scrollY !== pageY) {
+      window.scrollTo(pageX, pageY)
     }
+    return true
   }
 
+  const restoreScroll = () => {
+    const container = getScrollContainer()
+    if (!container) return
+    container.scrollTop = preservedScrollTop
+  }
+
+  type SyncMode = "align" | "restore" | "measure"
+
   let syncQueued = false
-  const syncListViewport = async () => {
+  const syncListViewport = async (mode: SyncMode) => {
     if (syncQueued) return
     syncQueued = true
     await nextTick()
@@ -96,19 +118,37 @@
     if (loading.value || options.value.length === 0) return
     measureListViewport()
     await nextTick()
-    scrollSelectedIntoView()
+    if (mode === "align" || pendingAlignSelected) {
+      if (scrollSelectedIntoView()) {
+        pendingAlignSelected = false
+      }
+      return
+    }
+    if (mode === "restore") {
+      restoreScroll()
+    }
   }
 
+  watch(categoryId, (nextId, previousId) => {
+    if (previousId && nextId !== previousId) {
+      pendingAlignSelected = true
+    }
+  })
+
+  watch(options, () => {
+    preservedScrollTop = getScrollContainer()?.scrollTop ?? preservedScrollTop
+  }, { flush: "pre" })
+
   watch(
-    [options, recipe, loading],
+    [options, loading],
     () => {
-      void syncListViewport()
+      void syncListViewport(pendingAlignSelected ? "align" : "restore")
     },
     { flush: "post", immediate: true },
   )
 
   useResizeObserver(listRoot, () => {
-    void syncListViewport()
+    void syncListViewport("measure")
   })
 </script>
 <template>
@@ -143,12 +183,15 @@
       :auto-option-focus="false"
       :focus-on-hover="false"
       :pt="{
-        listContainer: { class: 'recipe-list-scroll' },
+        listContainer: { class: 'recipe-list-scroll', 'data-testid': 'recipe-list-scroll' },
         option: { class: 'min-w-0' },
       }"
     >
       <template #option="{ option }">
-        <div class="recipe-list-item min-w-0 w-full">
+        <div
+          class="recipe-list-item min-w-0 w-full"
+          :data-recipe-slug="option.slug"
+        >
           <span class="recipe-list-title">{{ option.title }}</span>
           <RecipeRatingSummary
             class="recipe-list-rating"
