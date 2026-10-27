@@ -69,6 +69,12 @@ export const useAuth = () => {
     isLoggedIn: boolean
     isAdmin: boolean
   }> => {
+    const existingUser = session.value.data?.user
+    if (existingUser && !session.value.isPending) {
+      const userType = (existingUser as { type?: number }).type
+      return { isLoggedIn: true, isAdmin: userType === 1 }
+    }
+
     const { data } = await authClient.getSession()
     if (!data?.user) {
       return { isLoggedIn: false, isAdmin: false }
