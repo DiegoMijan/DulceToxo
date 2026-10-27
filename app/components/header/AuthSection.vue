@@ -1,7 +1,8 @@
 <script setup lang="ts">
   import { useAuth } from "~/composables/useAuth"
 
-  const { user, isLoggedIn, signOut } = useAuth()
+  const { user, isLoggedIn, isAdmin, signOut } = useAuth()
+  const localePath = useLocalePath()
 
   const isDropdownOpen = ref(false)
   const isSigningOut = ref(false)
@@ -88,6 +89,19 @@
                 class="inline w-4 h-4 mr-2"
               />
               Dashboard
+            </NuxtLink>
+
+            <NuxtLink
+              v-if="isAdmin"
+              :to="localePath('/edit')"
+              class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              @click="closeDropdown"
+            >
+              <NuxtIcon
+                name="mdi:plus"
+                class="inline w-4 h-4 mr-2"
+              />
+              {{ $t('recipe.edit.newRecipe') }}
             </NuxtLink>
             
             <button

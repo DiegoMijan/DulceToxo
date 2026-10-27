@@ -98,6 +98,10 @@
         type="dotted"
         class="my-8!"
       />
+      <RecipeNewButton
+        v-if="categoryId"
+        :category-id="categoryId"
+      />
       <div
         v-if="loading"
         class="flex justify-center items-center py-8"

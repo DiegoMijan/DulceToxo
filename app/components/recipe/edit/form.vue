@@ -41,6 +41,10 @@
 
   const route = useRoute()
   const { recipe: recipeParam } = route.params as { recipe?: string }
+  const preselectedCategoryQuery = computed(() => {
+    const value = route.query.category
+    return typeof value === "string" ? value : ""
+  })
 
   const localePath = useLocalePath()
   const { t, locale } = useI18n()
@@ -98,9 +102,27 @@
     instructions: [],
   })
 
+  const resolveCategoryUrlName = (categoryRef: string): string => {
+    if (!categoryRef) return ""
+
+    const byId = categories.value.find((category) => category.id === categoryRef)
+    if (byId) {
+      return byId.locale[locale.value as LocaleKey]?.url_name || byId.locale.gl?.url_name || ""
+    }
+
+    const byUrlName = categories.value.find((category) =>
+      Object.values(category.locale).some((entry) => entry?.url_name === categoryRef),
+    )
+    if (byUrlName) {
+      return byUrlName.locale[locale.value as LocaleKey]?.url_name || categoryRef
+    }
+
+    return ""
+  }
+
   const createInitialValues = (): RecipeFormValues => ({
     id: "",
-    category: "",
+    category: resolveCategoryUrlName(preselectedCategoryQuery.value),
     difficulty: 2,
     prepTime: 1,
     cookTime: 1,
@@ -436,6 +458,11 @@
     if (recipeParam) {
       selectedRecipeId.value = recipeParam
       await loadRecipeDetail(recipeParam)
+      return
+    }
+
+    if (preselectedCategoryQuery.value) {
+      applyFormValues(createInitialValues())
     }
   })
 </script>
