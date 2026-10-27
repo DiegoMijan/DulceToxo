@@ -397,6 +397,8 @@
   }
 
   const handleRecipeChange = async (event: SelectChangeEvent) => {
+    if (saving.value) return
+
     await uploadRef.value?.discardSessionUploads()
     const newId = event.value as string
     selectedRecipeId.value = newId
@@ -411,6 +413,8 @@
   }
 
   const onCancel = async () => {
+    if (saving.value) return
+
     slugErrors.value = { es: null, en: null, gl: null }
     await uploadRef.value?.discardSessionUploads()
     if (currentRecipe.value) {
@@ -421,7 +425,7 @@
   }
 
   const onBack = () => {
-    if (!currentRecipe.value) return
+    if (saving.value || !currentRecipe.value) return
     const categoryUrlName = categories.value.find((c) => c.id === currentRecipe.value!.category_id)
       ?.locale[locale.value as LocaleKey]?.url_name
     const recipeSlug = currentRecipe.value.locales[locale.value as LocaleKey]?.slug
@@ -474,8 +478,18 @@
     :resolver
     :initialValues
     class="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col flex-1 overflow-hidden"
+    :aria-busy="saving"
     @submit="onSubmit"
   >
+    <fieldset
+      :disabled="saving"
+      :inert="saving ? true : undefined"
+      :class="[
+        'm-0 flex min-w-0 flex-1 flex-col border-0 p-0',
+        { 'pointer-events-none opacity-60': saving },
+      ]"
+    >
+      <legend class="sr-only">{{ t('recipe.edit.button') }}</legend>
     <div class="flex flex-wrap items-end gap-6 p-6 md:p-8 border-b border-french-lilac-100 dark:border-gray-700">
       <FormField
         fieldName="id"
@@ -493,6 +507,7 @@
             option-label="title"
             :placeholder="t('recipe.edit.recipeSelected')"
             :loading="loadingRecipes"
+            :disabled="saving"
             class="w-full"
             @change="handleRecipeChange"
           >
@@ -548,6 +563,7 @@
         <Rating
           :model-value="$form.difficulty?.value"
           name="difficulty"
+          :disabled="saving"
         >
           <template #onicon>
             <NuxtIcon
@@ -589,6 +605,7 @@
               ref="uploadRef"
               v-model:publicIds="$form.images.value"
               :persistedPublicIds="currentRecipe?.images.map((img) => img.public_id) ?? []"
+              :disabled="saving"
               @change="triggerImagesChange"
             />
           </template>
@@ -613,9 +630,10 @@
                 v-bind="a11yAttrs.root"
               >
                 <button
-                  class="bg-transparent border-0 inline-flex flex-col gap-2 cursor-pointer"
+                  class="bg-transparent border-0 inline-flex flex-col gap-2 cursor-pointer disabled:cursor-not-allowed"
                   v-bind="a11yAttrs.header"
                   type="button"
+                  :disabled="saving"
                   @click="activateCallback"
                 >
                   <span
@@ -651,6 +669,7 @@
                 :locale="step.locale"
                 :formInstance="$form"
                 :slug-error="slugErrors[step.locale]"
+                :disabled="saving"
                 @change="triggerLocalesChange"
               />
             </StepPanel>
@@ -675,6 +694,7 @@
               showClear
               class="w-full"
               :placeholder="t('recipe.edit.categorySelected')"
+              :disabled="saving"
             />
           </template>
         </FormField>
@@ -692,6 +712,7 @@
               :max="10000"
               fluid
               :useGrouping="false"
+              :disabled="saving"
             />
           </template>
         </FormField>
@@ -709,6 +730,7 @@
               :max="10000"
               fluid
               :useGrouping="false"
+              :disabled="saving"
             />
           </template>
         </FormField>
@@ -722,6 +744,7 @@
         severity="secondary"
         text
         class="mr-auto!"
+        :disabled="saving"
         @click="onBack"
       >
         <i class="pi pi-arrow-left mr-2" />
@@ -731,7 +754,7 @@
         type="button"
         severity="danger"
         outlined
-        :disabled="!formStates.isDirty"
+        :disabled="!formStates.isDirty || saving"
         @click="onCancel"
       >
         <i class="pi pi-times mr-2" />
@@ -749,5 +772,6 @@
         {{ t('recipe.edit.save') }}
       </Button>
     </div>
+    </fieldset>
   </Form>
 </template>
