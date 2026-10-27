@@ -58,6 +58,7 @@
         return
       }
       pointerLockedScrollTop = container.scrollTop
+      container.style.overflowY = "hidden"
     }
     container.addEventListener("pointerdown", lockFromEvent, true)
     container.addEventListener("mousedown", lockFromEvent, true)
@@ -68,12 +69,17 @@
       }
     })
     const unlock = () => {
+      const top = pointerLockedScrollTop
+      container.style.overflowY = "auto"
+      if (top != null) container.scrollTop = top
       window.setTimeout(() => {
+        if (top != null) container.scrollTop = top
         pointerLockedScrollTop = null
-      }, 500)
+      }, 50)
     }
     container.addEventListener("pointerup", unlock, true)
     container.addEventListener("mouseup", unlock, true)
+    container.addEventListener("click", unlock, true)
   }
 
   const measureListViewport = () => {
