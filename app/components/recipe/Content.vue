@@ -86,7 +86,10 @@
 <template>
   <div class="w-full h-full pl-10 pr-10 overflow-auto text-center">
     <section class="flex flex-col gap-4 mb-10 text-center">
-      <h1 class="title text-5xl font-bold flex flex-row gap-2 items-center justify-center">
+      <h1
+        class="title text-5xl font-bold flex flex-row gap-2 items-center justify-center"
+        data-testid="recipe-title"
+      >
         {{ localeData?.title }}
       </h1>
       <p

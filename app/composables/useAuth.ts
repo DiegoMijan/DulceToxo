@@ -52,8 +52,20 @@ export const useAuth = () => {
   }
 
   const signOut = async () => {
+    const recipesStore = useRecipes()
+    const localePath = useLocalePath()
+    const route = useRoute()
+
+    recipesStore.clearCache()
     await authClient.signOut()
-    await navigateTo("/")
+    recipesStore.clearCache()
+
+    if (isRecipesPage(route)) {
+      await navigateTo(localePath("/"))
+      return
+    }
+
+    await navigateTo(localePath("/"))
   }
 
   // Los middlewares de ruta corren fuera del ciclo de montado normal, así que el

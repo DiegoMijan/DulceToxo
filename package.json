@@ -14,7 +14,8 @@
     "format:check": "biome format .",
     "format:vue-templates": "eslint \"**/*.vue\" --fix --rule 'vue/html-indent: error' --rule 'vue/html-quotes: error' --rule 'vue/html-self-closing: error' --rule 'vue/max-attributes-per-line: error'",
     "format:all": "npm run format && npm run format:vue-templates",
-    "api:types": "bun scripts/api-types.ts"
+    "api:types": "bun scripts/api-types.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@antfu/utils": "^9.3.0",
@@ -57,6 +58,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.6.3",
     "@nuxt/eslint": "^1.17.0",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.5",
     "eslint": "^10.13.0",
