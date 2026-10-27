@@ -1,9 +1,10 @@
 <script setup lang="ts">
   import type { RecipeCarouselImage } from "./GallerySlide.vue"
 
-  const { images, showRemove = false } = defineProps<{
+  const { images, showRemove = false, disabled = false } = defineProps<{
     images: RecipeCarouselImage[]
     showRemove?: boolean
+    disabled?: boolean
   }>()
 
   const emit = defineEmits<{
@@ -16,6 +17,7 @@
   const singleImage = computed(() => (images.length === 1 ? images[0] : undefined))
 
   const handleRemove = (event: Event, index: number) => {
+    if (disabled) return
     emit("remove", index, event)
   }
 
@@ -37,6 +39,7 @@
       type="button"
       class="absolute! z-10 bottom-2 right-2"
       :aria-label="t('upload.removeImage')"
+      :disabled="disabled"
       @pointerdown="handleRemovePointerDown"
       @click="handleRemove($event, 0)"
     >
@@ -63,6 +66,7 @@
             type="button"
             class="absolute! z-10 bottom-2 right-2"
             :aria-label="t('upload.removeImage')"
+            :disabled="disabled"
             @pointerdown="handleRemovePointerDown"
             @click="handleRemove($event, index)"
           >

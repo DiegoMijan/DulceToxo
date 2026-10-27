@@ -8,8 +8,9 @@
 
   const publicIds = defineModel<string[]>("publicIds", { required: true })
 
-  const { persistedPublicIds = [] } = defineProps<{
+  const { persistedPublicIds = [], disabled = false } = defineProps<{
     persistedPublicIds?: string[]
+    disabled?: boolean
   }>()
 
   const confirm = useConfirm()
@@ -55,6 +56,8 @@
   }
 
   const handleUploader = async (event: FileUploadUploaderEvent) => {
+    if (disabled) return
+
     const files = Array.isArray(event.files) ? event.files : [event.files]
     uploading.value = true
 
@@ -80,6 +83,8 @@
   }
 
   const handleRemove = (index: number, event: Event) => {
+    if (disabled) return
+
     confirm.require({
       target: event.currentTarget as HTMLElement,
       message: t("upload.confirmDelete"),
@@ -100,6 +105,8 @@
   }
 
   const handleRemoveAll = (event: Event) => {
+    if (disabled) return
+
     confirm.require({
       target: event.currentTarget as HTMLElement,
       message: t("upload.confirmDeleteAll"),
@@ -154,14 +161,14 @@
         :max-file-size="RECIPE_UPLOAD_MAX_BYTES"
         :accept="RECIPE_UPLOAD_ACCEPT"
         :choose-label="t('upload.chooseImages')"
-        :disabled="uploading"
+        :disabled="uploading || disabled"
         :invalid-file-type-message="t('upload.invalidType')"
         :invalid-file-size-message="t('upload.tooLarge')"
         @uploader="handleUploader"
       />
       <Button
         type="button"
-        :disabled="publicIds.length === 0 || uploading"
+        :disabled="publicIds.length === 0 || uploading || disabled"
         severity="danger"
         outlined
         class="whitespace-nowrap"
@@ -180,6 +187,7 @@
     <RecipeImageCarousel
       :images="carouselImages"
       show-remove
+      :disabled="disabled"
       @remove="handleRemove"
     />
   </div>

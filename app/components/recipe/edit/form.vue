@@ -397,6 +397,8 @@
   }
 
   const handleRecipeChange = async (event: SelectChangeEvent) => {
+    if (saving.value) return
+
     await uploadRef.value?.discardSessionUploads()
     const newId = event.value as string
     selectedRecipeId.value = newId
@@ -411,6 +413,8 @@
   }
 
   const onCancel = async () => {
+    if (saving.value) return
+
     slugErrors.value = { es: null, en: null, gl: null }
     await uploadRef.value?.discardSessionUploads()
     if (currentRecipe.value) {
@@ -421,7 +425,7 @@
   }
 
   const onBack = () => {
-    if (!currentRecipe.value) return
+    if (saving.value || !currentRecipe.value) return
     const categoryUrlName = categories.value.find((c) => c.id === currentRecipe.value!.category_id)
       ?.locale[locale.value as LocaleKey]?.url_name
     const recipeSlug = currentRecipe.value.locales[locale.value as LocaleKey]?.slug
@@ -474,280 +478,300 @@
     :resolver
     :initialValues
     class="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col flex-1 overflow-hidden"
+    :aria-busy="saving"
     @submit="onSubmit"
   >
-    <div class="flex flex-wrap items-end gap-6 p-6 md:p-8 border-b border-french-lilac-100 dark:border-gray-700">
-      <FormField
-        fieldName="id"
-        :label="t('recipe.edit.recipeSelected')"
-        :form="$form"
-        class="min-w-64 grow max-w-sm"
-      >
-        <template #field>
-          <Select
-            filter
-            name="id"
-            :modelValue="selectedRecipeId"
-            :options="recipeOptions"
-            option-value="id"
-            option-label="title"
-            :placeholder="t('recipe.edit.recipeSelected')"
-            :loading="loadingRecipes"
-            class="w-full"
-            @change="handleRecipeChange"
-          >
-            <template #value="slotProps">
-              <div
-                v-if="slotProps.value"
-                class="flex items-center gap-2"
-              >
-                <NuxtIcon
-                  v-if="recipeOptions.find((o) => o.id === slotProps.value)?.isNew"
-                  name="line-md:plus"
-                  class="text-xl text-green-500"
-                />
-                <div>{{ recipeOptions.find((o) => o.id === slotProps.value)?.title }}</div>
-                <NuxtIcon
-                  v-if="recipeOptions.find((o) => o.id === slotProps.value)?.isDirty"
-                  name="line-md:pencil-twotone"
-                  class="text-xl text-amber-300"
-                />
-              </div>
-              <span v-else>
-                {{ slotProps.placeholder }}
-              </span>
-            </template>
-            <template #option="slotProps">
-              <div class="flex items-center gap-2">
-                <NuxtIcon
-                  v-if="slotProps.option.isNew"
-                  name="line-md:plus"
-                  class="text-xl text-green-500"
-                />
-                <NuxtIcon
-                  v-else-if="slotProps.option.isDirty"
-                  name="line-md:pencil-twotone"
-                  class="text-xl text-amber-300"
-                />
-                <div :class="{ 'ml-7': !slotProps.option.isNew && !slotProps.option.isDirty }">
-                  {{ slotProps.option.title }}
-                </div>
-              </div>
-            </template>
-            <template #empty>
-              <div class="p-4 text-center text-gray-500">
-                {{ loadingRecipes ? t('recipe.edit.loadingRecipes') : t('recipe.edit.noRecipesYet') }}
-              </div>
-            </template>
-          </Select>
-        </template>
-      </FormField>
-
-      <div class="flex flex-col gap-1">
-        <span class="text-sm font-medium text-french-lilac-600">{{ t('recipe.edit.form.difficulty') }}</span>
-        <Rating
-          :model-value="$form.difficulty?.value"
-          name="difficulty"
-        >
-          <template #onicon>
-            <NuxtIcon
-              class="text-xl text-french-lilac-700 dark:text-french-lilac-400"
-              name="icon-park-twotone:chef-hat-one"
-            />
-          </template>
-          <template #officon>
-            <NuxtIcon
-              class="text-xl text-gray-300 dark:text-gray-600"
-              name="icon-park-twotone:chef-hat-one"
-            />
-          </template>
-        </Rating>
-      </div>
-    </div>
-
-    <div
-      v-if="loading"
-      class="flex justify-center items-center py-16"
+    <fieldset
+      :disabled="saving"
+      :inert="saving ? true : undefined"
+      :class="[
+        'm-0 flex min-w-0 flex-1 flex-col border-0 p-0',
+        { 'pointer-events-none opacity-60': saving },
+      ]"
     >
-      <ProgressSpinner
-        style="width: 50px; height: 50px"
-        stroke-width="4"
-      />
-    </div>
-
-    <div
-      v-else
-      class="flex flex-col gap-8 p-6 md:p-8"
-    >
-      <section>
-        <h2 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300 mb-3">
-          {{ t('upload.title') }}
-        </h2>
-        <PrimeVueFormField name="images">
-          <template v-if="$form.images?.value">
-            <FormUpload
-              ref="uploadRef"
-              v-model:publicIds="$form.images.value"
-              :persistedPublicIds="currentRecipe?.images.map((img) => img.public_id) ?? []"
-              @change="triggerImagesChange"
-            />
-          </template>
-        </PrimeVueFormField>
-      </section>
-
-      <section>
-        <Stepper
-          v-model:value="activeStep"
-          class="basis-160"
-        >
-          <StepList>
-            <Step
-              v-for="step in steps"
-              v-slot="{ activateCallback, value, a11yAttrs }"
-              :key="step.id"
-              asChild
-              :value="step.id"
-            >
-              <div
-                :class="['flex flex-row flex-auto gap-2', step.id === 3 ? 'flex-none': 'flex-auto']"
-                v-bind="a11yAttrs.root"
-              >
-                <button
-                  class="bg-transparent border-0 inline-flex flex-col gap-2 cursor-pointer"
-                  v-bind="a11yAttrs.header"
-                  type="button"
-                  @click="activateCallback"
-                >
-                  <span
-                    :class="[
-                      'rounded-full border-2 w-12 h-12 inline-flex items-center justify-center transition-colors',
-                      { 'border-fuchsia-600 border-primary bg-fuchsia-50 dark:bg-fuchsia-950': Number(value) === activeStep, 'border-french-lilac-200 dark:border-gray-600': Number(value) !== activeStep },
-                      { 'ring-2 ring-red-500': slugErrors[step.locale] }
-                    ]"
-                  >
-                    <img
-                      :src="step.img"
-                      :alt="step.locale"
-                      class="h-4 rounded"
-                    >
-                  </span>
-                </button>
-                <Divider
-                  v-if="step.id !== steps.length"
-                  class="mr-2!"
-                />
-              </div>
-            </Step>
-          </StepList>
-          <StepPanels class="px-0! pt-4!">
-            <StepPanel
-              v-for="step in steps"
-              :key="step.id"
-              :value="step.id"
-              class="bg-transparent!"
-            >
-              <RecipeEditLocale
-                v-model:form="$form.locales"
-                :locale="step.locale"
-                :formInstance="$form"
-                :slug-error="slugErrors[step.locale]"
-                @change="triggerLocalesChange"
-              />
-            </StepPanel>
-          </StepPanels>
-        </Stepper>
-      </section>
-
-      <div class="flex flex-wrap gap-4 w-full">
+      <legend class="sr-only">{{ t('recipe.edit.button') }}</legend>
+      <div class="flex flex-wrap items-end gap-6 p-6 md:p-8 border-b border-french-lilac-100 dark:border-gray-700">
         <FormField
-          fieldName="category"
-          :label="t('recipe.edit.category')"
+          fieldName="id"
+          :label="t('recipe.edit.recipeSelected')"
           :form="$form"
-          class="basis-1/3 grow"
+          class="min-w-64 grow max-w-sm"
         >
           <template #field>
             <Select
               filter
-              name="category"
-              :options="categoriesByLocale"
-              optionValue="url_name"
-              optionLabel="name"
-              showClear
+              name="id"
+              :modelValue="selectedRecipeId"
+              :options="recipeOptions"
+              option-value="id"
+              option-label="title"
+              :placeholder="t('recipe.edit.recipeSelected')"
+              :loading="loadingRecipes"
+              :disabled="saving"
               class="w-full"
-              :placeholder="t('recipe.edit.categorySelected')"
-            />
+              @change="handleRecipeChange"
+            >
+              <template #value="slotProps">
+                <div
+                  v-if="slotProps.value"
+                  class="flex items-center gap-2"
+                >
+                  <NuxtIcon
+                    v-if="recipeOptions.find((o) => o.id === slotProps.value)?.isNew"
+                    name="line-md:plus"
+                    class="text-xl text-green-500"
+                  />
+                  <div>{{ recipeOptions.find((o) => o.id === slotProps.value)?.title }}</div>
+                  <NuxtIcon
+                    v-if="recipeOptions.find((o) => o.id === slotProps.value)?.isDirty"
+                    name="line-md:pencil-twotone"
+                    class="text-xl text-amber-300"
+                  />
+                </div>
+                <span v-else>
+                  {{ slotProps.placeholder }}
+                </span>
+              </template>
+              <template #option="slotProps">
+                <div class="flex items-center gap-2">
+                  <NuxtIcon
+                    v-if="slotProps.option.isNew"
+                    name="line-md:plus"
+                    class="text-xl text-green-500"
+                  />
+                  <NuxtIcon
+                    v-else-if="slotProps.option.isDirty"
+                    name="line-md:pencil-twotone"
+                    class="text-xl text-amber-300"
+                  />
+                  <div :class="{ 'ml-7': !slotProps.option.isNew && !slotProps.option.isDirty }">
+                    {{ slotProps.option.title }}
+                  </div>
+                </div>
+              </template>
+              <template #empty>
+                <div class="p-4 text-center text-gray-500">
+                  {{ loadingRecipes ? t('recipe.edit.loadingRecipes') : t('recipe.edit.noRecipesYet') }}
+                </div>
+              </template>
+            </Select>
           </template>
         </FormField>
-        <FormField
-          fieldName="cookTime"
-          :label="t('recipe.edit.form.cookTime')"
-          :form="$form"
-          class="basis-32 grow"
-        >
-          <template #field>
-            <InputNumber
-              name="cookTime"
-              class="w-full"
-              :min="1"
-              :max="10000"
-              fluid
-              :useGrouping="false"
-            />
-          </template>
-        </FormField>
-        <FormField
-          fieldName="prepTime"
-          :label="t('recipe.edit.form.prepTime')"
-          :form="$form"
-          class="basis-32 grow"
-        >
-          <template #field>
-            <InputNumber
-              name="prepTime"
-              class="w-full"
-              :min="1"
-              :max="10000"
-              fluid
-              :useGrouping="false"
-            />
-          </template>
-        </FormField>
-      </div>
-    </div>
 
-    <div class="flex flex-wrap justify-end gap-3 px-6 md:px-8 py-5 bg-french-lilac-50 dark:bg-gray-900/40 border-t border-french-lilac-100 dark:border-gray-700">
-      <Button
-        v-if="!isNewRecipe && currentRecipe"
-        type="button"
-        severity="secondary"
-        text
-        class="mr-auto!"
-        @click="onBack"
+        <div class="flex flex-col gap-1">
+          <span class="text-sm font-medium text-french-lilac-600">{{ t('recipe.edit.form.difficulty') }}</span>
+          <Rating
+            :model-value="$form.difficulty?.value"
+            name="difficulty"
+            :disabled="saving"
+          >
+            <template #onicon>
+              <NuxtIcon
+                class="text-xl text-french-lilac-700 dark:text-french-lilac-400"
+                name="icon-park-twotone:chef-hat-one"
+              />
+            </template>
+            <template #officon>
+              <NuxtIcon
+                class="text-xl text-gray-300 dark:text-gray-600"
+                name="icon-park-twotone:chef-hat-one"
+              />
+            </template>
+          </Rating>
+        </div>
+      </div>
+
+      <div
+        v-if="loading"
+        class="flex justify-center items-center py-16"
       >
-        <i class="pi pi-arrow-left mr-2" />
-        {{ t('recipe.edit.back') }}
-      </Button>
-      <Button
-        type="button"
-        severity="danger"
-        outlined
-        :disabled="!formStates.isDirty"
-        @click="onCancel"
-      >
-        <i class="pi pi-times mr-2" />
-        {{ t('recipe.edit.cancelChanges') }}
-      </Button>
-      <Button
-        type="submit"
-        :disabled="!formStates.isDirty || saving"
-        :loading="saving"
-      >
-        <i
-          v-if="!saving"
-          class="pi pi-save mr-2"
+        <ProgressSpinner
+          style="width: 50px; height: 50px"
+          stroke-width="4"
         />
-        {{ t('recipe.edit.save') }}
-      </Button>
-    </div>
+      </div>
+
+      <div
+        v-else
+        class="flex flex-col gap-8 p-6 md:p-8"
+      >
+        <section>
+          <h2 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300 mb-3">
+            {{ t('upload.title') }}
+          </h2>
+          <PrimeVueFormField name="images">
+            <template v-if="$form.images?.value">
+              <FormUpload
+                ref="uploadRef"
+                v-model:publicIds="$form.images.value"
+                :persistedPublicIds="currentRecipe?.images.map((img) => img.public_id) ?? []"
+                :disabled="saving"
+                @change="triggerImagesChange"
+              />
+            </template>
+          </PrimeVueFormField>
+        </section>
+
+        <section>
+          <Stepper
+            v-model:value="activeStep"
+            class="basis-160"
+          >
+            <StepList>
+              <Step
+                v-for="step in steps"
+                v-slot="{ activateCallback, value, a11yAttrs }"
+                :key="step.id"
+                asChild
+                :value="step.id"
+              >
+                <div
+                  :class="['flex flex-row flex-auto gap-2', step.id === 3 ? 'flex-none': 'flex-auto']"
+                  v-bind="a11yAttrs.root"
+                >
+                  <button
+                    class="bg-transparent border-0 inline-flex flex-col gap-2 cursor-pointer disabled:cursor-not-allowed"
+                    v-bind="a11yAttrs.header"
+                    type="button"
+                    :disabled="saving"
+                    @click="activateCallback"
+                  >
+                    <span
+                      :class="[
+                        'rounded-full border-2 w-12 h-12 inline-flex items-center justify-center transition-colors',
+                        { 'border-fuchsia-600 border-primary bg-fuchsia-50 dark:bg-fuchsia-950': Number(value) === activeStep, 'border-french-lilac-200 dark:border-gray-600': Number(value) !== activeStep },
+                        { 'ring-2 ring-red-500': slugErrors[step.locale] }
+                      ]"
+                    >
+                      <img
+                        :src="step.img"
+                        :alt="step.locale"
+                        class="h-4 rounded"
+                      >
+                    </span>
+                  </button>
+                  <Divider
+                    v-if="step.id !== steps.length"
+                    class="mr-2!"
+                  />
+                </div>
+              </Step>
+            </StepList>
+            <StepPanels class="px-0! pt-4!">
+              <StepPanel
+                v-for="step in steps"
+                :key="step.id"
+                :value="step.id"
+                class="bg-transparent!"
+              >
+                <RecipeEditLocale
+                  v-model:form="$form.locales"
+                  :locale="step.locale"
+                  :formInstance="$form"
+                  :slug-error="slugErrors[step.locale]"
+                  :disabled="saving"
+                  @change="triggerLocalesChange"
+                />
+              </StepPanel>
+            </StepPanels>
+          </Stepper>
+        </section>
+
+        <div class="flex flex-wrap gap-4 w-full">
+          <FormField
+            fieldName="category"
+            :label="t('recipe.edit.category')"
+            :form="$form"
+            class="basis-1/3 grow"
+          >
+            <template #field>
+              <Select
+                filter
+                name="category"
+                :options="categoriesByLocale"
+                optionValue="url_name"
+                optionLabel="name"
+                showClear
+                class="w-full"
+                :placeholder="t('recipe.edit.categorySelected')"
+                :disabled="saving"
+              />
+            </template>
+          </FormField>
+          <FormField
+            fieldName="cookTime"
+            :label="t('recipe.edit.form.cookTime')"
+            :form="$form"
+            class="basis-32 grow"
+          >
+            <template #field>
+              <InputNumber
+                name="cookTime"
+                class="w-full"
+                :min="1"
+                :max="10000"
+                fluid
+                :useGrouping="false"
+                :disabled="saving"
+              />
+            </template>
+          </FormField>
+          <FormField
+            fieldName="prepTime"
+            :label="t('recipe.edit.form.prepTime')"
+            :form="$form"
+            class="basis-32 grow"
+          >
+            <template #field>
+              <InputNumber
+                name="prepTime"
+                class="w-full"
+                :min="1"
+                :max="10000"
+                fluid
+                :useGrouping="false"
+                :disabled="saving"
+              />
+            </template>
+          </FormField>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-end gap-3 px-6 md:px-8 py-5 bg-french-lilac-50 dark:bg-gray-900/40 border-t border-french-lilac-100 dark:border-gray-700">
+        <Button
+          v-if="!isNewRecipe && currentRecipe"
+          type="button"
+          severity="secondary"
+          text
+          class="mr-auto!"
+          :disabled="saving"
+          @click="onBack"
+        >
+          <i class="pi pi-arrow-left mr-2" />
+          {{ t('recipe.edit.back') }}
+        </Button>
+        <Button
+          type="button"
+          severity="danger"
+          outlined
+          :disabled="!formStates.isDirty || saving"
+          @click="onCancel"
+        >
+          <i class="pi pi-times mr-2" />
+          {{ t('recipe.edit.cancelChanges') }}
+        </Button>
+        <Button
+          type="submit"
+          :disabled="!formStates.isDirty || saving"
+          :loading="saving"
+        >
+          <i
+            v-if="!saving"
+            class="pi pi-save mr-2"
+          />
+          {{ t('recipe.edit.save') }}
+        </Button>
+      </div>
+    </fieldset>
   </Form>
 </template>

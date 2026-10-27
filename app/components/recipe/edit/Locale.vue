@@ -13,10 +13,11 @@
     }
   }
 
-  const { locale, formInstance, slugError } = defineProps<{
+  const { locale, formInstance, slugError, disabled = false } = defineProps<{
     locale: "es" | "en" | "gl"
     formInstance: FormInstance
     slugError?: string | null
+    disabled?: boolean
   }>()
 
   const emit = defineEmits<{
@@ -40,6 +41,7 @@
   }
 
   const onRowReorder = (event: DataTableRowReorderEvent, type: "ingredients" | "instructions") => {
+    if (disabled) return
     if (!form.value[locale]?.[type]?.value) return
     form.value[locale][type].value = event.value?.map((item: Ingredient | Step, index: number) => ({
       ...item,
@@ -51,12 +53,15 @@
     event: DataTableCellEditCompleteEvent,
     type: "ingredients" | "instructions",
   ) => {
+    if (disabled) return
+
     const { data, newValue, field } = event
     data[field] = newValue ? newValue.trim() : ""
     emit("change", locale, type)
   }
 
   const addItem = (type: "ingredients" | "instructions") => {
+    if (disabled) return
     if (form.value[locale]?.[type]?.value) {
       const newId = crypto.randomUUID()
 
@@ -78,6 +83,7 @@
   }
 
   const deleteItem = (type: "ingredients" | "instructions", data: Ingredient | Step) => {
+    if (disabled) return
     if (form.value[locale]?.[type]?.value) {
       form.value[locale][type].value = form.value[locale][type].value
         .filter((item: Ingredient | Step) => item.id !== data.id)
@@ -105,6 +111,8 @@
     type: "ingredients" | "instructions",
     data: Ingredient | Step,
   ) => {
+    if (disabled) return
+
     confirm.require({
       target: event.currentTarget as HTMLElement,
       message: t("recipe.edit.form.confirmDelete"),
@@ -142,6 +150,7 @@
             :maxlength="200"
             :value="form?.[locale]?.title?.value"
             class="w-full"
+            :disabled="disabled"
             @blur="handleBlur"
           />
         </template>
@@ -161,6 +170,7 @@
             :value="form?.[locale]?.slug?.value"
             class="w-full"
             :class="{ 'p-invalid': slugError }"
+            :disabled="disabled"
             @blur="handleBlur"
           />
         </template>
@@ -191,6 +201,7 @@
           :value="form?.[locale]?.description?.value"
           class="w-full"
           rows="3"
+          :disabled="disabled"
           @blur="handleBlur"
         />
       </template>
@@ -202,6 +213,7 @@
           v-if="locale === 'gl'"
           size="small"
           rounded
+          :disabled="disabled"
           @click="addItem('ingredients')"
         >
           <i class="pi pi-plus" />
@@ -213,7 +225,7 @@
       <DataTable
         :value="form?.[locale]?.ingredients?.value"
         tableStyle="min-width: 50rem"
-        editMode="cell"
+        :editMode="disabled ? undefined : 'cell'"
         class="rounded-lg"
         :name="`locales.${locale}.ingredients`"
         :pt="{
@@ -269,6 +281,7 @@
               rounded
               severity="secondary"
               size="small"
+              :disabled="disabled"
               @click="confirmDelete($event, 'ingredients', data as Ingredient)"
             >
               <i class="pi pi-trash" />
@@ -289,6 +302,7 @@
           v-if="locale === 'gl'"
           size="small"
           rounded
+          :disabled="disabled"
           @click="addItem('instructions')"
         >
           <i class="pi pi-plus" />
@@ -300,7 +314,7 @@
       <DataTable
         :value="form?.[locale]?.instructions?.value"
         tableStyle="min-width: 50rem"
-        editMode="cell"
+        :editMode="disabled ? undefined : 'cell'"
         class="rounded-lg"
         dataKey="id"
         :pt="{
@@ -356,6 +370,7 @@
               rounded
               severity="secondary"
               size="small"
+              :disabled="disabled"
               @click="confirmDelete($event, 'instructions', data as Step)"
             >
               <i class="pi pi-trash" />
