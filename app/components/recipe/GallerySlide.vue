@@ -22,9 +22,8 @@
           provider="cloudinary"
           :src="image.publicId"
           :alt="image.alt"
-          width="800"
-          height="320"
-          fit="cover"
+          width="1600"
+          fit="coverLimit"
           class="max-h-80 h-80 w-full rounded object-cover"
         />
         <NuxtImg
@@ -52,11 +51,13 @@
 </template>
 
 <style scoped>
+  /* Gallery fija width/height inline al montar: si el contenedor crece despues (por ejemplo al llegar desde
+     la lista) la imagen se queda pequena y pegada a la izquierda. Siempre ocupa todo el hueco. */
   :deep(.p-gallery-item[data-active]) {
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
     transform: translate(var(--px-position-x), var(--px-position-y))
       scale(var(--px-scale))
       rotate(var(--px-rotation))
@@ -69,5 +70,11 @@
     height: 100% !important;
     max-height: none !important;
     object-fit: cover;
+  }
+
+  /* En pantalla completa, la foto entera y centrada */
+  .p-gallery[data-fullscreen] :deep(.p-gallery-item > *) {
+    object-fit: contain;
+    border-radius: 0;
   }
 </style>

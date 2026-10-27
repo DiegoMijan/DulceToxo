@@ -149,11 +149,11 @@
           <div
             v-for="ingredient in ingredients"
             :key="ingredient.id"
-            class="flex flex-row gap-2 items-center"
+            class="flex flex-row gap-2 items-start text-left"
           >
             <NuxtIcon
               name="emojione-v1:sparkles"
-              class="text-xl"
+              class="text-xl shrink-0"
             />
             <span class="text-md">{{ ingredient.description }}</span>
           </div>
@@ -176,9 +176,12 @@
           <div
             v-for="(step, index) in steps"
             :key="step.id"
-            class="flex flex-row gap-2 items-center"
+            class="flex flex-row gap-3 items-start text-left"
           >
-            <Badge :value="index + 1" />
+            <Badge
+              :value="index + 1"
+              class="shrink-0 mt-0.5"
+            />
             <span class="text-md">{{ step.description }}</span>
           </div>
         </div>
