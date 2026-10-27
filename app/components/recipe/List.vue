@@ -136,23 +136,24 @@
   </div>
   <nav
     v-else
-    class="recipe-list w-full min-h-0"
+    class="recipe-list p-listbox p-component p-listbox-fluid flex-1 min-w-0 w-full"
     :aria-label="t('recipe.list.nav')"
   >
     <ul
       ref="scroller"
-      class="recipe-list-scroll"
+      class="recipe-list-scroll p-listbox-list"
       :class="{ 'recipe-list-scroll--measured': measured }"
       data-testid="recipe-list-scroll"
     >
       <li
         v-for="item in options"
         :key="item.id"
-        class="min-w-0"
+        class="min-w-0 w-full"
       >
         <NuxtLink
           :to="item.to"
-          class="recipe-list-item-link"
+          class="recipe-list-item-link p-listbox-option"
+          :class="{ 'p-listbox-option-selected': item.slug === activeSlug }"
           :aria-current="item.slug === activeSlug ? 'page' : undefined"
           :data-recipe-slug="item.slug"
         >
@@ -175,52 +176,38 @@
   .recipe-list {
     --font-recipe-title: "Quicksand", ui-sans-serif, sans-serif;
     --recipe-list-title-gap: 0.375rem;
+    overflow: hidden;
   }
 
   .recipe-list-scroll {
-    display: flex;
     max-height: none;
-    flex-direction: column;
-    gap: var(--p-listbox-list-gap, 2px);
-    margin: 0;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: var(--p-listbox-list-padding, 0.25rem);
-    list-style: none;
+    padding-inline: 0;
     scrollbar-width: thin;
     scrollbar-color: var(--color-french-lilac-400) var(--color-french-lilac-100);
   }
 
   .recipe-list-item-link {
     display: block;
+    width: 100%;
     min-width: 0;
-    padding: var(--p-listbox-option-padding, 0.5rem 0.75rem);
-    border-radius: var(--p-listbox-option-border-radius, 6px);
-    color: inherit;
+    box-sizing: border-box;
+    border-radius: 0;
     text-decoration: none;
   }
 
-  .recipe-list-item-link:hover {
-    background: var(--p-listbox-option-focus-background, var(--color-french-lilac-50));
-  }
-
-  .recipe-list-item-link[aria-current="page"] {
-    background: var(--p-listbox-option-selected-background, var(--color-french-lilac-100));
-    color: var(--p-listbox-option-selected-color, inherit);
-  }
-
-  .recipe-list-item-link:focus-visible {
+  .recipe-list-item-link:focus-visible:not(.p-listbox-option-selected) {
+    background: var(--p-listbox-option-focus-background);
+    color: var(--p-listbox-option-focus-color);
     outline: none;
-    box-shadow: 0 0 0 2px var(--color-french-lilac-500);
   }
 
-  .dark .recipe-list-item-link:hover:not([aria-current="page"]) {
-    background: var(--p-listbox-option-focus-background, rgb(90 50 93 / 0.35));
-  }
-
-  .dark .recipe-list-item-link[aria-current="page"] {
-    background: var(--p-listbox-option-selected-background, rgb(90 50 93 / 0.55));
+  .recipe-list-item-link.p-listbox-option-selected:focus-visible {
+    background: var(--p-listbox-option-selected-focus-background);
+    color: var(--p-listbox-option-selected-focus-color);
+    outline: none;
   }
 
   .recipe-list-item {

@@ -172,10 +172,6 @@
   <NuxtLayout name="sidebar">
     <template #left-menu>
       <RecipeSortSelect />
-      <Divider
-        type="dotted"
-        class="my-8!"
-      />
       <RecipeNewButton
         v-if="categoryId"
         :category-id="categoryId"
@@ -192,7 +188,7 @@
       <div
         v-else-if="categoryId"
         data-testid="recipe-sidebar-list"
-        class="w-full"
+        class="mt-8 w-full min-w-0"
       >
         <RecipeList
           v-model="selectedSlug"
