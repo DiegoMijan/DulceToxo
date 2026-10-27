@@ -49,6 +49,7 @@
                   :alt="image.alt"
                   width="800"
                   height="320"
+                  fit="cover"
                   class="max-h-80 w-full rounded object-cover shadow-md"
                 />
                 <NuxtImg
@@ -57,6 +58,7 @@
                   :alt="image.alt"
                   width="800"
                   height="320"
+                  fit="cover"
                   class="max-h-80 w-full rounded object-cover shadow-md"
                 />
               </GalleryItem>
