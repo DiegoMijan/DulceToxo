@@ -13,6 +13,11 @@ const BRAND = {
 }
 
 const PAGE = { width: 210, height: 297, margin: 16, footerReserve: 14 }
+const CONTENT_WIDTH = PAGE.width - PAGE.margin * 2
+const DESCRIPTION_LINE_HEIGHT = 5.2
+// About half an A4 page under the title, without overflowing the body.
+const MAX_IMAGE_HEIGHT_MM = 128
+const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g
 
 interface PdfLabels {
   prepTime: string
@@ -139,12 +144,14 @@ const drawColumn = (
   startY: number,
   textIndent: number,
   drawMarker: (doc: jsPDF, x: number, y: number, index: number) => void,
+  compact = false,
 ): ColumnCursor => {
   const cursor: ColumnCursor = { page: startPage, y: startY }
   getOrAddPage(doc, cursor.page)
 
   items.forEach((item, index) => {
     const isHeading = Boolean(item.isHeading)
+    // Headings keep extra space above even when ingredient rows are tighter.
     if (isHeading && index > 0) {
       ensureSpace(doc, cursor, 4)
       cursor.y += 3
@@ -158,7 +165,11 @@ const drawColumn = (
     doc.setFont(fontFamily, fontStyle)
     doc.setFontSize(fontSize)
     const lines = doc.splitTextToSize(description, columnWidth - indent)
-    const blockHeight = Math.max(lines.length * (isHeading ? 5.5 : 5), 6) + 3
+    const lineHeight = isHeading ? 5.5 : 5
+    const minHeight = compact && !isHeading ? 5.5 : 6
+    // Compact ingredients: ~27% less gap after each row, font size unchanged.
+    const extraAfter = compact && !isHeading ? 1 : 3
+    const blockHeight = Math.max(lines.length * lineHeight, minHeight) + extraAfter
 
     ensureSpace(doc, cursor, blockHeight)
 
@@ -190,8 +201,33 @@ const drawInstructionMarker = (doc: jsPDF, x: number, y: number, index: number) 
   doc.text(String(index + 1), x + 2.6, y - 0.9, { align: "center" })
 }
 
-const drawFooters = (doc: jsPDF) => {
+const FOOTER_ELLIPSIS = "…"
+const FOOTER_PAGE_GAP = 4
+
+const truncateToWidth = (doc: jsPDF, text: string, maxWidth: number): string => {
+  if (maxWidth <= 0) return ""
+  if (doc.getTextWidth(text) <= maxWidth) return text
+
+  const ellipsisWidth = doc.getTextWidth(FOOTER_ELLIPSIS)
+  if (ellipsisWidth > maxWidth) return ""
+
+  let truncated = text
+  while (truncated.length > 0 && doc.getTextWidth(truncated) + ellipsisWidth > maxWidth) {
+    truncated = truncated.slice(0, -1)
+  }
+  return truncated.length ? `${truncated}${FOOTER_ELLIPSIS}` : FOOTER_ELLIPSIS
+}
+
+const formatFooterLabel = (category: string, title: string): string => {
+  const parts = ["Dulce Toxo", category.trim(), title.trim()].filter((part) => part.length > 0)
+  return parts.join(" - ")
+}
+
+const drawFooters = (doc: jsPDF, category: string, title: string) => {
   const pageCount = doc.getNumberOfPages()
+  const footerY = PAGE.height - 9
+  const label = formatFooterLabel(category, title)
+
   for (let page = 1; page <= pageCount; page++) {
     doc.setPage(page)
     doc.setDrawColor(...BRAND.rule)
@@ -200,16 +236,15 @@ const drawFooters = (doc: jsPDF) => {
     doc.setTextColor(...BRAND.muted)
     doc.setFont("helvetica", "normal")
     doc.setFontSize(8)
-    doc.text("Dulce Toxo • Recetario", PAGE.margin, PAGE.height - 9)
-    doc.text(`${page} / ${pageCount}`, PAGE.width - PAGE.margin, PAGE.height - 9, {
-      align: "right",
-    })
+
+    const pageLabel = `${page} / ${pageCount}`
+    const pageLabelWidth = doc.getTextWidth(pageLabel)
+    const maxLabelWidth = CONTENT_WIDTH - pageLabelWidth - FOOTER_PAGE_GAP
+    doc.text(truncateToWidth(doc, label, maxLabelWidth), PAGE.margin, footerY)
+    doc.text(pageLabel, PAGE.width - PAGE.margin, footerY, { align: "right" })
   }
 }
 
-const CONTENT_WIDTH = PAGE.width - PAGE.margin * 2
-const DESCRIPTION_LINE_HEIGHT = 5.2
-const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g
 // Maps to Cloudinary `f_jpg,q_80,w_1000,c_limit` via @nuxt/image.
 const RECIPE_PDF_IMAGE_MODIFIERS = {
   format: "jpg",
@@ -281,16 +316,19 @@ const drawMainImage = (doc: jsPDF, y: number, imageDataUrl: string): number => {
       availableHeight = pageBottom - y
     }
 
+    const maxHeight = Math.min(MAX_IMAGE_HEIGHT_MM, availableHeight)
     const ratio = properties.width / properties.height
     let width = CONTENT_WIDTH
     let height = width / ratio
-    if (height > availableHeight) {
-      height = availableHeight
+    if (height > maxHeight) {
+      height = maxHeight
       width = height * ratio
     }
 
+    // Portrait/square images that do not fill the content width sit in the center.
+    const x = PAGE.margin + (CONTENT_WIDTH - width) / 2
     const format = imageDataUrl.startsWith("data:image/png") ? "PNG" : "JPEG"
-    doc.addImage(imageDataUrl, format, PAGE.margin, y, width, height)
+    doc.addImage(imageDataUrl, format, x, y, width, height)
     return y + height + 8
   } catch {
     return y
@@ -306,10 +344,10 @@ export const buildRecipePdf = (
   const doc = new jsPDF({ unit: "mm", format: "a4" })
 
   let y = drawHeader(doc, recipe.title)
-  y = drawDescription(doc, y, recipe.description)
   if (imageDataUrl) {
     y = drawMainImage(doc, y, imageDataUrl)
   }
+  y = drawDescription(doc, y, recipe.description)
   y = drawMetaRow(doc, y, recipe.prepTime, recipe.cookTime, recipe.difficulty, labels)
 
   const gutter = 10
@@ -335,6 +373,7 @@ export const buildRecipePdf = (
     contentStartY,
     6,
     drawIngredientMarker,
+    true,
   )
   drawColumn(
     doc,
@@ -349,13 +388,21 @@ export const buildRecipePdf = (
     drawInstructionMarker,
   )
 
-  drawFooters(doc)
+  drawFooters(doc, recipe.category, recipe.title)
 
   return doc
 }
 
 export const useRecipePdf = () => {
   const img = useImage()
+  const categoriesStore = useCategories()
+
+  const resolveCategoryName = (categoryIdOrName: string): string => {
+    const match = categoriesStore.categoriesByLocale.find(
+      (category) => category.id === categoryIdOrName,
+    )
+    return match?.name || categoryIdOrName
+  }
 
   const downloadRecipePdf = async (
     recipe: Recipe,
@@ -367,7 +414,11 @@ export const useRecipePdf = () => {
       ? img(mainImage.public_id, RECIPE_PDF_IMAGE_MODIFIERS, { provider: "cloudinary" })
       : null
     const imageDataUrl = imageUrl ? await loadRecipeImageAsDataUrl(imageUrl) : null
-    const doc = buildRecipePdf(recipe, labels, imageDataUrl)
+    const doc = buildRecipePdf(
+      { ...recipe, category: resolveCategoryName(recipe.category) },
+      labels,
+      imageDataUrl,
+    )
     doc.save(recipePdfFileName(recipe.title))
   }
 

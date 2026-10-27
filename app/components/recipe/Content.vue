@@ -36,6 +36,13 @@
   })
 
   const { downloadRecipePdf } = useRecipePdf()
+  const categoriesStore = useCategories()
+  const { categoriesByLocale } = storeToRefs(categoriesStore)
+
+  const categoryName = computed(
+    () =>
+      categoriesByLocale.value.find((category) => category.id === recipe.category_id)?.name ?? "",
+  )
 
   const downloadPdf = async () => {
     const recipeForPdf = {
@@ -58,7 +65,7 @@
       cookTime: recipe.cook_time,
       createdAt: new Date(recipe.created_at),
       updatedAt: new Date(recipe.updated_at),
-      category: recipe.category_id,
+      category: categoryName.value || recipe.category_id,
     }
     await downloadRecipePdf(
       recipeForPdf,
