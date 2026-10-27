@@ -114,6 +114,36 @@ export default defineNuxtConfig({
         styles: ["normal"],
       },
       {
+        name: "Nunito",
+        provider: "google",
+        weights: [500, 600],
+        styles: ["normal"],
+      },
+      {
+        name: "Quicksand",
+        provider: "google",
+        weights: [500, 600],
+        styles: ["normal"],
+      },
+      {
+        name: "Lora",
+        provider: "google",
+        weights: [400, 600],
+        styles: ["normal"],
+      },
+      {
+        name: "Fraunces",
+        provider: "google",
+        weights: [400, 600],
+        styles: ["normal"],
+      },
+      {
+        name: "Cormorant Garamond",
+        provider: "google",
+        weights: [500, 600],
+        styles: ["normal"],
+      },
+      {
         name: "Merriweather",
         provider: "google",
         weights: [300, 400, 700],
