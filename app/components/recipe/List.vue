@@ -34,10 +34,15 @@
   const getScrollContainer = () =>
     listRoot.value?.querySelector<HTMLElement>(".p-listbox-list-container") ?? null
 
+  const nativeFocus = HTMLElement.prototype.focus
+
   const guardOptionScrollIntoView = (option: HTMLElement) => {
     if (option.dataset.scrollGuard === "true") return
     option.dataset.scrollGuard = "true"
     option.scrollIntoView = (() => {}) as HTMLElement["scrollIntoView"]
+    option.focus = ((options?: FocusOptions) => {
+      nativeFocus.call(option, { ...options, preventScroll: true })
+    }) as HTMLElement["focus"]
   }
 
   let pointerLockedScrollTop: number | null = null
@@ -46,33 +51,29 @@
     const container = getScrollContainer()
     if (!container || container.dataset.scrollLock === "true") return
     container.dataset.scrollLock = "true"
-    container.addEventListener(
-      "pointerdown",
-      (event) => {
-        const target = event.target
-        if (!(target instanceof Element) || !target.closest(".p-listbox-option")) {
-          pointerLockedScrollTop = null
-          return
-        }
-        pointerLockedScrollTop = container.scrollTop
-      },
-      true,
-    )
+    const lockFromEvent = (event: Event) => {
+      const target = event.target
+      if (!(target instanceof Element) || !target.closest(".p-listbox-option")) {
+        pointerLockedScrollTop = null
+        return
+      }
+      pointerLockedScrollTop = container.scrollTop
+    }
+    container.addEventListener("pointerdown", lockFromEvent, true)
+    container.addEventListener("mousedown", lockFromEvent, true)
     container.addEventListener("scroll", () => {
       if (pendingAlignSelected || pointerLockedScrollTop == null) return
       if (container.scrollTop !== pointerLockedScrollTop) {
         container.scrollTop = pointerLockedScrollTop
       }
     })
-    container.addEventListener(
-      "pointerup",
-      () => {
-        window.setTimeout(() => {
-          pointerLockedScrollTop = null
-        }, 400)
-      },
-      true,
-    )
+    const unlock = () => {
+      window.setTimeout(() => {
+        pointerLockedScrollTop = null
+      }, 500)
+    }
+    container.addEventListener("pointerup", unlock, true)
+    container.addEventListener("mouseup", unlock, true)
   }
 
   const measureListViewport = () => {
@@ -83,6 +84,14 @@
     const list = root.querySelector<HTMLElement>(".p-listbox-list")
     if (optionEls.length === 0 || !list) return
     optionEls.forEach(guardOptionScrollIntoView)
+    const listEl = listRoot.value?.querySelector<HTMLElement>(".p-listbox-list")
+    if (listEl && listEl.dataset.scrollGuard !== "true") {
+      listEl.dataset.scrollGuard = "true"
+      listEl.scrollIntoView = (() => {}) as HTMLElement["scrollIntoView"]
+      listEl.focus = ((options?: FocusOptions) => {
+        nativeFocus.call(listEl, { ...options, preventScroll: true })
+      }) as HTMLElement["focus"]
+    }
     attachClickScrollLock()
 
     const itemHeight = optionEls[0].getBoundingClientRect().height
@@ -194,6 +203,7 @@
   )
 
   watch(recipe, () => {
+    if (pendingAlignSelected) return
     preservedScrollTop = getScrollContainer()?.scrollTop ?? preservedScrollTop
   }, { flush: "pre" })
 
