@@ -77,7 +77,7 @@
 <template>
   <div
     v-if="isAdmin"
-    class="absolute bottom-10 right-10 flex flex-col gap-3"
+    class="fixed bottom-10 right-10 z-20 flex flex-col gap-3"
   >
     <ConfirmDialog group="recipe-delete" />
     <span
