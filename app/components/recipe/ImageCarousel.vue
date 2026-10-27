@@ -16,9 +16,11 @@
   const singleImage = computed(() => (images.length === 1 ? images[0] : undefined))
 
   const handleRemove = (event: Event, index: number) => {
-    event.preventDefault()
-    event.stopPropagation()
     emit("remove", index, event)
+  }
+
+  const handleRemovePointerDown = (event: PointerEvent) => {
+    event.stopPropagation()
   }
 </script>
 
@@ -35,6 +37,7 @@
       type="button"
       class="absolute! z-10 bottom-2 right-2"
       :aria-label="t('upload.removeImage')"
+      @pointerdown="handleRemovePointerDown"
       @click="handleRemove($event, 0)"
     >
       <i class="pi pi-trash" />
@@ -60,6 +63,7 @@
             type="button"
             class="absolute! z-10 bottom-2 right-2"
             :aria-label="t('upload.removeImage')"
+            @pointerdown="handleRemovePointerDown"
             @click="handleRemove($event, index)"
           >
             <i class="pi pi-trash" />
