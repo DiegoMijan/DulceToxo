@@ -31,6 +31,8 @@
       if (nextValue < 1 || nextValue > 5) return
       await recipesStore.upsertRating(recipeId, nextValue)
     } catch (error) {
+      // Sesión caducada: el store ya redirige al login, sin toast de error.
+      if (isUnauthorizedError(error)) return
       ratingKey.value += 1
       toast.add({
         severity: "error",

@@ -54,16 +54,12 @@ export const useAuth = () => {
   const signOut = async () => {
     const recipesStore = useRecipes()
     const localePath = useLocalePath()
-    const route = useRoute()
 
+    // Se limpia antes para vaciar la vista al momento, y después por si alguna
+    // petición empezó mientras se cerraba la sesión.
     recipesStore.clearCache()
     await authClient.signOut()
     recipesStore.clearCache()
-
-    if (isRecipesPage(route)) {
-      await navigateTo(localePath("/"))
-      return
-    }
 
     await navigateTo(localePath("/"))
   }
