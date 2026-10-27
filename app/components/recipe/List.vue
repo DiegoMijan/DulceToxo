@@ -9,14 +9,22 @@
 
   const recipe = defineModel<string>()
   const { t, locale } = useI18n()
+  const localePath = useLocalePath()
+  const route = useRoute()
 
   const recipesStore = useRecipes()
   const { sortRecipeList } = useRecipeSort()
   const loading = computed(() => recipesStore.loadingList)
-  const listRoot = useTemplateRef<HTMLElement>("listRoot")
-  const listScrollHeight = shallowRef("")
+  const scroller = useTemplateRef<HTMLElement>("scroller")
+  const measured = ref(false)
   let pendingAlignSelected = true
-  let preservedScrollTop = 0
+
+  const categoryUrlName = computed(() => String(route.params.category ?? ""))
+  const activeSlug = computed(() => {
+    const param = route.params.recipe
+    if (typeof param === "string" && param.length > 0) return param
+    return recipe.value
+  })
 
   const options = computed(() => {
     const recipes = sortRecipeList(recipesStore.recipesByCategory.get(categoryId) ?? [])
@@ -28,116 +36,38 @@
       title: item.locale[localeKey]?.title || "",
       ratingAvg: item.rating_avg,
       ratingCount: item.rating_count,
+      to: localePath(`/${categoryUrlName.value}/${item.locale[localeKey]?.slug || item.id}`),
     }))
   })
 
-  const getScrollContainer = () =>
-    listRoot.value?.querySelector<HTMLElement>(".p-listbox-list-container") ?? null
-
-  const nativeFocus = HTMLElement.prototype.focus
-
-  const guardOptionScrollIntoView = (option: HTMLElement) => {
-    if (option.dataset.scrollGuard === "true") return
-    option.dataset.scrollGuard = "true"
-    option.scrollIntoView = (() => {}) as HTMLElement["scrollIntoView"]
-    option.focus = ((options?: FocusOptions) => {
-      nativeFocus.call(option, { ...options, preventScroll: true })
-    }) as HTMLElement["focus"]
-  }
-
-  let pointerLockedScrollTop: number | null = null
-
-  const attachClickScrollLock = () => {
-    const container = getScrollContainer()
-    if (!container || container.dataset.scrollLock === "true") return
-    container.dataset.scrollLock = "true"
-    const lockFromEvent = (event: Event) => {
-      const target = event.target
-      if (!(target instanceof Element) || !target.closest(".p-listbox-option")) {
-        pointerLockedScrollTop = null
-        return
-      }
-      pointerLockedScrollTop = container.scrollTop
-      container.style.overflowY = "hidden"
-    }
-    container.addEventListener("pointerdown", lockFromEvent, true)
-    container.addEventListener("mousedown", lockFromEvent, true)
-    container.addEventListener("scroll", () => {
-      if (pendingAlignSelected || pointerLockedScrollTop == null) return
-      if (container.scrollTop !== pointerLockedScrollTop) {
-        container.scrollTop = pointerLockedScrollTop
-      }
-    })
-    const unlock = () => {
-      const top = pointerLockedScrollTop
-      container.style.overflowY = "auto"
-      if (top != null) container.scrollTop = top
-      window.setTimeout(() => {
-        if (top != null) container.scrollTop = top
-        pointerLockedScrollTop = null
-      }, 50)
-    }
-    container.addEventListener("pointerup", unlock, true)
-    container.addEventListener("mouseup", unlock, true)
-    container.addEventListener("click", unlock, true)
-  }
-
   const measureListViewport = () => {
-    const root = listRoot.value
-    if (!root) return
+    const list = scroller.value
+    if (!list || measured.value) return
 
-    const optionEls = [...root.querySelectorAll<HTMLElement>(".p-listbox-option")]
-    const list = root.querySelector<HTMLElement>(".p-listbox-list")
-    if (optionEls.length === 0 || !list) return
-    optionEls.forEach(guardOptionScrollIntoView)
-    const listEl = listRoot.value?.querySelector<HTMLElement>(".p-listbox-list")
-    if (listEl && listEl.dataset.scrollGuard !== "true") {
-      listEl.dataset.scrollGuard = "true"
-      listEl.scrollIntoView = (() => {}) as HTMLElement["scrollIntoView"]
-      listEl.focus = ((options?: FocusOptions) => {
-        nativeFocus.call(listEl, { ...options, preventScroll: true })
-      }) as HTMLElement["focus"]
-    }
-    attachClickScrollLock()
+    const itemEls = [...list.querySelectorAll<HTMLElement>(".recipe-list-item-link")]
+    if (itemEls.length === 0) return
 
-    const itemHeight = optionEls[0].getBoundingClientRect().height
+    const itemHeight = itemEls[0].getBoundingClientRect().height
     if (itemHeight <= 0) return
 
     const listStyles = getComputedStyle(list)
     const gap = Number.parseFloat(listStyles.rowGap || listStyles.gap || "0") || 0
     const paddingTop = Number.parseFloat(listStyles.paddingTop) || 0
     const paddingBottom = Number.parseFloat(listStyles.paddingBottom) || 0
-    const visibleCount = Math.min(RECIPE_LIST_VISIBLE_ITEMS, optionEls.length)
-    let itemsSpan = 0
-    for (let index = 0; index < visibleCount; index += 1) {
-      const height = optionEls[index].getBoundingClientRect().height
-      if (height <= 0) return
-      itemsSpan += height
-      if (index < visibleCount - 1) itemsSpan += gap
-    }
-    const maxHeight = paddingTop + itemsSpan + paddingBottom
+    const visibleCount = Math.min(RECIPE_LIST_VISIBLE_ITEMS, itemEls.length)
+    const maxHeight = paddingTop + paddingBottom + itemHeight * visibleCount + gap * Math.max(0, visibleCount - 1)
 
     if (maxHeight <= 0) return
 
-    root.style.setProperty("--recipe-list-item-height", `${itemHeight}px`)
-    root.style.setProperty("--recipe-list-item-gap", `${gap}px`)
-    root.style.setProperty("--recipe-list-padding-block", `${paddingTop + paddingBottom}px`)
-    root.style.setProperty("--recipe-list-visible-items", String(RECIPE_LIST_VISIBLE_ITEMS))
-    root.style.setProperty("--recipe-list-max-height", `${maxHeight}px`)
-
-    const nextHeight = `${maxHeight}px`
-    if (listScrollHeight.value !== nextHeight) {
-      listScrollHeight.value = nextHeight
-    }
+    list.style.maxHeight = `${maxHeight}px`
+    measured.value = true
   }
 
-  const scrollSelectedIntoView = (): boolean => {
-    const container = getScrollContainer()
-    const selected = container?.querySelector<HTMLElement>("[data-p-selected='true']")
-    if (!container || !selected) return false
+  const alignActiveIntoView = () => {
+    const container = scroller.value
+    const selected = container?.querySelector<HTMLElement>("[aria-current='page']")
+    if (!container || !selected) return
 
-    // block: "nearest" inside the list container only. Element.scrollIntoView
-    // would also scroll the page, so adjust the container's scrollTop instead.
     const containerRect = container.getBoundingClientRect()
     const selectedRect = selected.getBoundingClientRect()
     if (selectedRect.bottom > containerRect.bottom) {
@@ -145,46 +75,15 @@
     } else if (selectedRect.top < containerRect.top) {
       container.scrollTop -= containerRect.top - selectedRect.top
     }
-    return true
   }
 
-  const isSelectedInView = () => {
-    const container = getScrollContainer()
-    const selected = container?.querySelector<HTMLElement>("[data-p-selected='true']")
-    if (!container || !selected) return false
-    const containerRect = container.getBoundingClientRect()
-    const selectedRect = selected.getBoundingClientRect()
-    return selectedRect.top >= containerRect.top - 1 && selectedRect.bottom <= containerRect.bottom + 1
-  }
-
-  const restoreScroll = () => {
-    const container = getScrollContainer()
-    if (!container) return
-    container.scrollTop = preservedScrollTop
-  }
-
-  type SyncMode = "align" | "restore" | "measure"
-
-  let syncQueued = false
-  const syncListViewport = async (mode: SyncMode) => {
-    if (syncQueued) return
-    syncQueued = true
-    await nextTick()
-    syncQueued = false
+  const syncListViewport = async () => {
     if (loading.value || options.value.length === 0) return
-    measureListViewport()
     await nextTick()
-    if (mode === "align" || pendingAlignSelected) {
-      if (!listScrollHeight.value) return
-      scrollSelectedIntoView()
-      if (isSelectedInView()) {
-        pendingAlignSelected = false
-      }
-      return
-    }
-    if (mode === "restore") {
-      restoreScroll()
-    }
+    measureListViewport()
+    if (!pendingAlignSelected) return
+    alignActiveIntoView()
+    pendingAlignSelected = false
   }
 
   watch(
@@ -192,39 +91,18 @@
     (nextId, previousId) => {
       if (previousId && nextId !== previousId) {
         pendingAlignSelected = true
+        measured.value = false
       }
     },
   )
 
-  watch(options, () => {
-    preservedScrollTop = getScrollContainer()?.scrollTop ?? preservedScrollTop
-  }, { flush: "pre" })
-
   watch(
     [options, loading],
     () => {
-      void syncListViewport(pendingAlignSelected ? "align" : "restore")
+      void syncListViewport()
     },
     { flush: "post", immediate: true },
   )
-
-  watch(recipe, () => {
-    if (pendingAlignSelected) return
-    preservedScrollTop = getScrollContainer()?.scrollTop ?? preservedScrollTop
-  }, { flush: "pre" })
-
-  watch(recipe, async () => {
-    if (pendingAlignSelected) return
-    const top = preservedScrollTop
-    await nextTick()
-    await nextTick()
-    const container = getScrollContainer()
-    if (container) container.scrollTop = top
-  })
-
-  useResizeObserver(listRoot, () => {
-    void syncListViewport("measure")
-  })
 </script>
 <template>
   <div
@@ -242,48 +120,93 @@
   >
     {{ t('common.empty') }}
   </div>
-  <div
+  <nav
     v-else
-    ref="listRoot"
     class="recipe-list w-full min-h-0"
-    :class="{ 'recipe-list--measured': listScrollHeight }"
+    :aria-label="t('recipe.list.nav')"
   >
-    <ListBox
-      v-model="recipe"
-      :options="options"
-      option-label="title"
-      option-value="slug"
-      class="w-full"
-      :scroll-height="listScrollHeight || 'none'"
-      :auto-option-focus="false"
-      :focus-on-hover="false"
-      :pt="{
-        listContainer: { class: 'recipe-list-scroll', 'data-testid': 'recipe-list-scroll' },
-        option: { class: 'min-w-0' },
-      }"
+    <ul
+      ref="scroller"
+      class="recipe-list-scroll"
+      :class="{ 'recipe-list-scroll--measured': measured }"
+      data-testid="recipe-list-scroll"
     >
-      <template #option="{ option }">
-        <div
-          class="recipe-list-item min-w-0 w-full"
-          :data-recipe-slug="option.slug"
+      <li
+        v-for="item in options"
+        :key="item.id"
+        class="min-w-0"
+      >
+        <NuxtLink
+          :to="item.to"
+          class="recipe-list-item-link"
+          :aria-current="item.slug === activeSlug ? 'page' : undefined"
+          :data-recipe-slug="item.slug"
         >
-          <span class="recipe-list-title">{{ option.title }}</span>
-          <RecipeRatingSummary
-            class="recipe-list-rating"
-            :rating-avg="option.ratingAvg"
-            :rating-count="option.ratingCount"
-            compact
-          />
-        </div>
-      </template>
-    </ListBox>
-  </div>
+          <span class="recipe-list-item">
+            <span class="recipe-list-title">{{ item.title }}</span>
+            <RecipeRatingSummary
+              class="recipe-list-rating"
+              aria-hidden="true"
+              :rating-avg="item.ratingAvg"
+              :rating-count="item.ratingCount"
+              compact
+            />
+          </span>
+        </NuxtLink>
+      </li>
+    </ul>
+  </nav>
 </template>
 <style scoped>
   .recipe-list {
     --font-recipe-title: "Quicksand", ui-sans-serif, sans-serif;
     --recipe-list-title-gap: 0.375rem;
-    --recipe-list-visible-items: 10;
+  }
+
+  .recipe-list-scroll {
+    display: flex;
+    max-height: none;
+    flex-direction: column;
+    gap: var(--p-listbox-list-gap, 2px);
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--p-listbox-list-padding, 0.25rem);
+    list-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-french-lilac-400) var(--color-french-lilac-100);
+  }
+
+  .recipe-list-item-link {
+    display: block;
+    min-width: 0;
+    padding: var(--p-listbox-option-padding, 0.5rem 0.75rem);
+    border-radius: var(--p-listbox-option-border-radius, 6px);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .recipe-list-item-link:hover {
+    background: var(--p-listbox-option-focus-background, var(--color-french-lilac-50));
+  }
+
+  .recipe-list-item-link[aria-current="page"] {
+    background: var(--p-listbox-option-selected-background, var(--color-french-lilac-100));
+    color: var(--p-listbox-option-selected-color, inherit);
+  }
+
+  .recipe-list-item-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-french-lilac-500);
+  }
+
+  .dark .recipe-list-item-link:hover:not([aria-current="page"]) {
+    background: var(--p-listbox-option-focus-background, rgb(90 50 93 / 0.35));
+  }
+
+  .dark .recipe-list-item-link[aria-current="page"] {
+    background: var(--p-listbox-option-selected-background, rgb(90 50 93 / 0.55));
   }
 
   .recipe-list-item {
@@ -292,6 +215,7 @@
     width: 100%;
     flex-direction: column;
     gap: var(--recipe-list-title-gap);
+    pointer-events: none;
   }
 
   .recipe-list-title {
@@ -308,47 +232,29 @@
     min-height: 0.8rem;
   }
 
-  .recipe-list :deep(.recipe-list-scroll) {
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-french-lilac-400) var(--color-french-lilac-100);
-  }
-
-  .recipe-list--measured {
-    max-height: var(--recipe-list-max-height);
-    overflow: hidden;
-  }
-
-  .recipe-list--measured :deep(.p-listbox),
-  .recipe-list--measured :deep(.recipe-list-scroll) {
-    max-height: var(--recipe-list-max-height);
-  }
-
-  .dark .recipe-list :deep(.recipe-list-scroll) {
+  .dark .recipe-list-scroll {
     scrollbar-color: var(--color-french-lilac-500) var(--color-french-lilac-950);
   }
 
-  .recipe-list :deep(.recipe-list-scroll)::-webkit-scrollbar {
+  .recipe-list-scroll::-webkit-scrollbar {
     width: 6px;
   }
 
-  .recipe-list :deep(.recipe-list-scroll)::-webkit-scrollbar-track {
+  .recipe-list-scroll::-webkit-scrollbar-track {
     background: var(--color-french-lilac-100);
     border-radius: 999px;
   }
 
-  .dark .recipe-list :deep(.recipe-list-scroll)::-webkit-scrollbar-track {
+  .dark .recipe-list-scroll::-webkit-scrollbar-track {
     background: var(--color-french-lilac-950);
   }
 
-  .recipe-list :deep(.recipe-list-scroll)::-webkit-scrollbar-thumb {
+  .recipe-list-scroll::-webkit-scrollbar-thumb {
     background: var(--color-french-lilac-400);
     border-radius: 999px;
   }
 
-  .dark .recipe-list :deep(.recipe-list-scroll)::-webkit-scrollbar-thumb {
+  .dark .recipe-list-scroll::-webkit-scrollbar-thumb {
     background: var(--color-french-lilac-500);
   }
 </style>

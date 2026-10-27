@@ -145,6 +145,9 @@
   "recipe": {
     "notFound": "Recipe not found",
     "notFoundDescription": "The recipe you are looking for does not exist or has been deleted.",
+    "list": {
+      "nav": "Recipe list"
+    },
     "delete": {
       "button": "Delete recipe",
       "confirmHeader": "Delete recipe",

@@ -145,6 +145,9 @@
   "recipe": {
     "notFound": "Receta no encontrada",
     "notFoundDescription": "La receta que buscas no existe o ha sido eliminada.",
+    "list": {
+      "nav": "Lista de recetas"
+    },
     "delete": {
       "button": "Eliminar receta",
       "confirmHeader": "Eliminar receta",
