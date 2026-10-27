@@ -36,6 +36,67 @@
 
   const { downloadRecipePdf } = useRecipePdf()
 
+  type RecipeSectionsVariant = "a" | "b" | "c"
+  // A is the implemented proposal. Switch to "b" or "c" only to compare screenshots.
+  const RECIPE_SECTIONS_VARIANT: RecipeSectionsVariant = "a"
+
+  const ingredientHeadingClass =
+    "font-caveat font-semibold text-[20px] leading-snug tracking-wide uppercase text-french-lilac-700 dark:text-french-lilac-300"
+
+  const sectionStyles = {
+    a: {
+      columns: "flex flex-col gap-10 lg:flex-row lg:gap-12",
+      column: "flex min-w-0 flex-1 flex-col",
+      instructionsColumn: "flex min-w-0 flex-2 flex-col",
+      title: "title text-[1.75rem] tracking-wide text-left md:text-3xl",
+      accent: "bar" as const,
+      ingredientsList: "flex flex-col gap-[10px]",
+      ingredientRow: "flex flex-row items-start gap-2.5 text-left",
+      bullet: "dot" as const,
+      ingredientText: "content text-[15px] leading-relaxed",
+      stepsList: "relative flex flex-col gap-5",
+      stepRow: "relative z-10 flex flex-row items-start gap-3 text-left",
+      stepMarker: "filled-circle" as const,
+      stepText: "content pt-0.5 text-[15px] leading-relaxed",
+    },
+    b: {
+      columns: "flex flex-col gap-10 lg:flex-row lg:gap-12",
+      column: "flex min-w-0 flex-1 flex-col",
+      instructionsColumn: "flex min-w-0 flex-2 flex-col",
+      title:
+        "font-[Pacifico] text-[1.85rem] leading-tight text-left text-french-lilac-700 dark:text-french-lilac-300",
+      accent: "dashed" as const,
+      ingredientsList: "flex flex-col gap-[10px]",
+      ingredientRow: "flex flex-row items-start gap-2.5 text-left",
+      bullet: "sparkle" as const,
+      ingredientText: "sub-title text-[15px] leading-relaxed",
+      stepsList: "flex flex-col gap-5",
+      stepRow: "flex flex-row items-start gap-4 text-left",
+      stepMarker: "playfair-index" as const,
+      stepText: "sub-title pt-1 text-[15px] leading-relaxed",
+    },
+    c: {
+      columns: "flex flex-col gap-12 lg:flex-row lg:gap-14",
+      column: "flex min-w-0 flex-1 flex-col",
+      instructionsColumn: "flex min-w-0 flex-2 flex-col",
+      title:
+        "font-[Merriweather] text-left text-lg font-light uppercase tracking-[0.28em] text-french-lilac-800 dark:text-french-lilac-200",
+      accent: "flourish" as const,
+      ingredientsList: "flex flex-col gap-[10px]",
+      ingredientRow: "flex flex-row items-start gap-3 text-left",
+      bullet: "dash" as const,
+      ingredientText: "content text-[15px] leading-relaxed text-surface-700 dark:text-surface-200",
+      stepsList: "flex flex-col gap-5",
+      stepRow: "flex flex-row items-start gap-3 text-left",
+      stepMarker: "outline-circle" as const,
+      stepText: "content pt-0.5 text-[15px] leading-relaxed",
+    },
+  } as const
+
+  const sectionStyle = sectionStyles[RECIPE_SECTIONS_VARIANT]
+
+  const paddedStepNumber = (index: number): string => String(index + 1).padStart(2, "0")
+
   const downloadPdf = async () => {
     const recipeForPdf = {
       id: recipe.id,
@@ -132,73 +193,99 @@
         :images="images"
       />
     </section>
-    <section class="flex gap-4">
-      <div class="flex flex-1 flex-col gap-4">
-        <h2 class="title text-3xl text-left">
-          {{ t("recipe.edit.form.ingredients") }}
-        </h2>
-        <div
+    <section :class="sectionStyle.columns">
+      <div :class="sectionStyle.column">
+        <RecipeSectionTitle
+          :title="t('recipe.edit.form.ingredients')"
+          :title-class="sectionStyle.title"
+          :accent="sectionStyle.accent"
+        />
+        <p
           v-if="ingredients.length === 0"
-          class="text-surface-500 text-left"
+          class="content text-left text-surface-500"
         >
           {{ t("common.empty") }}
-        </div>
-        <div
+        </p>
+        <ul
           v-else
-          class="flex flex-col gap-4"
+          :class="sectionStyle.ingredientsList"
         >
-          <div
+          <li
             v-for="(ingredient, index) in ingredients"
             :key="ingredient.id"
             :class="[
-              'flex flex-row gap-2 items-start text-left',
-              { 'mt-4': ingredient.is_heading && index > 0 },
+              sectionStyle.ingredientRow,
+              { 'mt-3': ingredient.is_heading && index > 0 },
             ]"
           >
+            <span
+              v-if="!ingredient.is_heading && sectionStyle.bullet === 'dot'"
+              class="mt-[0.45rem] size-1.5 shrink-0 rounded-full bg-french-lilac-500"
+              aria-hidden="true"
+            />
             <NuxtIcon
-              v-if="!ingredient.is_heading"
+              v-else-if="!ingredient.is_heading && sectionStyle.bullet === 'sparkle'"
               name="emojione-v1:sparkles"
-              class="text-xl shrink-0"
+              class="mt-0.5 shrink-0 text-sm"
             />
             <span
-              :class="[
-                'text-md',
-                ingredient.is_heading
-                  ? 'font-caveat font-semibold text-[1.5rem] leading-snug tracking-wide uppercase text-french-lilac-700 dark:text-french-lilac-300'
-                  : '',
-              ]"
+              v-else-if="!ingredient.is_heading && sectionStyle.bullet === 'dash'"
+              class="mt-[0.7rem] h-px w-3 shrink-0 bg-french-lilac-400"
+              aria-hidden="true"
+            />
+            <span
+              :class="ingredient.is_heading ? ingredientHeadingClass : sectionStyle.ingredientText"
             >
               {{ ingredient.description }}
             </span>
-          </div>
-        </div>
+          </li>
+        </ul>
       </div>
-      <div class="flex flex-2 flex-col gap-4">
-        <h2 class="title text-3xl text-left">
-          {{ t("recipe.edit.form.instructions") }}
-        </h2>
-        <div
+      <div :class="sectionStyle.instructionsColumn">
+        <RecipeSectionTitle
+          :title="t('recipe.edit.form.instructions')"
+          :title-class="sectionStyle.title"
+          :accent="sectionStyle.accent"
+        />
+        <p
           v-if="steps.length === 0"
-          class="text-surface-500 text-left"
+          class="content text-left text-surface-500"
         >
           {{ t("common.empty") }}
-        </div>
-        <div
+        </p>
+        <ol
           v-else
-          class="flex flex-col gap-4"
+          :class="['list-none', sectionStyle.stepsList]"
         >
-          <div
+          <li
             v-for="(step, index) in steps"
             :key="step.id"
-            class="flex flex-row gap-3 items-start text-left"
+            :class="sectionStyle.stepRow"
           >
-            <Badge
-              :value="index + 1"
-              class="shrink-0 mt-0.5"
-            />
-            <span class="text-md">{{ step.description }}</span>
-          </div>
-        </div>
+            <span
+              v-if="sectionStyle.stepMarker === 'filled-circle'"
+              class="title flex size-7 shrink-0 items-center justify-center rounded-full bg-french-lilac-700 text-sm text-white dark:bg-french-lilac-400 dark:text-gray-950"
+              aria-hidden="true"
+            >
+              {{ index + 1 }}
+            </span>
+            <span
+              v-else-if="sectionStyle.stepMarker === 'playfair-index'"
+              class="title w-10 shrink-0 text-2xl leading-none text-french-lilac-500 dark:text-french-lilac-400"
+              aria-hidden="true"
+            >
+              {{ paddedStepNumber(index) }}
+            </span>
+            <span
+              v-else
+              class="title flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-french-lilac-500 text-sm text-french-lilac-700 dark:border-french-lilac-400 dark:text-french-lilac-300"
+              aria-hidden="true"
+            >
+              {{ index + 1 }}
+            </span>
+            <span :class="sectionStyle.stepText">{{ step.description }}</span>
+          </li>
+        </ol>
       </div>
     </section>
     <RecipeDifficultyDrawer
