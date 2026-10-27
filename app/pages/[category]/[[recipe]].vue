@@ -146,8 +146,14 @@
     }
   }
 
-  watch(locale, async () => {
+  watch(locale, async (newLocale) => {
     await nextTick()
+    if (newLocale !== "gl") {
+      await until(() => route.path.startsWith(`/${newLocale}/`)).toBe(true, {
+        timeout: 1000,
+        throwOnTimeout: false,
+      })
+    }
     await navigateToLocalizedCategory()
   })
 
