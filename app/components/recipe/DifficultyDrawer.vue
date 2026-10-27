@@ -7,7 +7,6 @@
 
   const { t } = useI18n()
 
-  const overflow = document.body.style.overflow
   const difficultyList = [1, 2, 3, 4, 5]
 
   const difficultyListTranslated = computed(() =>
@@ -19,17 +18,20 @@
     })),
   )
 
-  const getVisibleValue = computed(() => (visible.value ? "hidden" : "auto"))
-
-  onUnmounted(() => {
-    document.body.style.overflow = overflow
-    document.documentElement.style.overflow = overflow
-  })
-
-  const toggleBodyOverflow = () => {
-    document.body.style.overflow = getVisibleValue.value
-    document.documentElement.style.overflow = getVisibleValue.value
+  // html y body tienen height: 100vh y html es el que hace scroll (main.css).
+  // Al cerrar hay que quitar el estilo en línea, no poner "auto": con "auto"
+  // el body se convierte en un segundo contenedor de scroll (doble scrollbar).
+  const lockPageScroll = () => {
+    document.body.style.overflow = "hidden"
+    document.documentElement.style.overflow = "hidden"
   }
+
+  const unlockPageScroll = () => {
+    document.body.style.removeProperty("overflow")
+    document.documentElement.style.removeProperty("overflow")
+  }
+
+  onUnmounted(unlockPageScroll)
 </script>
 
 <template>
@@ -38,8 +40,8 @@
     :header="t('recipe.difficultyExplanationTitle')"
     position="right"
     class="w-full! md:w-80! lg:w-120!"
-    @show="toggleBodyOverflow"
-    @hide="toggleBodyOverflow"
+    @show="lockPageScroll"
+    @hide="unlockPageScroll"
   >
     <div class="flex flex-col gap-4 text-left">
       <div
