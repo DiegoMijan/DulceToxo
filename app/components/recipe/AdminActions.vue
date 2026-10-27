@@ -41,6 +41,8 @@
       const categoryUrlName = categoriesStore.getCategoryUrlNameById(categoryId)
       await navigateTo(localePath(categoryUrlName ? `/${categoryUrlName}` : "/"))
     } catch (error) {
+      // Sesión caducada: el store ya redirige al login, sin toast de error.
+      if (isUnauthorizedError(error)) return
       toast.add({
         severity: "error",
         summary: t("recipe.delete.error"),
