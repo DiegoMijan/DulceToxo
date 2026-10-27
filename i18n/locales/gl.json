@@ -189,6 +189,16 @@
     "difficulty": "Dificultade: ",
     "downloadPdf": "Descargar PDF",
     "sortBy": "Ordenar por",
+    "sort": {
+      "name": "Nome",
+      "createdAt": "Data de publicación",
+      "updatedAt": "Data de actualización",
+      "difficulty": "Dificultade",
+      "totalTime": "Tempo total",
+      "ascending": "ascendente",
+      "descending": "descendente",
+      "toggleDirection": "Cambiar a dirección da ordenación ({direction})"
+    },
     "difficultyTooltip": "Fai clic para ver a explicación de cada nivel de dificultade",
     "difficultyExplanationTitle": "Explicación da dificultade",
     "difficultyExplanation": {

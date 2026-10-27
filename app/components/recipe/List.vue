@@ -1,14 +1,27 @@
 <script setup lang="ts">
+  import type { LocaleKey } from "#shared/types/Recipe"
+
   const { categoryId } = defineProps<{
     categoryId: string
   }>()
 
   const recipe = defineModel<string>()
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
 
   const recipesStore = useRecipes()
-  const options = computed(() => recipesStore.getRecipesListByLocale(categoryId))
+  const { sortRecipeList } = useRecipeSort()
   const loading = computed(() => recipesStore.loadingList)
+
+  const options = computed(() => {
+    const recipes = sortRecipeList(recipesStore.recipesByCategory.get(categoryId) ?? [])
+    const localeKey = locale.value as LocaleKey
+
+    return recipes.map((item) => ({
+      id: item.id,
+      slug: item.locale[localeKey]?.slug || item.id,
+      title: item.locale[localeKey]?.title || "",
+    }))
+  })
 </script>
 <template>
   <div
