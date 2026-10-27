@@ -69,7 +69,7 @@
       () => {
         window.setTimeout(() => {
           pointerLockedScrollTop = null
-        }, 100)
+        }, 400)
       },
       true,
     )
@@ -192,6 +192,19 @@
     },
     { flush: "post", immediate: true },
   )
+
+  watch(recipe, () => {
+    preservedScrollTop = getScrollContainer()?.scrollTop ?? preservedScrollTop
+  }, { flush: "pre" })
+
+  watch(recipe, async () => {
+    if (pendingAlignSelected) return
+    const top = preservedScrollTop
+    await nextTick()
+    await nextTick()
+    const container = getScrollContainer()
+    if (container) container.scrollTop = top
+  })
 
   useResizeObserver(listRoot, () => {
     void syncListViewport("measure")
