@@ -9,8 +9,6 @@
   const { t, locale } = useI18n()
   const localePath = useLocalePath()
   const { isAdmin } = useAuth()
-  const runtimeConfig = useRuntimeConfig()
-  const cloudinaryBaseUrl = runtimeConfig.public.cloudinaryBaseUrl as string
 
   const currentLocale = computed(() => locale.value as LocaleKey)
 
@@ -21,12 +19,20 @@
   const difficultyDrawerVisible = ref(false)
 
   const images = computed(() => {
+    const title = localeData.value?.title || t("upload.imageFallback")
     if (recipe.images.length === 0) {
-      return [{ src: "/img/ejemplo_receta.jpg", alt: localeData.value?.title || "Recipe" }]
+      return [
+        {
+          key: "placeholder",
+          src: "/img/ejemplo_receta.jpg",
+          alt: title,
+        },
+      ]
     }
     return recipe.images.map((img) => ({
-      src: `${cloudinaryBaseUrl}${img.public_id}`,
-      alt: localeData.value?.title || "Recipe",
+      key: img.id,
+      publicId: img.public_id,
+      alt: title,
     }))
   })
 
@@ -122,23 +128,10 @@
         <i class="pi pi-file-pdf mr-2" />
         {{ t("recipe.downloadPdf") }}
       </Button>
-      <Carousel
-        :value="images"
-        :num-visible="1"
-        :num-scroll="1"
-        orientation="horizontal"
-      >
-        <template #item="{ data }">
-          <Image
-            :src="data.src"
-            :alt="data.alt"
-            class="mt-4 rounded w-full"
-            image-class="rounded w-full"
-            image-style="height: 320px !important; object-fit: cover;"
-            preview
-          />
-        </template>
-      </Carousel>
+      <RecipeImageCarousel
+        class="mt-4"
+        :images="images"
+      />
     </section>
     <section class="flex gap-4">
       <div class="flex flex-1 flex-col gap-4">

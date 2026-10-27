@@ -214,6 +214,15 @@
     "confirmDelete": "¿Desea eliminar esta imagen?",
     "confirmDeleteAll": "¿Desea eliminar todas las imágenes?",
     "chooseImages": "Elegir imágenes",
-    "removeAllImages": "Eliminar todas las imágenes"
+    "removeAllImages": "Eliminar todas las imágenes",
+    "success": "Imagen subida correctamente",
+    "error": "No se pudo subir la imagen",
+    "invalidType": "Solo se permiten imágenes JPEG, PNG y WebP",
+    "tooLarge": "La imagen debe pesar 10 MB o menos",
+    "uploading": "Subiendo imagen...",
+    "imageAlt": "Imagen de la receta {n}",
+    "imageFallback": "Imagen de la receta",
+    "previousImage": "Imagen anterior",
+    "nextImage": "Imagen siguiente"
   }
 }

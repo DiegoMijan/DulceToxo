@@ -49,9 +49,10 @@
   const { categories, categoriesByLocale } = storeToRefs(categoriesStore)
   const { getCategories } = categoriesStore
   const recipesStore = useRecipes()
-
-  const runtimeConfig = useRuntimeConfig()
-  const cloudinaryBaseUrl = runtimeConfig.public.cloudinaryBaseUrl as string
+  const uploadRef = useTemplateRef<{
+    discardSessionUploads: () => Promise<void>
+    markSessionPersisted: () => void
+  }>("uploadRef")
 
   const resolver = ref(valibotResolver(recipeFormSchema(t)))
   const loading = ref(false)
@@ -152,9 +153,9 @@
       const data = await $fetch<RecipeDetail>(`/api/recipes/${recipeId}`)
       currentRecipe.value = data
 
-      const categoryUrlName = categories.value
-        .find((c) => c.id === data.category_id)
-        ?.locale[locale.value as LocaleKey]?.url_name || ""
+      const categoryUrlName =
+        categories.value.find((c) => c.id === data.category_id)?.locale[locale.value as LocaleKey]
+          ?.url_name || ""
 
       const newValues: RecipeFormValues = {
         id: data.id,
@@ -162,52 +163,58 @@
         difficulty: data.difficulty,
         prepTime: data.prep_time,
         cookTime: data.cook_time,
-        images: data.images.map((img) => `${cloudinaryBaseUrl}${img.public_id}`),
+        images: data.images.map((img) => img.public_id),
         locales: {
           es: {
             slug: data.locales.es?.slug || "",
             title: data.locales.es?.title || "",
             description: data.locales.es?.description || "",
-            ingredients: data.ingredients.es?.map((i) => ({
-              id: i.id,
-              order: i.order,
-              description: i.description,
-            })) || [],
-            instructions: data.steps.es?.map((s) => ({
-              id: s.id,
-              order: s.order,
-              description: s.description,
-            })) || [],
+            ingredients:
+              data.ingredients.es?.map((i) => ({
+                id: i.id,
+                order: i.order,
+                description: i.description,
+              })) || [],
+            instructions:
+              data.steps.es?.map((s) => ({
+                id: s.id,
+                order: s.order,
+                description: s.description,
+              })) || [],
           },
           en: {
             slug: data.locales.en?.slug || "",
             title: data.locales.en?.title || "",
             description: data.locales.en?.description || "",
-            ingredients: data.ingredients.en?.map((i) => ({
-              id: i.id,
-              order: i.order,
-              description: i.description,
-            })) || [],
-            instructions: data.steps.en?.map((s) => ({
-              id: s.id,
-              order: s.order,
-              description: s.description,
-            })) || [],
+            ingredients:
+              data.ingredients.en?.map((i) => ({
+                id: i.id,
+                order: i.order,
+                description: i.description,
+              })) || [],
+            instructions:
+              data.steps.en?.map((s) => ({
+                id: s.id,
+                order: s.order,
+                description: s.description,
+              })) || [],
           },
           gl: {
             slug: data.locales.gl?.slug || "",
             title: data.locales.gl?.title || "",
             description: data.locales.gl?.description || "",
-            ingredients: data.ingredients.gl?.map((i) => ({
-              id: i.id,
-              order: i.order,
-              description: i.description,
-            })) || [],
-            instructions: data.steps.gl?.map((s) => ({
-              id: s.id,
-              order: s.order,
-              description: s.description,
-            })) || [],
+            ingredients:
+              data.ingredients.gl?.map((i) => ({
+                id: i.id,
+                order: i.order,
+                description: i.description,
+              })) || [],
+            instructions:
+              data.steps.gl?.map((s) => ({
+                id: s.id,
+                order: s.order,
+                description: s.description,
+              })) || [],
           },
         },
       }
@@ -253,13 +260,10 @@
       })),
     )
 
-    const images = values.images
-      .filter((url) => !url.startsWith("data:") && !url.startsWith("blob:"))
-      .map((url, index) => {
-        const match = url.match(/\/upload\/(?:v\d+\/)?(.+)$/)
-        const publicId = match ? match[1].replace(/\.[^.]+$/, "") : url
-        return { public_id: publicId, order: index + 1 }
-      })
+    const images = values.images.map((publicId, index) => ({
+      public_id: publicId,
+      order: index + 1,
+    }))
 
     return {
       category_id: categoryId,
@@ -323,6 +327,7 @@
           life: 3000,
         })
 
+        uploadRef.value?.markSessionPersisted()
         await loadAllRecipes()
         selectedRecipeId.value = result.id
         await navigateTo(localePath(`/edit/${result.id}`))
@@ -339,6 +344,7 @@
           life: 3000,
         })
 
+        uploadRef.value?.markSessionPersisted()
         await loadAllRecipes()
         await loadRecipeDetail(selectedRecipeId.value)
       }
@@ -365,6 +371,7 @@
   }
 
   const handleRecipeChange = async (event: SelectChangeEvent) => {
+    await uploadRef.value?.discardSessionUploads()
     const newId = event.value as string
     selectedRecipeId.value = newId
 
@@ -377,8 +384,9 @@
     await loadRecipeDetail(newId)
   }
 
-  const onCancel = () => {
+  const onCancel = async () => {
     slugErrors.value = { es: null, en: null, gl: null }
+    await uploadRef.value?.discardSessionUploads()
     if (currentRecipe.value) {
       loadRecipeDetail(currentRecipe.value.id)
     } else {
@@ -388,8 +396,7 @@
 
   const onBack = () => {
     if (!currentRecipe.value) return
-    const categoryUrlName = categories.value
-      .find((c) => c.id === currentRecipe.value!.category_id)
+    const categoryUrlName = categories.value.find((c) => c.id === currentRecipe.value!.category_id)
       ?.locale[locale.value as LocaleKey]?.url_name
     const recipeSlug = currentRecipe.value.locales[locale.value as LocaleKey]?.slug
     if (categoryUrlName && recipeSlug) {
@@ -404,10 +411,7 @@
     }
   }
 
-  const triggerLocalesChange = (
-    localeKey: LocaleKey,
-    type: "ingredients" | "instructions",
-  ) => {
+  const triggerLocalesChange = (localeKey: LocaleKey, type: "ingredients" | "instructions") => {
     slugErrors.value[localeKey] = null
 
     const localesStates = form.value?.states?.locales as
@@ -551,7 +555,9 @@
         <PrimeVueFormField name="images">
           <template v-if="$form.images?.value">
             <FormUpload
-              v-model:listSrcs="$form.images.value"
+              ref="uploadRef"
+              v-model:publicIds="$form.images.value"
+              :persistedPublicIds="currentRecipe?.images.map((img) => img.public_id) ?? []"
               @change="triggerImagesChange"
             />
           </template>
