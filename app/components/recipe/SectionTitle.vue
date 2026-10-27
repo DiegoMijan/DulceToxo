@@ -8,7 +8,7 @@
 
 <template>
   <div>
-    <h2 :class="titleClass">
+    <h2 :class="[titleClass, 'break-words']">
       {{ title }}
     </h2>
     <span
