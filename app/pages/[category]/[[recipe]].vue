@@ -1,6 +1,10 @@
 <script setup lang="ts">
   import type { RecipeDetail } from "~/stores/recipes"
 
+  definePageMeta({
+    key: (route) => String(route.params.category),
+  })
+
   const route = useRoute()
   const { locale, t } = useI18n()
   const localePath = useLocalePath()
@@ -21,9 +25,42 @@
   const recipeDetail = ref<RecipeDetail | null>(null)
   const loading = ref(true)
   const recipeNotFound = ref(false)
+  let recipeLoadGeneration = 0
+
+  const recipePath = (slug: string) => localePath(`/${categoryUrlName.value}/${slug}`)
+
+  const loadRecipeBySlug = async (slug: string | undefined) => {
+    const generation = ++recipeLoadGeneration
+    recipeNotFound.value = false
+
+    if (!slug || !categoryId.value) {
+      if (generation === recipeLoadGeneration) {
+        recipeDetail.value = null
+      }
+      return
+    }
+
+    const recipeId = recipesStore.findRecipeIdBySlug(categoryId.value, slug)
+    if (!recipeId) {
+      if (generation === recipeLoadGeneration) {
+        recipeDetail.value = null
+        recipeNotFound.value = true
+      }
+      return
+    }
+
+    if (recipeDetail.value?.id === recipeId) return
+
+    const detail = await recipesStore.getRecipeDetail(recipeId)
+    if (generation !== recipeLoadGeneration) return
+
+    recipeDetail.value = detail
+    if (!detail) {
+      recipeNotFound.value = true
+    }
+  }
 
   const initializeData = async () => {
-    loading.value = true
     recipeNotFound.value = false
 
     await categoriesStore.getCategories()
@@ -31,20 +68,17 @@
     const catId = categoryId.value
     if (!catId) {
       loading.value = false
+      recipeDetail.value = null
       return
     }
 
-    await recipesStore.getRecipesByCategory(catId, true)
-
-    const recipeSlug = recipeSlugParam.value
-    if (recipeSlug) {
-      const recipeId = recipesStore.findRecipeIdBySlug(catId, recipeSlug)
-      if (recipeId) {
-        recipeDetail.value = await recipesStore.getRecipeDetail(recipeId, true)
-      } else {
-        recipeNotFound.value = true
-      }
+    const hasList = recipesStore.recipesByCategory.has(catId)
+    if (!hasList) {
+      loading.value = true
     }
+
+    await recipesStore.getRecipesByCategory(catId)
+    await loadRecipeBySlug(recipeSlugParam.value)
 
     loading.value = false
   }
@@ -52,18 +86,25 @@
   await initializeData()
 
   watch(selectedSlug, async (newSlug) => {
-    if (!newSlug || !categoryId.value) return
-
-    recipeNotFound.value = false
-    const recipeId = recipesStore.findRecipeIdBySlug(categoryId.value, newSlug)
-    if (recipeId) {
-      recipeDetail.value = await recipesStore.getRecipeDetail(recipeId)
-    } else {
-      recipeDetail.value = null
-      recipeNotFound.value = true
+    if (newSlug === recipeSlugParam.value) {
+      await loadRecipeBySlug(newSlug)
+      return
     }
 
-    navigateTo(localePath(`/${categoryUrlName.value}/${newSlug}`))
+    await loadRecipeBySlug(newSlug)
+
+    if (!newSlug) {
+      const categoryPath = localePath(`/${categoryUrlName.value}`)
+      if (route.path !== categoryPath) {
+        await navigateTo(categoryPath)
+      }
+      return
+    }
+
+    const targetPath = recipePath(newSlug)
+    if (route.path !== targetPath) {
+      await navigateTo(targetPath)
+    }
   })
 
   watch(
@@ -71,10 +112,6 @@
     (recipeSlug) => {
       if (recipeSlug === selectedSlug.value) return
       selectedSlug.value = recipeSlug
-      if (!recipeSlug) {
-        recipeDetail.value = null
-        recipeNotFound.value = false
-      }
     },
   )
 
@@ -83,7 +120,7 @@
     await initializeData()
   })
 
-  const navigateToLocalizedCategory = () => {
+  const navigateToLocalizedCategory = async () => {
     if (!categoryId.value) return
 
     const newCategoryUrlName = categoriesStore.getCategoryUrlNameById(categoryId.value)
@@ -93,18 +130,31 @@
       const newSlug = recipesStore.getRecipeSlugById(categoryId.value, recipeDetail.value.id)
       if (newSlug) {
         selectedSlug.value = newSlug
-        navigateTo(localePath(`/${newCategoryUrlName}/${newSlug}`), { replace: true })
+        const targetPath = localePath(`/${newCategoryUrlName}/${newSlug}`)
+        if (route.path !== targetPath) {
+          await navigateTo(targetPath, { replace: true })
+        }
         return
       }
     }
 
     if (newCategoryUrlName !== categoryUrlName.value) {
-      navigateTo(localePath(`/${newCategoryUrlName}`), { replace: true })
+      const targetPath = localePath(`/${newCategoryUrlName}`)
+      if (route.path !== targetPath) {
+        await navigateTo(targetPath, { replace: true })
+      }
     }
   }
 
-  watch(locale, () => {
-    navigateToLocalizedCategory()
+  watch(locale, async (newLocale) => {
+    await nextTick()
+    if (newLocale !== "gl") {
+      await until(() => route.path.startsWith(`/${newLocale}/`)).toBe(true, {
+        timeout: 1000,
+        throwOnTimeout: false,
+      })
+    }
+    await navigateToLocalizedCategory()
   })
 
   watch(
@@ -139,16 +189,20 @@
           stroke-width="4"
         />
       </div>
-      <RecipeList
+      <div
         v-else-if="categoryId"
-        v-model="selectedSlug"
-        :category-id="categoryId"
+        data-testid="recipe-sidebar-list"
         class="w-full"
-      />
+      >
+        <RecipeList
+          v-model="selectedSlug"
+          :category-id="categoryId"
+        />
+      </div>
     </template>
     <template #content>
       <div
-        v-if="loading || recipesStore.loadingDetail"
+        v-if="loading && !recipeDetail"
         class="flex justify-center items-center h-full"
       >
         <ProgressSpinner

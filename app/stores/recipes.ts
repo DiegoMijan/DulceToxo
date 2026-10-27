@@ -14,26 +14,54 @@ export type UpsertRecipeRatingRequest = components["schemas"]["UpsertRecipeRatin
 export const useRecipes = defineStore("recipes", () => {
   const { locale } = useI18n()
 
+  // Cache keys are categoryId / recipeId only — they do not include locale.
+  // GET /categories/:id/recipes and GET /recipes/:id return gl+es+en fields together;
+  // views pick the active language with locale.value. If the backend ever returns a
+  // single locale, key these maps per locale or lists/details will stay in the old
+  // language after a locale change.
   const recipesByCategory = ref<Map<string, RecipeListItem[]>>(new Map())
   const recipesCache = ref<Map<string, RecipeDetail>>(new Map())
   const loadingList = ref(false)
   const loadingDetail = ref(false)
+  const pendingLists = new Map<string, Promise<RecipeListItem[]>>()
+  const pendingDetails = new Map<string, Promise<RecipeDetail | null>>()
+
+  const trackPending = <T>(
+    pending: Map<string, Promise<T>>,
+    key: string,
+    factory: () => Promise<T>,
+  ): Promise<T> => {
+    const request = factory()
+    pending.set(key, request)
+    return request.finally(() => {
+      if (pending.get(key) === request) {
+        pending.delete(key)
+      }
+    })
+  }
 
   const getRecipesByCategory = async (categoryId: string, force = false) => {
     if (!force && recipesByCategory.value.has(categoryId)) {
       return recipesByCategory.value.get(categoryId) || []
     }
 
-    loadingList.value = true
-    try {
-      const data = await $fetch<RecipeListItem[]>(`/api/categories/${categoryId}/recipes`)
-      recipesByCategory.value.set(categoryId, data || [])
-      return data || []
-    } catch {
-      return recipesByCategory.value.get(categoryId) || []
-    } finally {
-      loadingList.value = false
+    const inFlight = pendingLists.get(categoryId)
+    if (!force && inFlight) {
+      return inFlight
     }
+
+    return trackPending(pendingLists, categoryId, async () => {
+      loadingList.value = true
+      try {
+        const data = await $fetch<RecipeListItem[]>(`/api/categories/${categoryId}/recipes`)
+        recipesByCategory.value.set(categoryId, data || [])
+        return data || []
+      } catch {
+        return recipesByCategory.value.get(categoryId) || []
+      } finally {
+        loadingList.value = false
+      }
+    })
   }
 
   const getRecipeDetail = async (recipeId: string, force = false) => {
@@ -41,18 +69,25 @@ export const useRecipes = defineStore("recipes", () => {
       return recipesCache.value.get(recipeId) || null
     }
 
-    loadingDetail.value = true
-    try {
-      const data = await $fetch<RecipeDetail>(`/api/recipes/${recipeId}`)
-      if (data) {
-        recipesCache.value.set(recipeId, data)
-      }
-      return data || null
-    } catch {
-      return recipesCache.value.get(recipeId) || null
-    } finally {
-      loadingDetail.value = false
+    const inFlight = pendingDetails.get(recipeId)
+    if (!force && inFlight) {
+      return inFlight
     }
+
+    return trackPending(pendingDetails, recipeId, async () => {
+      loadingDetail.value = true
+      try {
+        const data = await $fetch<RecipeDetail>(`/api/recipes/${recipeId}`)
+        if (data) {
+          recipesCache.value.set(recipeId, data)
+        }
+        return data || null
+      } catch {
+        return recipesCache.value.get(recipeId) || null
+      } finally {
+        loadingDetail.value = false
+      }
+    })
   }
 
   const getRecipesListByLocale = (categoryId: string) => {
