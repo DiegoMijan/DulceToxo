@@ -19,11 +19,17 @@
     isDirty?: boolean
   }
 
+  type IngredientFormRow = Pick<
+    components["schemas"]["RecipeIngredientContent"],
+    "id" | "order" | "description" | "is_heading"
+  >
+  type RecipeIngredientInput = components["schemas"]["RecipeIngredientInput"]
+
   interface LocaleData {
     slug: string
     title: string
     description: string
-    ingredients: { id: string; order: number; description: string }[]
+    ingredients: IngredientFormRow[]
     instructions: { id: string; order: number; description: string }[]
   }
 
@@ -172,6 +178,7 @@
         id: item.id,
         order: item.order,
         description: item.description,
+        is_heading: item.is_heading ?? false,
       })) || [],
     instructions:
       data.steps[localeKey]?.map((item) => ({
@@ -211,9 +218,7 @@
 
   const collectRecipesFromStore = (): RecipeListItem[] => {
     const categoryList = Array.isArray(categories.value) ? categories.value : []
-    return categoryList.flatMap(
-      (category) => recipesStore.recipesByCategory.get(category.id) || [],
-    )
+    return categoryList.flatMap((category) => recipesStore.recipesByCategory.get(category.id) || [])
   }
 
   const loadAllRecipes = async (force = false) => {
@@ -297,11 +302,12 @@
       description: values.locales[loc].description,
     }))
 
-    const ingredients = (["es", "en", "gl"] as const).flatMap((loc) =>
+    const ingredients: RecipeIngredientInput[] = (["es", "en", "gl"] as const).flatMap((loc) =>
       values.locales[loc].ingredients.map((ing) => ({
         locale: loc,
         order: ing.order,
         description: ing.description,
+        is_heading: ing.is_heading ?? false,
       })),
     )
 

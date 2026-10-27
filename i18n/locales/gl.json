@@ -193,6 +193,7 @@
         "prepTime": "Tempo de preparación",
         "cookTime": "Tempo de cocción",
         "order": "Orden",
+        "heading": "Título",
         "id": "ID (para mostrar na URL)",
         "slug": "Slug (URL)"
       }

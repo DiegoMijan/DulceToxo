@@ -31,11 +31,12 @@ export interface Recipe extends State {
   >
 }
 
-export interface Ingredient extends State {
-  id: string
-  description: string
-  order: number
-}
+export interface Ingredient
+  extends State,
+    Pick<
+      components["schemas"]["RecipeIngredientContent"],
+      "id" | "description" | "order" | "is_heading"
+    > {}
 
 export interface Step extends State, Ingredient {}
 
