@@ -152,9 +152,9 @@ const drawColumn = (
 
     const fontFamily = isHeading ? "times" : "helvetica"
     const fontStyle = isHeading ? "bolditalic" : "normal"
-    const fontSize = isHeading ? 12.5 : 10.5
+    const fontSize = isHeading ? 11.5 : 10.5
     const indent = isHeading ? 0 : textIndent
-    const description = item.description
+    const description = isHeading ? item.description.toLocaleUpperCase() : item.description
     doc.setFont(fontFamily, fontStyle)
     doc.setFontSize(fontSize)
     const lines = doc.splitTextToSize(description, columnWidth - indent)
