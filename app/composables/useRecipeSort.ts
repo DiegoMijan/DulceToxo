@@ -29,7 +29,7 @@ const RECIPE_SORT_ICONS: Record<RecipeSortCode, string> = {
   createdAt: "line-md:calendar",
   updatedAt: "line-md:bell-twotone-loop",
   difficulty: "icon-park-twotone:chef-hat-one",
-  totalTime: "line-md:watch-loop",
+  totalTime: "tabler:clock",
 }
 
 const LEGACY_SORT_CODES: Record<string, RecipeSortCode> = {
