@@ -12,8 +12,23 @@ const cardKeys: Record<string, string> = {
 } as const
 
 const { t } = useI18n()
+const categoriesStore = useCategories()
+const { categoriesByLocale } = storeToRefs(categoriesStore)
 
 const isModalOpen = ref(false)
+
+const toKebabCase = (value: string): string =>
+  value.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
+
+const resolveCategoryUrlName = (cardKey: string, title: string): string => {
+  const byName = categoriesStore.getCategoryUrlNameByLocalizedName(title)
+  if (byName) return byName
+
+  return (
+    categoriesByLocale.value.find((category) => category.id === toKebabCase(cardKey))?.url_name ??
+    ""
+  )
+}
 
 const cards = ref([
   {
@@ -50,11 +65,15 @@ const cards = ref([
 ])
 
 const translateCards = computed(() =>
-  cards.value.map((card) => ({
-    ...card,
-    title: t(`landing.${card.key}.title`),
-    description: t(`landing.${card.key}.description`),
-  })),
+  cards.value.map((card) => {
+    const title = t(`landing.${card.key}.title`)
+    return {
+      ...card,
+      title,
+      description: t(`landing.${card.key}.description`),
+      urlName: resolveCategoryUrlName(card.key, title),
+    }
+  }),
 )
 </script>
 
@@ -64,12 +83,13 @@ const translateCards = computed(() =>
       <LazyLandingProfile @toggle-modal="isModalOpen = $event as boolean" />
       <div class="grid md:grid-cols-2 gap-10 sm:grid-cols-1 lg:px-0 px-4">
         <LandingCard
-          v-for="{ description, icon, title, darkIcon, isImage, key } in translateCards"
+          v-for="{ description, icon, title, darkIcon, isImage, key, urlName } in translateCards"
           :key
           :description
           :icon
           :dark-icon
           :title
+          :url-name="urlName"
           :is-modal-open="isModalOpen"
         >
           <template #icon="{ calculatedIcon }">

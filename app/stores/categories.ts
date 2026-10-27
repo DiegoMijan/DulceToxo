@@ -26,11 +26,14 @@ export const useCategories = defineStore(
       }
     }
 
-    const getCategoryIdByUrlName = (url_name: string): Nullable<string> => {
-      return (
-        categories.value.find((category) => category.locale[locale.value]?.url_name === url_name)
-          ?.id || null
+    const findCategoryByUrlName = (urlName: string): CategoryWithLocales | undefined => {
+      return categories.value.find((category) =>
+        Object.values(category.locale).some((entry) => entry?.url_name === urlName),
       )
+    }
+
+    const getCategoryIdByUrlName = (urlName: string): Nullable<string> => {
+      return findCategoryByUrlName(urlName)?.id || null
     }
 
     const getCategoryUrlNameById = (id: Nullable<string>): Nullable<string> => {
@@ -40,12 +43,17 @@ export const useCategories = defineStore(
       )
     }
 
+    const getCategoryUrlNameByLocalizedName = (name: string): Nullable<string> => {
+      return categoriesByLocale.value.find((category) => category.name === name)?.url_name || null
+    }
+
     return {
       categories,
       categoriesByLocale,
       getCategories,
       getCategoryIdByUrlName,
       getCategoryUrlNameById,
+      getCategoryUrlNameByLocalizedName,
     }
   },
   {

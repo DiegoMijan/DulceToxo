@@ -3,11 +3,12 @@ interface Props {
   icon: string
   title: string
   description: string
+  urlName?: string
   darkIcon?: string
   isModalOpen?: boolean
 }
 
-const { description, icon, title, darkIcon, isModalOpen } = defineProps<Props>()
+const { description, icon, title, urlName, darkIcon, isModalOpen } = defineProps<Props>()
 
 const localePath = useLocalePath()
 const colorMode = useColorMode()
@@ -41,15 +42,24 @@ watchEffect(() => {
   transformStyle.value = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`
 })
 
+const categoryPath = computed(() => (urlName ? localePath(`/${urlName}`) : null))
+
 const goToCategory = () => {
-  navigateTo(localePath(`/${title.toLowerCase()}`))
+  if (!categoryPath.value) return
+  navigateTo(categoryPath.value)
 }
 
 const handleMouseEnter = () => {
-  if (!hasPrefetched.value) {
-    const targetRoute = `/${title.toLowerCase()}`
-    preloadRouteComponents(targetRoute)
+  if (!hasPrefetched.value && categoryPath.value) {
+    preloadRouteComponents(categoryPath.value)
     hasPrefetched.value = true
+  }
+}
+
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault()
+    goToCategory()
   }
 }
 </script>
@@ -59,6 +69,9 @@ const handleMouseEnter = () => {
     ref="cardRef"
     class="cursor-pointer card-container"
     :style="{ transform: transformStyle }"
+    role="link"
+    tabindex="0"
+    :aria-label="title"
     :pt="{
       content: {
         class: 'content',
@@ -66,6 +79,7 @@ const handleMouseEnter = () => {
     }"
     @mouseenter="handleMouseEnter"
     @click="goToCategory"
+    @keydown="handleKeyDown"
   >
     <template #header>
       <h3 class="flex items-center p-2 pl-4 gap-2 title text-2xl!">
