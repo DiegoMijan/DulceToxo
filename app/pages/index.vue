@@ -9,13 +9,16 @@ const cardKeys: Record<string, string> = {
   spongeCakes: "spongeCakes",
   brownies: "brownies",
   coldCakes: "coldCakes",
+  layerCakes: "layerCakes",
+  iceCream: "iceCream",
+  classics: "classics",
 } as const
 
 const { t } = useI18n()
 const categoriesStore = useCategories()
 const { categoriesByLocale } = storeToRefs(categoriesStore)
 
-await categoriesStore.getCategories()
+await categoriesStore.getCategories(true)
 
 const isModalOpen = ref(false)
 
@@ -64,6 +67,21 @@ const cards = ref([
     icon: "emojione-v1:shortcake",
     darkIcon: "streamline-emojis:shortcake-1",
   },
+  {
+    key: cardKeys.layerCakes,
+    icon: "fluent-emoji:birthday-cake",
+    darkIcon: "twemoji:birthday-cake",
+  },
+  {
+    key: cardKeys.iceCream,
+    icon: "fluent-emoji:ice-cream",
+    darkIcon: "streamline-emojis:soft-ice-cream-1",
+  },
+  {
+    key: cardKeys.classics,
+    icon: "fluent-emoji:pancakes",
+    darkIcon: "twemoji:pancakes",
+  },
 ])
 
 const translateCards = computed(() =>
@@ -83,7 +101,9 @@ const translateCards = computed(() =>
   <main class="flex justify-center py-8">
     <div class="max-w-[100ch] flex flex-col gap-7">
       <LazyLandingProfile @toggle-modal="isModalOpen = $event as boolean" />
-      <div class="grid md:grid-cols-2 gap-10 sm:grid-cols-1 lg:px-0 px-4">
+      <div
+        class="grid gap-10 px-4 sm:grid-cols-1 md:grid-cols-2 lg:px-0 md:[&>:last-child:nth-child(odd)]:col-span-2 md:[&>:last-child:nth-child(odd)]:w-[calc((100%-2.5rem)/2)] md:[&>:last-child:nth-child(odd)]:justify-self-center"
+      >
         <LandingCard
           v-for="{ description, icon, title, darkIcon, isImage, key, urlName } in translateCards"
           :key
