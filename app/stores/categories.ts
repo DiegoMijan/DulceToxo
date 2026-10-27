@@ -7,10 +7,11 @@ export const useCategories = defineStore(
 
     const categoriesByLocale = computed(() => {
       return categories.value.map((category) => {
+        const localeContent = category.locale[locale.value]
         return {
           id: category.id,
-          name: category.locale[locale.value].name,
-          url_name: category.locale[locale.value].url_name,
+          name: localeContent?.name ?? "",
+          url_name: localeContent?.url_name ?? "",
         }
       })
     })
@@ -27,14 +28,14 @@ export const useCategories = defineStore(
 
     const getCategoryIdByUrlName = (url_name: string): Nullable<string> => {
       return (
-        categories.value.find((category) => category.locale[locale.value].url_name === url_name)
+        categories.value.find((category) => category.locale[locale.value]?.url_name === url_name)
           ?.id || null
       )
     }
 
     const getCategoryUrlNameById = (id: Nullable<string>): Nullable<string> => {
       return (
-        categories.value.find((category) => category.id === id)?.locale[locale.value].url_name ||
+        categories.value.find((category) => category.id === id)?.locale[locale.value]?.url_name ||
         null
       )
     }

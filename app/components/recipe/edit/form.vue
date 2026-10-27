@@ -8,6 +8,7 @@
   import en from "@/../public/img/gb.svg"
   import { FormField as PrimeVueFormField } from "@primevue/forms"
   import type { RecipeDetail, RecipeListItem } from "~/stores/recipes"
+  import type { components } from "#shared/types/api"
 
   type LocaleKey = "es" | "en" | "gl"
 
@@ -160,7 +161,7 @@
       const newValues: RecipeFormValues = {
         id: data.id,
         category: categoryUrlName,
-        difficulty: data.difficulty,
+        difficulty: data.difficulty as RecipeFormValues["difficulty"],
         prepTime: data.prep_time,
         cookTime: data.cook_time,
         images: data.images.map((img) => img.public_id),
@@ -234,7 +235,7 @@
 
   const buildRequestBody = (values: RecipeFormValues) => {
     const categoryId = categories.value.find((c) =>
-      Object.values(c.locale).some((l) => l.url_name === values.category),
+      Object.values(c.locale).some((l) => l?.url_name === values.category),
     )?.id
 
     const locales = (["es", "en", "gl"] as const).map((loc) => ({
@@ -316,7 +317,7 @@
       const body = buildRequestBody(values)
 
       if (isNewRecipe.value) {
-        const result = await $fetch<{ id: string }>("/api/recipes", {
+        const result = await $fetch<components["schemas"]["CreateRecipeResponse"]>("/api/recipes", {
           method: "POST",
           body,
         })
@@ -333,10 +334,13 @@
         await navigateTo(localePath(`/edit/${result.id}`))
         await loadRecipeDetail(result.id)
       } else {
-        await $fetch(`/api/recipes/${selectedRecipeId.value}`, {
-          method: "PUT",
-          body,
-        })
+        await $fetch<components["schemas"]["UpdateRecipeResponse"]>(
+          `/api/recipes/${selectedRecipeId.value}`,
+          {
+            method: "PUT",
+            body,
+          },
+        )
 
         toast.add({
           severity: "success",

@@ -1,12 +1,11 @@
+import type { components } from "#shared/types/api"
+
 export const RECIPE_UPLOAD_MAX_BYTES = 10 * 1024 * 1024
 export const RECIPE_UPLOAD_ACCEPT = "image/jpeg,image/png,image/webp"
 export const RECIPE_UPLOAD_TYPES = ["image/jpeg", "image/png", "image/webp"] as const
 
-export interface RecipeUploadResult {
-  public_id: string
-  width: number
-  height: number
-}
+export type RecipeUploadResult = components["schemas"]["UploadResult"]
+export type DeleteUploadResponse = components["schemas"]["DeleteUploadResponse"]
 
 export const useRecipeUploads = () => {
   const { t } = useI18n()
@@ -60,7 +59,7 @@ export const useRecipeUploads = () => {
 
   const deleteUpload = async (publicId: string): Promise<boolean> => {
     try {
-      await $fetch(`/api/uploads/${publicId}`, {
+      await $fetch<DeleteUploadResponse>(`/api/uploads/${publicId}`, {
         method: "DELETE",
       })
       return true

@@ -41,6 +41,10 @@ export interface paths {
       path?: never
       cookie?: never
     }
+    /**
+     * Obtener todas las categorías
+     * @description Devuelve todas las categorías con sus traducciones en español, inglés y gallego
+     */
     get: {
       parameters: {
         query?: never
@@ -50,12 +54,14 @@ export interface paths {
       }
       requestBody?: never
       responses: {
-        /** @description OK */
+        /** @description Lista de categorías con traducciones */
         200: {
           headers: {
             [name: string]: unknown
           }
-          content?: never
+          content: {
+            "application/json": components["schemas"]["Category"][]
+          }
         }
       }
     }
@@ -74,23 +80,48 @@ export interface paths {
       path?: never
       cookie?: never
     }
+    /**
+     * List recipes by category
+     * @description Returns a lightweight list of recipes for a category with id, slug and title per locale
+     */
     get: {
       parameters: {
         query?: never
         header?: never
         path: {
+          /** @description Category ID */
           id: string
         }
         cookie?: never
       }
       requestBody?: never
       responses: {
-        /** @description OK */
+        /** @description List of recipes */
         200: {
           headers: {
             [name: string]: unknown
           }
-          content?: never
+          content: {
+            "application/json": components["schemas"]["RecipeListItem"][]
+          }
+        }
+        /** @description Category ID is required */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Category not found */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
         }
       }
     }
@@ -142,64 +173,188 @@ export interface paths {
       path?: never
       cookie?: never
     }
+    /**
+     * Get recipe detail
+     * @description Returns full recipe with locales, ingredients, steps and images
+     */
     get: {
       parameters: {
         query?: never
         header?: never
         path: {
+          /** @description Recipe ID */
           id: string
         }
         cookie?: never
       }
       requestBody?: never
       responses: {
-        /** @description OK */
+        /** @description Recipe detail */
         200: {
           headers: {
             [name: string]: unknown
           }
-          content?: never
+          content: {
+            "application/json": components["schemas"]["RecipeDetail"]
+          }
+        }
+        /** @description Recipe ID is required */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Recipe not found */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
         }
       }
     }
+    /**
+     * Update a recipe
+     * @description Updates an existing recipe. Requires admin authentication. All fields are optional - only provided fields are updated.
+     */
     put: {
       parameters: {
         query?: never
         header?: never
         path: {
+          /** @description Recipe ID */
           id: string
         }
         cookie?: never
       }
-      requestBody?: never
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["UpdateRecipeRequest"]
+        }
+      }
       responses: {
-        /** @description OK */
+        /** @description Recipe updated successfully */
         200: {
           headers: {
             [name: string]: unknown
           }
-          content?: never
+          content: {
+            "application/json": components["schemas"]["UpdateRecipeResponse"]
+          }
+        }
+        /** @description Recipe ID is required, or validation error. On validation failure, body `data` is the Valibot issues array from safeParse. */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Admin access required */
+        403: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Recipe or category not found */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Slug already exists for locale */
+        409: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
         }
       }
     }
     post?: never
+    /**
+     * Delete a recipe
+     * @description Deletes a recipe and all its related data (locales, ingredients, steps, images). Also deletes associated images from Cloudinary. Requires admin authentication.
+     */
     delete: {
       parameters: {
         query?: never
         header?: never
         path: {
+          /** @description Recipe ID */
           id: string
         }
         cookie?: never
       }
       requestBody?: never
       responses: {
-        /** @description OK */
+        /** @description Recipe deleted successfully */
         200: {
           headers: {
             [name: string]: unknown
           }
-          content?: never
+          content: {
+            "application/json": components["schemas"]["DeleteRecipeResponse"]
+          }
+        }
+        /** @description Recipe ID is required */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Admin access required */
+        403: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Recipe not found */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
         }
       }
     }
@@ -217,6 +372,10 @@ export interface paths {
     }
     get?: never
     put?: never
+    /**
+     * Create a new recipe
+     * @description Creates a new recipe with locales, ingredients, steps and images. Requires admin authentication.
+     */
     post: {
       parameters: {
         query?: never
@@ -224,14 +383,65 @@ export interface paths {
         path?: never
         cookie?: never
       }
-      requestBody?: never
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["CreateRecipeRequest"]
+        }
+      }
       responses: {
-        /** @description OK */
-        200: {
+        /** @description Recipe created successfully */
+        201: {
           headers: {
             [name: string]: unknown
           }
-          content?: never
+          content: {
+            "application/json": components["schemas"]["CreateRecipeResponse"]
+          }
+        }
+        /** @description Validation error. Body `data` is the Valibot issues array from safeParse. */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Admin access required */
+        403: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Category not found */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Slug already exists for locale */
+        409: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
         }
       }
     }
@@ -250,6 +460,10 @@ export interface paths {
     }
     get?: never
     put?: never
+    /**
+     * Upload an image to Cloudinary
+     * @description Uploads an image file to Cloudinary in the recipes folder. Requires admin authentication. Accepts jpeg, png, webp up to 10MB.
+     */
     post: {
       parameters: {
         query?: never
@@ -257,14 +471,62 @@ export interface paths {
         path?: never
         cookie?: never
       }
-      requestBody?: never
+      requestBody: {
+        content: {
+          "multipart/form-data": {
+            /**
+             * Format: binary
+             * @description Image file (jpeg, png, webp, max 10MB)
+             */
+            file: string
+          }
+        }
+      }
       responses: {
-        /** @description OK */
+        /** @description Image uploaded successfully */
         200: {
           headers: {
             [name: string]: unknown
           }
-          content?: never
+          content: {
+            "application/json": components["schemas"]["UploadResult"]
+          }
+        }
+        /** @description No file uploaded, missing `file` field, invalid file type (allowed: image/jpeg, image/png, image/webp), or file larger than 10MB */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Admin access required */
+        403: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Failed to upload image to Cloudinary */
+        500: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
         }
       }
     }
@@ -284,23 +546,66 @@ export interface paths {
     get?: never
     put?: never
     post?: never
+    /**
+     * Delete an image from Cloudinary
+     * @description Deletes an image from Cloudinary by its public_id. Requires admin authentication. Only images in the Cloudinary folder can be deleted.
+     */
     delete: {
       parameters: {
         query?: never
         header?: never
         path: {
+          /** @description Cloudinary public_id (must start with the configured Cloudinary prefix, e.g. recipes/abc123) */
           publicId: string
         }
         cookie?: never
       }
       requestBody?: never
       responses: {
-        /** @description OK */
+        /** @description Image deleted successfully */
         200: {
           headers: {
             [name: string]: unknown
           }
-          content?: never
+          content: {
+            "application/json": components["schemas"]["DeleteUploadResponse"]
+          }
+        }
+        /** @description Public ID is required, or public_id does not start with <cloud>/ */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Admin access required */
+        403: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Image not found or already deleted */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
         }
       }
     }
@@ -411,7 +716,220 @@ export interface paths {
 }
 export type webhooks = Record<string, never>
 export interface components {
-  schemas: never
+  schemas: {
+    ValibotIssuePathItem: {
+      /** @enum {string} */
+      type: "array" | "map" | "object" | "set" | "unknown"
+      /** @enum {string} */
+      origin: "key" | "value"
+      /** @description Raw input at this path segment */
+      input: unknown
+      /** @description Object key, array index, or null for set items */
+      key: unknown
+      /** @description Value at this path segment. Omitted on missing-key issues. */
+      value?: unknown
+    }
+    ValibotIssue: {
+      /** @enum {string} */
+      kind: "schema" | "validation" | "transformation"
+      type: string
+      /** @description Raw input that failed validation. Omitted when JSON.stringify drops undefined (e.g. missing object keys). */
+      input?: unknown
+      expected: string | null
+      received: string
+      message: string
+      /** @description Present on some validation issues */
+      requirement?: unknown
+      path?: components["schemas"]["ValibotIssuePathItem"][]
+      issues?: components["schemas"]["ValibotIssue"][]
+      lang?: string
+      abort?: boolean
+    }
+    ErrorResponse: {
+      /** @enum {boolean} */
+      error: true
+      /** @description Request URL (href) */
+      url: string
+      statusCode: number
+      statusMessage: string
+      message: string
+      /** @description Present only when createError is called with data. For recipe POST/PUT validation failures this is the Valibot issues array from safeParse. */
+      data?: components["schemas"]["ValibotIssue"][]
+      /** @description Included by the Nitro dev error handler; omitted in production. */
+      stack?: string[]
+    }
+    CategoryLocale: {
+      id: string
+      name: string
+      url_name: string
+    }
+    Category: {
+      /** @example cat-123 */
+      id: string
+      /**
+       * @description SQLite datetime text, e.g. '2025-01-05 12:00:00'
+       * @example 2025-01-05 12:00:00
+       */
+      created_at: string
+      /** @description Translations keyed by locale. A key is omitted when that translation is missing in the database. */
+      locale: {
+        es?: components["schemas"]["CategoryLocale"]
+        en?: components["schemas"]["CategoryLocale"]
+        gl?: components["schemas"]["CategoryLocale"]
+      }
+    }
+    RecipeListLocale: {
+      slug: string
+      title: string
+    }
+    RecipeListItem: {
+      id: string
+      /** @description Title and slug keyed by locale. A key is omitted when that translation is missing in the database. */
+      locale: {
+        es?: components["schemas"]["RecipeListLocale"]
+        en?: components["schemas"]["RecipeListLocale"]
+        gl?: components["schemas"]["RecipeListLocale"]
+      }
+    }
+    DeleteRecipeResponse: {
+      /** @enum {boolean} */
+      deleted: true
+      id: string
+      cloudinary: components["schemas"]["CloudinaryResult"]
+    }
+    RecipeLocaleContent: {
+      id: string
+      slug: string
+      title: string
+      description: string
+    }
+    RecipeIngredientContent: {
+      id: string
+      order: number
+      description: string
+    }
+    RecipeStepContent: {
+      id: string
+      order: number
+      description: string
+    }
+    RecipeImageContent: {
+      id: string
+      public_id: string
+      order: number
+    }
+    RecipeDetail: {
+      id: string
+      category_id: string
+      difficulty: number
+      /** @description Preparation time in minutes */
+      prep_time: number
+      /** @description Cooking time in minutes */
+      cook_time: number
+      author_id: string | null
+      /** @description Unix timestamp in ms */
+      created_at: number
+      /** @description Unix timestamp in ms */
+      updated_at: number
+      /** @description Locale content keyed by language. A key is omitted when that translation is missing in the database. */
+      locales: {
+        es?: components["schemas"]["RecipeLocaleContent"]
+        en?: components["schemas"]["RecipeLocaleContent"]
+        gl?: components["schemas"]["RecipeLocaleContent"]
+      }
+      /** @description Ingredients grouped by locale. Keys are always present; missing locales are empty arrays. */
+      ingredients: {
+        es: components["schemas"]["RecipeIngredientContent"][]
+        en: components["schemas"]["RecipeIngredientContent"][]
+        gl: components["schemas"]["RecipeIngredientContent"][]
+      }
+      /** @description Steps grouped by locale. Keys are always present; missing locales are empty arrays. */
+      steps: {
+        es: components["schemas"]["RecipeStepContent"][]
+        en: components["schemas"]["RecipeStepContent"][]
+        gl: components["schemas"]["RecipeStepContent"][]
+      }
+      images: components["schemas"]["RecipeImageContent"][]
+    }
+    /** @description All fields are optional. Provided locales, ingredients, steps and images replace the existing rows for that collection. */
+    UpdateRecipeRequest: {
+      category_id?: string
+      difficulty?: number
+      prep_time?: number
+      cook_time?: number
+      /** @description Replaces all existing locales. Each locale can only appear once. Empty array deletes every locale. */
+      locales?: components["schemas"]["RecipeLocaleInput"][]
+      /** @description Replaces all existing ingredients. Empty array deletes every ingredient. */
+      ingredients?: components["schemas"]["RecipeIngredientInput"][]
+      /** @description Replaces all existing steps. Empty array deletes every step. */
+      steps?: components["schemas"]["RecipeStepInput"][]
+      /** @description Replaces all existing images. Public IDs removed from the recipe are deleted from Cloudinary. */
+      images?: components["schemas"]["RecipeImageInput"][]
+    }
+    CloudinaryResult: {
+      deleted: string[]
+      failed: string[]
+    }
+    UpdateRecipeResponse: {
+      id: string
+      /** @enum {boolean} */
+      updated: true
+      cloudinary: components["schemas"]["CloudinaryResult"]
+    }
+    RecipeLocaleInput: {
+      /** @enum {string} */
+      locale: "es" | "en" | "gl"
+      slug: string
+      title: string
+      description: string
+    }
+    RecipeIngredientInput: {
+      /** @enum {string} */
+      locale: "es" | "en" | "gl"
+      order: number
+      description: string
+    }
+    RecipeStepInput: {
+      /** @enum {string} */
+      locale: "es" | "en" | "gl"
+      order: number
+      description: string
+    }
+    RecipeImageInput: {
+      public_id: string
+      order: number
+    }
+    CreateRecipeRequest: {
+      category_id: string
+      difficulty: number
+      /** @description Minutes */
+      prep_time: number
+      /** @description Minutes */
+      cook_time: number
+      /** @description Each locale can only appear once in locales */
+      locales: components["schemas"]["RecipeLocaleInput"][]
+      /** @description Optional. Defaults to an empty array when omitted. */
+      ingredients?: components["schemas"]["RecipeIngredientInput"][]
+      /** @description Optional. Defaults to an empty array when omitted. */
+      steps?: components["schemas"]["RecipeStepInput"][]
+      /** @description Optional. Defaults to an empty array when omitted. */
+      images?: components["schemas"]["RecipeImageInput"][]
+    }
+    CreateRecipeResponse: {
+      id: string
+    }
+    UploadResult: {
+      /** @description Cloudinary public ID */
+      public_id: string
+      width: number
+      height: number
+    }
+    DeleteUploadResponse: {
+      /** @enum {boolean} */
+      deleted: true
+      public_id: string
+    }
+  }
   responses: never
   parameters: never
   requestBodies: never
