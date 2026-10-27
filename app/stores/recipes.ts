@@ -119,6 +119,25 @@ export const useRecipes = defineStore("recipes", () => {
     return null
   }
 
+  const removeRecipeFromCache = (recipeId: string, categoryId: string) => {
+    recipesCache.value.delete(recipeId)
+    const list = recipesByCategory.value.get(categoryId)
+    if (list) {
+      recipesByCategory.value.set(
+        categoryId,
+        list.filter((recipe) => recipe.id !== recipeId),
+      )
+    }
+  }
+
+  const deleteRecipe = async (recipeId: string, categoryId: string) => {
+    const data = await $fetch<{ deleted: boolean; id: string }>(`/api/recipes/${recipeId}`, {
+      method: "DELETE",
+    })
+    removeRecipeFromCache(recipeId, categoryId)
+    return data
+  }
+
   const clearCache = () => {
     recipesByCategory.value.clear()
     recipesCache.value.clear()
@@ -134,6 +153,7 @@ export const useRecipes = defineStore("recipes", () => {
     getRecipesListByLocale,
     findRecipeIdBySlug,
     getRecipeSlugById,
+    deleteRecipe,
     clearCache,
   }
 })

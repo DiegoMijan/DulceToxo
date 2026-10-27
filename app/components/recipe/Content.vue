@@ -7,8 +7,6 @@
   }>()
 
   const { t, locale } = useI18n()
-  const localePath = useLocalePath()
-  const { isAdmin } = useAuth()
 
   const currentLocale = computed(() => locale.value as LocaleKey)
 
@@ -35,10 +33,6 @@
       alt: title,
     }))
   })
-
-  const goToEdit = () => {
-    navigateTo(localePath(`/edit/${recipe.id}`))
-  }
 
   const { downloadRecipePdf } = useRecipePdf()
 
@@ -191,20 +185,11 @@
       :difficulty-selected="recipe.difficulty"
     />
   </div>
-  <div
-    v-if="isAdmin"
-    v-tooltip.top="t('recipe.edit.button')"
-    class="absolute bottom-10 right-10"
-  >
-    <Button
-      rounded
-      size="large"
-      :aria-label="t('recipe.edit.button')"
-      @click="goToEdit"
-    >
-      <i class="pi pi-pencil" />
-    </Button>
-  </div>
+  <RecipeAdminActions
+    :recipe-id="recipe.id"
+    :category-id="recipe.category_id"
+    :recipe-title="localeData?.title || ''"
+  />
 </template>
 
 <style scoped lang="scss">
