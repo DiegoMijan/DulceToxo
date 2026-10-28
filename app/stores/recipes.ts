@@ -144,13 +144,29 @@ export const useRecipes = defineStore("recipes", () => {
         }
       }
     }
+
+    // Keep the current detail keyed while a favorite is removed so the page
+    // can navigate to the next item instead of flashing "not found".
+    for (const entry of queryCache.getEntries({ key: ["recipe"] })) {
+      const recipeId = entry.key[1]
+      const detail = entry.state.value.data as RecipeDetail | undefined
+      if (typeof recipeId !== "string" || !detail) continue
+      for (const localeKey of Object.keys(detail.locales) as LocaleKey[]) {
+        if (detail.locales[localeKey]?.slug === slug) {
+          return recipeId
+        }
+      }
+    }
     return null
   }
 
   const getFavoriteSlugById = (recipeId: string): string | null => {
     const recipe = (getCachedFavorites() ?? []).find((item) => item.id === recipeId)
-    if (!recipe) return null
-    return recipe.locale[locale.value as LocaleKey]?.slug || null
+    if (recipe) {
+      return recipe.locale[locale.value as LocaleKey]?.slug || null
+    }
+    const detail = getCachedRecipe(recipeId)
+    return detail?.locales[locale.value as LocaleKey]?.slug || null
   }
 
   const deleteRecipe = async (recipeId: string, categoryId: string) => {
