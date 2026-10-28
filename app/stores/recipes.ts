@@ -12,6 +12,7 @@ export type RecipeRatingStats = components["schemas"]["RecipeRatingStats"]
 export type UpsertRecipeRatingRequest = components["schemas"]["UpsertRecipeRatingRequest"]
 export type FavoriteListItem = components["schemas"]["FavoriteListItem"]
 export type FavoriteStatus = components["schemas"]["FavoriteStatus"]
+export type RecipeSearchItem = components["schemas"]["RecipeSearchItem"]
 
 const LOCALE_KEYS: LocaleKey[] = ["es", "en", "gl"]
 
@@ -131,6 +132,28 @@ export const useRecipes = defineStore("recipes", () => {
         loadingDetail.value = false
       }
     })
+  }
+
+  const searchRecipes = async (
+    q: string,
+    options: { limit?: number; signal?: AbortSignal } = {},
+  ): Promise<RecipeSearchItem[]> => {
+    try {
+      const data = await $fetch<RecipeSearchItem[]>("/api/recipes/search", {
+        query: {
+          q,
+          locale: locale.value,
+          limit: options.limit ?? 20,
+        },
+        signal: options.signal,
+      })
+      return data ?? []
+    } catch (error) {
+      if (isAbortError(error)) throw error
+      if (await handleUnauthorized(error)) return []
+      console.error("Recipe search failed:", error)
+      return []
+    }
   }
 
   const getFavorites = async (force = false) => {
@@ -446,6 +469,7 @@ export const useRecipes = defineStore("recipes", () => {
     getRecipesByCategory,
     getRecipeDetail,
     getFavorites,
+    searchRecipes,
     getRecipesListByLocale,
     findRecipeIdBySlug,
     getRecipeSlugById,

@@ -40,6 +40,7 @@
       class="ml-auto flex gap-3 items-center"
     >
       <HeaderAuthSection />
+      <HeaderSearchButton />
       <HeaderThemeToggle />
       <HeaderSelectLanguage />
     </nav>

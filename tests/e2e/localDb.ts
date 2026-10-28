@@ -191,3 +191,88 @@ export const prepareE2eUsers = async () => {
   promoteAdmin(dbPath, ADMIN_EMAIL)
   return dbPath
 }
+
+export const SEARCH_E2E_PREFIX = "search-e2e-"
+export const SEARCH_E2E_LEMON_TART_ID = `${SEARCH_E2E_PREFIX}lemon-tart`
+export const SEARCH_E2E_SPONGE_ID = `${SEARCH_E2E_PREFIX}lemon-sponge`
+
+const querySql = (dbPath: string, sql: string): unknown[][] => {
+  const output = execFileSync(
+    "python3",
+    [
+      "-c",
+      "import sqlite3,sys,json; c=sqlite3.connect(sys.argv[1]); rows=c.execute(sys.argv[2]).fetchall(); print(json.dumps(rows))",
+      dbPath,
+      sql,
+    ],
+    { encoding: "utf8" },
+  )
+  return JSON.parse(output) as unknown[][]
+}
+
+export const getUserIdByEmail = (dbPath: string, email: string): string => {
+  const rows = querySql(
+    dbPath,
+    `SELECT id FROM users WHERE email = '${email.replaceAll("'", "''")}'`,
+  )
+  const id = rows[0]?.[0]
+  if (typeof id !== "string" || id.length === 0) {
+    throw new Error(`User not found: ${email}`)
+  }
+  return id
+}
+
+export const deleteSearchFixtures = (dbPath: string) => {
+  runSql(
+    dbPath,
+    `
+    DELETE FROM recipe_favorites WHERE recipe_id LIKE '${SEARCH_E2E_PREFIX}%';
+    DELETE FROM recipe_ratings WHERE recipe_id LIKE '${SEARCH_E2E_PREFIX}%';
+    DELETE FROM recipe_ingredients WHERE recipe_id LIKE '${SEARCH_E2E_PREFIX}%';
+    DELETE FROM recipe_steps WHERE recipe_id LIKE '${SEARCH_E2E_PREFIX}%';
+    DELETE FROM recipe_images WHERE recipe_id LIKE '${SEARCH_E2E_PREFIX}%';
+    DELETE FROM recipe_locales WHERE recipe_id LIKE '${SEARCH_E2E_PREFIX}%';
+    DELETE FROM recipes WHERE id LIKE '${SEARCH_E2E_PREFIX}%';
+    `,
+  )
+}
+
+export const seedSearchFixtures = (dbPath: string, adminEmail: string) => {
+  deleteSearchFixtures(dbPath)
+  const adminId = getUserIdByEmail(dbPath, adminEmail)
+  const now = Date.now()
+
+  runSql(
+    dbPath,
+    `
+    INSERT INTO recipes (id, category_id, difficulty, prep_time, cook_time, author_id, created_at, updated_at)
+    VALUES
+      ('${SEARCH_E2E_LEMON_TART_ID}', 'cold-cakes', 3, 30, 0, '${adminId}', ${now}, ${now}),
+      ('${SEARCH_E2E_SPONGE_ID}', 'sponge-cakes', 2, 20, 40, '${adminId}', ${now}, ${now});
+
+    INSERT INTO recipe_locales (id, recipe_id, locale, slug, title, description)
+    VALUES
+      ('${SEARCH_E2E_LEMON_TART_ID}-es', '${SEARCH_E2E_LEMON_TART_ID}', 'es', 'tarta-de-limon-e2e', 'Tarta de limón', 'Tarta de limón de prueba'),
+      ('${SEARCH_E2E_LEMON_TART_ID}-en', '${SEARCH_E2E_LEMON_TART_ID}', 'en', 'lemon-tart-e2e', 'Lemon tart', 'Test lemon tart'),
+      ('${SEARCH_E2E_LEMON_TART_ID}-gl', '${SEARCH_E2E_LEMON_TART_ID}', 'gl', 'tarta-de-limon-e2e', 'Tarta de limón', 'Tarta de limón de proba'),
+      ('${SEARCH_E2E_SPONGE_ID}-es', '${SEARCH_E2E_SPONGE_ID}', 'es', 'bizcocho-de-limon-e2e', 'Bizcocho esponjoso', 'Bizcocho con ralladura'),
+      ('${SEARCH_E2E_SPONGE_ID}-en', '${SEARCH_E2E_SPONGE_ID}', 'en', 'lemon-sponge-e2e', 'Fluffy sponge cake', 'Sponge with lemon zest'),
+      ('${SEARCH_E2E_SPONGE_ID}-gl', '${SEARCH_E2E_SPONGE_ID}', 'gl', 'bolo-de-limon-e2e', 'Bolo esponxoso', 'Bolo con ralladura');
+
+    INSERT INTO recipe_ingredients (id, recipe_id, locale, "order", description, is_heading)
+    VALUES
+      ('${SEARCH_E2E_LEMON_TART_ID}-es-1', '${SEARCH_E2E_LEMON_TART_ID}', 'es', 1, 'Galletas trituradas', 0),
+      ('${SEARCH_E2E_LEMON_TART_ID}-en-1', '${SEARCH_E2E_LEMON_TART_ID}', 'en', 1, 'Crushed biscuits', 0),
+      ('${SEARCH_E2E_LEMON_TART_ID}-gl-1', '${SEARCH_E2E_LEMON_TART_ID}', 'gl', 1, 'Galletas tritadas', 0),
+      ('${SEARCH_E2E_SPONGE_ID}-es-1', '${SEARCH_E2E_SPONGE_ID}', 'es', 1, 'Harina', 0),
+      ('${SEARCH_E2E_SPONGE_ID}-es-2', '${SEARCH_E2E_SPONGE_ID}', 'es', 2, 'Ralladura de limón', 0),
+      ('${SEARCH_E2E_SPONGE_ID}-en-1', '${SEARCH_E2E_SPONGE_ID}', 'en', 1, 'Flour', 0),
+      ('${SEARCH_E2E_SPONGE_ID}-en-2', '${SEARCH_E2E_SPONGE_ID}', 'en', 2, 'Lemon zest', 0),
+      ('${SEARCH_E2E_SPONGE_ID}-gl-1', '${SEARCH_E2E_SPONGE_ID}', 'gl', 1, 'Fariña', 0),
+      ('${SEARCH_E2E_SPONGE_ID}-gl-2', '${SEARCH_E2E_SPONGE_ID}', 'gl', 2, 'Ralladura de limón', 0);
+
+    INSERT INTO recipe_favorites (user_id, recipe_id, created_at)
+    VALUES ('${adminId}', '${SEARCH_E2E_LEMON_TART_ID}', ${now});
+    `,
+  )
+}
