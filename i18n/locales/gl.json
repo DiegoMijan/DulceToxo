@@ -7,7 +7,16 @@
     "name": "Nome:",
     "notSpecified": "Non especificado",
     "email": "Email:",
-    "backToHome": "Volver ao inicio"
+    "backToHome": "Volver ao inicio",
+    "favorites": "Favoritos"
+  },
+  "favorites": {
+    "all": "Todas",
+    "empty": "Aínda non tes favoritos",
+    "emptyCta": "Ir á portada",
+    "list": {
+      "nav": "Lista de favoritos"
+    }
   },
   "common": {
     "delete": "Eliminar",
@@ -17,7 +26,8 @@
   "header": {
     "theme": "Cambiar tema da páxina",
     "language": "Cambiar idioma",
-    "languageMenu": "Menú de selección de idioma"
+    "languageMenu": "Menú de selección de idioma",
+    "favorites": "Favoritos"
   },
   "languages": {
     "es": "Castelán",
@@ -213,9 +223,15 @@
       "difficulty": "Dificultade",
       "totalTime": "Tempo total",
       "ratingAvg": "Mellor valoradas",
+      "favoritedAt": "Engadidas recentemente",
       "ascending": "ascendente",
       "descending": "descendente",
       "toggleDirection": "Cambiar a dirección da ordenación ({direction})"
+    },
+    "favorite": {
+      "add": "Engadir a favoritos",
+      "remove": "Quitar de favoritos",
+      "error": "Non se puido actualizar o favorito"
     },
     "rating": {
       "none": "Sen valoracións",

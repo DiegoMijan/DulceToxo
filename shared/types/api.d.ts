@@ -82,7 +82,7 @@ export interface paths {
     }
     /**
      * List recipes by category
-     * @description Returns a lightweight list of recipes for a category with id, difficulty, times, timestamps, rating stats, and slug and title per locale. rating_avg and rating_count are computed with a LEFT JOIN aggregate in the same query.
+     * @description Returns a lightweight list of recipes for a category with id, difficulty, times, timestamps, rating stats, is_favorite for the authenticated user, and slug and title per locale. rating_avg and rating_count are computed with a LEFT JOIN aggregate in the same query. Requires authentication.
      */
     get: {
       parameters: {
@@ -114,8 +114,65 @@ export interface paths {
             "application/json": components["schemas"]["ErrorResponse"]
           }
         }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
         /** @description Category not found */
         404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/favorites": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List the current user favorite recipes
+     * @description Returns the authenticated user favorites in the same shape as GET /categories/:id/recipes, plus category id/url_name per locale and favorited_at. Sorted by most recently favorited first.
+     */
+    get: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Favorite recipes of the current user */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["FavoriteListItem"][]
+          }
+        }
+        /** @description Authentication required */
+        401: {
           headers: {
             [name: string]: unknown
           }
@@ -175,7 +232,7 @@ export interface paths {
     }
     /**
      * Get recipe detail
-     * @description Returns full recipe with locales, ingredients, steps, images and rating stats. my_rating is the authenticated user vote when a session is present; otherwise null. Works without a session.
+     * @description Returns full recipe with locales, ingredients, steps, images and rating stats. my_rating is the authenticated user vote, or null when the user has not voted. is_favorite is true when the authenticated user has favorited the recipe. Requires authentication.
      */
     get: {
       parameters: {
@@ -200,6 +257,15 @@ export interface paths {
         }
         /** @description Recipe ID is required */
         400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
           headers: {
             [name: string]: unknown
           }
@@ -340,6 +406,128 @@ export interface paths {
         }
         /** @description Admin access required */
         403: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Recipe not found */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+      }
+    }
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  "/recipes/{id}/favorite": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Mark a recipe as favorite
+     * @description Adds the recipe to the authenticated user favorites. Idempotent: repeating the request does not create duplicates.
+     */
+    put: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description Recipe ID */
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Recipe is marked as favorite */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["FavoriteStatus"]
+          }
+        }
+        /** @description Recipe ID is required */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Recipe not found */
+        404: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+      }
+    }
+    post?: never
+    /**
+     * Remove a recipe from favorites
+     * @description Removes the recipe from the authenticated user favorites. Idempotent: a missing favorite is a no-op. Missing recipes return 404.
+     */
+    delete: {
+      parameters: {
+        query?: never
+        header?: never
+        path: {
+          /** @description Recipe ID */
+          id: string
+        }
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Recipe is not a favorite */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["FavoriteStatus"]
+          }
+        }
+        /** @description Recipe ID is required */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
           headers: {
             [name: string]: unknown
           }
@@ -1010,11 +1198,46 @@ export interface components {
       /** @description Average rounded to one decimal. Null when there are no votes. */
       rating_avg: number | null
       rating_count: number
+      /** @description True when the authenticated user has favorited this recipe. */
+      is_favorite: boolean
       /** @description Title and slug keyed by locale. A key is omitted when that translation is missing in the database. */
       locale: {
         es?: components["schemas"]["RecipeListLocale"]
         en?: components["schemas"]["RecipeListLocale"]
         gl?: components["schemas"]["RecipeListLocale"]
+      }
+    }
+    FavoriteListItem: {
+      id: string
+      difficulty: number
+      /** @description Preparation time in minutes */
+      prep_time: number
+      /** @description Cooking time in minutes */
+      cook_time: number
+      /** @description Unix timestamp in ms */
+      created_at: number
+      /** @description Unix timestamp in ms */
+      updated_at: number
+      /** @description Average rounded to one decimal. Null when there are no votes. */
+      rating_avg: number | null
+      rating_count: number
+      is_favorite: boolean
+      /** @description Title and slug keyed by locale. A key is omitted when that translation is missing in the database. */
+      locale: {
+        es?: components["schemas"]["RecipeListLocale"]
+        en?: components["schemas"]["RecipeListLocale"]
+        gl?: components["schemas"]["RecipeListLocale"]
+      }
+      /** @description Unix timestamp in ms when the user marked the recipe as favorite */
+      favorited_at: number
+      category: {
+        id: string
+        /** @description Category url_name keyed by locale. A key is omitted when that translation is missing. */
+        url_name: {
+          es?: string
+          en?: string
+          gl?: string
+        }
       }
     }
     DeleteRecipeResponse: {
@@ -1061,8 +1284,10 @@ export interface components {
       /** @description Average rounded to one decimal. Null when there are no votes. */
       rating_avg: number | null
       rating_count: number
-      /** @description Current user vote when a session is present; otherwise null. */
+      /** @description Current user vote, or null when the user has not voted. */
       my_rating: number | null
+      /** @description True when the authenticated user has favorited this recipe. */
+      is_favorite: boolean
       /** @description Locale content keyed by language. A key is omitted when that translation is missing in the database. */
       locales: {
         es?: components["schemas"]["RecipeLocaleContent"]
@@ -1107,6 +1332,9 @@ export interface components {
       /** @enum {boolean} */
       updated: true
       cloudinary: components["schemas"]["CloudinaryResult"]
+    }
+    FavoriteStatus: {
+      is_favorite: boolean
     }
     UpsertRecipeRatingRequest: {
       value: number

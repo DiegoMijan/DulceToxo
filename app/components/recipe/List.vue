@@ -1,10 +1,21 @@
 <script setup lang="ts">
   import type { LocaleKey } from "#shared/types/Recipe"
+  import type { RecipeListItem } from "~/stores/recipes"
 
   const RECIPE_LIST_VISIBLE_ITEMS = 10
 
-  const { categoryId } = defineProps<{
-    categoryId: string
+  const {
+    categoryId,
+    items,
+    loading: loadingProp,
+    resolveTo,
+    navLabel,
+  } = defineProps<{
+    categoryId?: string
+    items?: RecipeListItem[]
+    loading?: boolean
+    resolveTo?: (slug: string) => string
+    navLabel?: string
   }>()
 
   const recipe = defineModel<string>()
@@ -13,8 +24,8 @@
   const route = useRoute()
 
   const recipesStore = useRecipes()
-  const { sortRecipeList } = useRecipeSort()
-  const loading = computed(() => recipesStore.loadingList)
+  const { sortRecipeList, sortFavoriteList } = useRecipeSort()
+  const loading = computed(() => loadingProp ?? recipesStore.loadingList)
   const scroller = useTemplateRef<HTMLElement>("scroller")
   const measured = ref(false)
   let pendingAlignSelected = true
@@ -27,17 +38,22 @@
   })
 
   const options = computed(() => {
-    const recipes = sortRecipeList(recipesStore.recipesByCategory.get(categoryId) ?? [])
+    const source = items ?? recipesStore.recipesByCategory.get(categoryId ?? "") ?? []
+    const recipes = items ? sortFavoriteList(source) : sortRecipeList(source)
     const localeKey = locale.value as LocaleKey
 
-    return recipes.map((item) => ({
-      id: item.id,
-      slug: item.locale[localeKey]?.slug || item.id,
-      title: item.locale[localeKey]?.title || "",
-      ratingAvg: item.rating_avg,
-      ratingCount: item.rating_count,
-      to: localePath(`/${categoryUrlName.value}/${item.locale[localeKey]?.slug || item.id}`),
-    }))
+    return recipes.map((item) => {
+      const slug = item.locale[localeKey]?.slug || item.id
+      return {
+        id: item.id,
+        slug,
+        title: item.locale[localeKey]?.title || "",
+        ratingAvg: item.rating_avg,
+        ratingCount: item.rating_count,
+        isFavorite: item.is_favorite,
+        to: resolveTo?.(slug) ?? localePath(`/${categoryUrlName.value}/${slug}`),
+      }
+    })
   })
 
   const measureListViewport = () => {
@@ -137,7 +153,7 @@
   <nav
     v-else
     class="recipe-list p-listbox p-component p-listbox-fluid flex-1 min-w-0 w-full"
-    :aria-label="t('recipe.list.nav')"
+    :aria-label="navLabel || t('recipe.list.nav')"
   >
     <ul
       ref="scroller"
@@ -148,7 +164,7 @@
       <li
         v-for="item in options"
         :key="item.id"
-        class="min-w-0 w-full"
+        class="recipe-list-row min-w-0 w-full"
       >
         <NuxtLink
           :to="item.to"
@@ -168,6 +184,12 @@
             />
           </span>
         </NuxtLink>
+        <RecipeFavoriteButton
+          class="recipe-list-favorite"
+          compact
+          :recipe-id="item.id"
+          :is-favorite="item.isFavorite"
+        />
       </li>
     </ul>
   </nav>
@@ -189,13 +211,28 @@
     scrollbar-color: var(--color-french-lilac-400) var(--color-french-lilac-100);
   }
 
+  .recipe-list-row {
+    position: relative;
+    min-width: 0;
+    width: 100%;
+  }
+
   .recipe-list-item-link {
     display: block;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
     border-radius: 0;
+    padding-right: 1.75rem;
     text-decoration: none;
+  }
+
+  .recipe-list-favorite {
+    position: absolute;
+    top: 50%;
+    right: 0.15rem;
+    z-index: 1;
+    transform: translateY(-50%);
   }
 
   .recipe-list-item-link:focus-visible:not(.p-listbox-option-selected) {

@@ -10,6 +10,10 @@ export type RecipeDetail = components["schemas"]["RecipeDetail"]
 export type DeleteRecipeResponse = components["schemas"]["DeleteRecipeResponse"]
 export type RecipeRatingStats = components["schemas"]["RecipeRatingStats"]
 export type UpsertRecipeRatingRequest = components["schemas"]["UpsertRecipeRatingRequest"]
+export type FavoriteListItem = components["schemas"]["FavoriteListItem"]
+export type FavoriteStatus = components["schemas"]["FavoriteStatus"]
+
+const LOCALE_KEYS: LocaleKey[] = ["es", "en", "gl"]
 
 export const useRecipes = defineStore("recipes", () => {
   const { locale } = useI18n()
@@ -21,10 +25,14 @@ export const useRecipes = defineStore("recipes", () => {
   // language after a locale change.
   const recipesByCategory = ref<Map<string, RecipeListItem[]>>(new Map())
   const recipesCache = ref<Map<string, RecipeDetail>>(new Map())
+  const favorites = ref<FavoriteListItem[] | null>(null)
   const loadingList = ref(false)
   const loadingDetail = ref(false)
+  const loadingFavorites = ref(false)
   const pendingLists = new Map<string, Promise<RecipeListItem[]>>()
   const pendingDetails = new Map<string, Promise<RecipeDetail | null>>()
+  const favoriteSnapshots = new Map<string, FavoriteListItem>()
+  let pendingFavorites: Promise<FavoriteListItem[]> | null = null
   let cacheGeneration = 0
 
   const trackPending = <T>(
@@ -45,8 +53,11 @@ export const useRecipes = defineStore("recipes", () => {
     cacheGeneration += 1
     pendingLists.clear()
     pendingDetails.clear()
+    pendingFavorites = null
+    favoriteSnapshots.clear()
     recipesByCategory.value = new Map()
     recipesCache.value = new Map()
+    favorites.value = null
   }
 
   const handleUnauthorized = async (error: unknown): Promise<boolean> => {
@@ -122,6 +133,39 @@ export const useRecipes = defineStore("recipes", () => {
     })
   }
 
+  const getFavorites = async (force = false) => {
+    if (!force && favorites.value) {
+      return favorites.value
+    }
+
+    if (!force && pendingFavorites) {
+      return pendingFavorites
+    }
+
+    const request = (async () => {
+      const generation = cacheGeneration
+      loadingFavorites.value = true
+      try {
+        const data = await $fetch<FavoriteListItem[]>("/api/favorites")
+        if (generation !== cacheGeneration) return []
+        favorites.value = data || []
+        return favorites.value
+      } catch (error) {
+        if (await handleUnauthorized(error)) return []
+        return favorites.value || []
+      } finally {
+        loadingFavorites.value = false
+      }
+    })()
+
+    pendingFavorites = request
+    return request.finally(() => {
+      if (pendingFavorites === request) {
+        pendingFavorites = null
+      }
+    })
+  }
+
   const getRecipesListByLocale = (categoryId: string) => {
     const recipes = recipesByCategory.value.get(categoryId) || []
     return recipes.map((recipe) => ({
@@ -152,14 +196,24 @@ export const useRecipes = defineStore("recipes", () => {
     return null
   }
 
-  const applyRatingStats = (recipeId: string, stats: RecipeRatingStats) => {
-    const detail = recipesCache.value.get(recipeId)
-    if (detail) {
-      detail.rating_avg = stats.rating_avg
-      detail.rating_count = stats.rating_count
-      detail.my_rating = stats.my_rating
+  const findFavoriteIdBySlug = (slug: string): string | null => {
+    for (const recipe of favorites.value ?? []) {
+      for (const localeKey of Object.keys(recipe.locale) as LocaleKey[]) {
+        if (recipe.locale[localeKey]?.slug === slug) {
+          return recipe.id
+        }
+      }
     }
+    return null
+  }
 
+  const getFavoriteSlugById = (recipeId: string): string | null => {
+    const recipe = (favorites.value ?? []).find((item) => item.id === recipeId)
+    if (!recipe) return null
+    return recipe.locale[locale.value as LocaleKey]?.slug || null
+  }
+
+  const patchCategoryLists = (recipeId: string, patch: Partial<RecipeListItem>): void => {
     const nextByCategory = new Map(recipesByCategory.value)
     let listChanged = false
     for (const [categoryId, list] of nextByCategory) {
@@ -168,14 +222,157 @@ export const useRecipes = defineStore("recipes", () => {
       const nextList = [...list]
       nextList[index] = {
         ...nextList[index],
-        rating_avg: stats.rating_avg,
-        rating_count: stats.rating_count,
+        ...patch,
       }
       nextByCategory.set(categoryId, nextList)
       listChanged = true
     }
     if (listChanged) {
       recipesByCategory.value = nextByCategory
+    }
+  }
+
+  const patchFavoritesList = (recipeId: string, patch: Partial<FavoriteListItem>): void => {
+    if (!favorites.value) return
+    const index = favorites.value.findIndex((recipe) => recipe.id === recipeId)
+    if (index === -1) return
+    const nextList = [...favorites.value]
+    nextList[index] = {
+      ...nextList[index],
+      ...patch,
+    }
+    favorites.value = nextList
+  }
+
+  const findListItem = (recipeId: string): { categoryId: string; item: RecipeListItem } | null => {
+    for (const [categoryId, list] of recipesByCategory.value) {
+      const item = list.find((recipe) => recipe.id === recipeId)
+      if (item) return { categoryId, item }
+    }
+    return null
+  }
+
+  const buildFavoriteListItem = (recipeId: string): FavoriteListItem | null => {
+    const snapshot = favoriteSnapshots.get(recipeId)
+    if (snapshot) return { ...snapshot, is_favorite: true }
+
+    const detail = recipesCache.value.get(recipeId)
+    const listed = findListItem(recipeId)
+    if (!detail && !listed) return null
+
+    const localeContent: FavoriteListItem["locale"] = { ...listed?.item.locale }
+    if (detail) {
+      for (const localeKey of LOCALE_KEYS) {
+        const entry = detail.locales[localeKey]
+        if (!entry) continue
+        localeContent[localeKey] = {
+          slug: entry.slug,
+          title: entry.title,
+        }
+      }
+    }
+
+    const categoryId = detail?.category_id ?? listed?.categoryId
+    if (!categoryId) return null
+
+    const categoriesStore = useCategories()
+    const category = categoriesStore.categories.find((item) => item.id === categoryId)
+    const urlName: FavoriteListItem["category"]["url_name"] = {}
+    if (category) {
+      for (const localeKey of LOCALE_KEYS) {
+        const entry = category.locale[localeKey]
+        if (entry?.url_name) urlName[localeKey] = entry.url_name
+      }
+    }
+
+    return {
+      id: recipeId,
+      difficulty: detail?.difficulty ?? listed?.item.difficulty ?? 1,
+      prep_time: detail?.prep_time ?? listed?.item.prep_time ?? 0,
+      cook_time: detail?.cook_time ?? listed?.item.cook_time ?? 0,
+      created_at: detail?.created_at ?? listed?.item.created_at ?? Date.now(),
+      updated_at: detail?.updated_at ?? listed?.item.updated_at ?? Date.now(),
+      rating_avg: detail?.rating_avg ?? listed?.item.rating_avg ?? null,
+      rating_count: detail?.rating_count ?? listed?.item.rating_count ?? 0,
+      is_favorite: true,
+      locale: localeContent,
+      favorited_at: Date.now(),
+      category: {
+        id: categoryId,
+        url_name: urlName,
+      },
+    }
+  }
+
+  const applyRatingStats = (recipeId: string, stats: RecipeRatingStats) => {
+    const detail = recipesCache.value.get(recipeId)
+    if (detail) {
+      detail.rating_avg = stats.rating_avg
+      detail.rating_count = stats.rating_count
+      detail.my_rating = stats.my_rating
+    }
+
+    patchCategoryLists(recipeId, {
+      rating_avg: stats.rating_avg,
+      rating_count: stats.rating_count,
+    })
+    patchFavoritesList(recipeId, {
+      rating_avg: stats.rating_avg,
+      rating_count: stats.rating_count,
+    })
+  }
+
+  const applyFavoriteState = (recipeId: string, isFavorite: boolean) => {
+    const detail = recipesCache.value.get(recipeId)
+    if (detail) {
+      detail.is_favorite = isFavorite
+    }
+
+    patchCategoryLists(recipeId, { is_favorite: isFavorite })
+
+    if (!favorites.value) return
+
+    const index = favorites.value.findIndex((recipe) => recipe.id === recipeId)
+    if (isFavorite) {
+      patchFavoritesList(recipeId, { is_favorite: true })
+      if (index !== -1) return
+      const item = buildFavoriteListItem(recipeId)
+      if (!item) return
+      favorites.value = [item, ...favorites.value]
+      return
+    }
+
+    if (index === -1) return
+    const current = favorites.value[index]
+    if (current) favoriteSnapshots.set(recipeId, current)
+    favorites.value = favorites.value.filter((recipe) => recipe.id !== recipeId)
+  }
+
+  const isRecipeFavorite = (recipeId: string): boolean => {
+    const detail = recipesCache.value.get(recipeId)
+    if (detail) return detail.is_favorite
+
+    const listed = findListItem(recipeId)
+    if (listed) return listed.item.is_favorite
+
+    return (favorites.value ?? []).some((recipe) => recipe.id === recipeId)
+  }
+
+  const toggleFavorite = async (recipeId: string) => {
+    const previous = isRecipeFavorite(recipeId)
+    const next = !previous
+    applyFavoriteState(recipeId, next)
+
+    try {
+      const status = await $fetch<FavoriteStatus>(`/api/recipes/${recipeId}/favorite`, {
+        method: next ? "PUT" : "DELETE",
+      })
+      applyFavoriteState(recipeId, status.is_favorite)
+      return status
+    } catch (error) {
+      applyFavoriteState(recipeId, previous)
+      await handleUnauthorized(error)
+      throw error
     }
   }
 
@@ -220,6 +417,10 @@ export const useRecipes = defineStore("recipes", () => {
         list.filter((recipe) => recipe.id !== recipeId),
       )
     }
+    if (favorites.value) {
+      favorites.value = favorites.value.filter((recipe) => recipe.id !== recipeId)
+    }
+    favoriteSnapshots.delete(recipeId)
   }
 
   const deleteRecipe = async (recipeId: string, categoryId: string) => {
@@ -238,17 +439,24 @@ export const useRecipes = defineStore("recipes", () => {
   return {
     recipesByCategory,
     recipesCache,
+    favorites,
     loadingList,
     loadingDetail,
+    loadingFavorites,
     getRecipesByCategory,
     getRecipeDetail,
+    getFavorites,
     getRecipesListByLocale,
     findRecipeIdBySlug,
     getRecipeSlugById,
+    findFavoriteIdBySlug,
+    getFavoriteSlugById,
     deleteRecipe,
     upsertRating,
     deleteRating,
+    toggleFavorite,
     applyRatingStats,
+    applyFavoriteState,
     clearDetailsCache,
     clearCache,
   }

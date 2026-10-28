@@ -79,6 +79,7 @@ export const deleteE2eUsers = (dbPath: string) => {
   runSql(
     dbPath,
     `
+    DELETE FROM recipe_favorites WHERE user_id IN (SELECT id FROM users WHERE email LIKE '%${E2E_EMAIL_SUFFIX}');
     DELETE FROM recipe_ratings WHERE user_id IN (SELECT id FROM users WHERE email LIKE '%${E2E_EMAIL_SUFFIX}');
     DELETE FROM users WHERE email LIKE '%${E2E_EMAIL_SUFFIX}';
     `,

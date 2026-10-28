@@ -4,6 +4,7 @@ import type { components } from "#shared/types/api"
 import type { SelectOption } from "#shared/types/Select"
 
 type RecipeListItem = components["schemas"]["RecipeListItem"]
+type SortableRecipe = RecipeListItem & { favorited_at?: number }
 
 export const RECIPE_SORT_CODES = [
   "name",
@@ -14,25 +15,30 @@ export const RECIPE_SORT_CODES = [
   "ratingAvg",
 ] as const
 
+export const FAVORITE_SORT_CODES = [...RECIPE_SORT_CODES, "favoritedAt"] as const
+
 export type RecipeSortCode = (typeof RECIPE_SORT_CODES)[number]
+export type FavoriteSortCode = (typeof FAVORITE_SORT_CODES)[number]
 export type RecipeSortDirection = "asc" | "desc"
 
-export const RECIPE_SORT_DEFAULT_DIRECTION: Record<RecipeSortCode, RecipeSortDirection> = {
+export const RECIPE_SORT_DEFAULT_DIRECTION: Record<FavoriteSortCode, RecipeSortDirection> = {
   name: "asc",
   createdAt: "desc",
   updatedAt: "desc",
   difficulty: "asc",
   totalTime: "asc",
   ratingAvg: "desc",
+  favoritedAt: "desc",
 }
 
-const RECIPE_SORT_ICONS: Record<RecipeSortCode, string> = {
+const RECIPE_SORT_ICONS: Record<FavoriteSortCode, string> = {
   name: "line-md:cake-twotone",
   createdAt: "line-md:calendar",
   updatedAt: "line-md:bell-twotone-loop",
   difficulty: "icon-park-twotone:chef-hat-one",
   totalTime: "tabler:clock",
   ratingAvg: "line-md:star-filled",
+  favoritedAt: "mdi:heart",
 }
 
 const LEGACY_SORT_CODES: Record<string, RecipeSortCode> = {
@@ -44,6 +50,9 @@ const LEGACY_SORT_CODES: Record<string, RecipeSortCode> = {
 
 const isRecipeSortCode = (value: unknown): value is RecipeSortCode =>
   typeof value === "string" && (RECIPE_SORT_CODES as readonly string[]).includes(value)
+
+const isFavoriteSortCode = (value: unknown): value is FavoriteSortCode =>
+  typeof value === "string" && (FAVORITE_SORT_CODES as readonly string[]).includes(value)
 
 const readLegacySortCode = (): RecipeSortCode | null => {
   if (!import.meta.client) return null
@@ -72,9 +81,9 @@ const getTitle = (recipe: RecipeListItem, locale: LocaleKey): string =>
   recipe.locale[locale]?.title || ""
 
 const getSortValue = (
-  recipe: RecipeListItem,
+  recipe: SortableRecipe,
   locale: LocaleKey,
-  code: RecipeSortCode,
+  code: FavoriteSortCode,
 ): string | number => {
   switch (code) {
     case "name":
@@ -89,6 +98,8 @@ const getSortValue = (
       return recipe.prep_time + recipe.cook_time
     case "ratingAvg":
       return recipe.rating_avg ?? 0
+    case "favoritedAt":
+      return recipe.favorited_at ?? 0
   }
 }
 
@@ -124,12 +135,12 @@ const compareSortValues = (
   return left - right
 }
 
-export const sortRecipeListBy = (
-  recipes: RecipeListItem[],
+export const sortRecipeListBy = <T extends SortableRecipe>(
+  recipes: T[],
   locale: LocaleKey,
-  code: RecipeSortCode,
+  code: FavoriteSortCode,
   direction: RecipeSortDirection,
-): RecipeListItem[] => {
+): T[] => {
   const factor = direction === "asc" ? 1 : -1
 
   return [...recipes].sort((left, right) => {
@@ -166,17 +177,30 @@ export const useRecipeSort = createGlobalState(() => {
     "recipe-sort-direction",
     RECIPE_SORT_DEFAULT_DIRECTION[readLegacySortCode() ?? "name"],
   )
-
-  const sortOptions = computed<SelectOption[]>(() =>
-    RECIPE_SORT_CODES.map((code) => ({
-      code,
-      name: t(`recipe.sort.${code}`),
-      icon: RECIPE_SORT_ICONS[code],
-    })),
+  const favoriteSortCode = useStorage<FavoriteSortCode>("favorite-sort-code", "favoritedAt")
+  const favoriteSortDirection = useStorage<RecipeSortDirection>(
+    "favorite-sort-direction",
+    RECIPE_SORT_DEFAULT_DIRECTION.favoritedAt,
   )
+
+  const sortOptionsFor = (codes: readonly FavoriteSortCode[]) =>
+    computed<SelectOption[]>(() =>
+      codes.map((code) => ({
+        code,
+        name: t(`recipe.sort.${code}`),
+        icon: RECIPE_SORT_ICONS[code],
+      })),
+    )
+
+  const sortOptions = sortOptionsFor(RECIPE_SORT_CODES)
+  const favoriteSortOptions = sortOptionsFor(FAVORITE_SORT_CODES)
 
   const selectedSortOption = computed(
     () => sortOptions.value.find((option) => option.code === sortCode.value) ?? null,
+  )
+  const selectedFavoriteSortOption = computed(
+    () =>
+      favoriteSortOptions.value.find((option) => option.code === favoriteSortCode.value) ?? null,
   )
 
   const setSortCode = (code: RecipeSortCode | SelectOption | string | null) => {
@@ -188,12 +212,33 @@ export const useRecipeSort = createGlobalState(() => {
     sortCode.value = nextCode
   }
 
+  const setFavoriteSortCode = (code: FavoriteSortCode | SelectOption | string | null) => {
+    const raw = typeof code === "string" ? code : code?.code
+    const nextCode = isFavoriteSortCode(raw) ? raw : "favoritedAt"
+    if (favoriteSortCode.value !== nextCode) {
+      favoriteSortDirection.value = RECIPE_SORT_DEFAULT_DIRECTION[nextCode]
+    }
+    favoriteSortCode.value = nextCode
+  }
+
   const toggleSortDirection = () => {
     sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc"
   }
 
+  const toggleFavoriteSortDirection = () => {
+    favoriteSortDirection.value = favoriteSortDirection.value === "asc" ? "desc" : "asc"
+  }
+
   const sortRecipeList = (recipes: RecipeListItem[]): RecipeListItem[] =>
     sortRecipeListBy(recipes, locale.value as LocaleKey, sortCode.value, sortDirection.value)
+
+  const sortFavoriteList = <T extends SortableRecipe>(recipes: T[]): T[] =>
+    sortRecipeListBy(
+      recipes,
+      locale.value as LocaleKey,
+      favoriteSortCode.value,
+      favoriteSortDirection.value,
+    )
 
   return {
     sortCode,
@@ -203,5 +248,12 @@ export const useRecipeSort = createGlobalState(() => {
     setSortCode,
     toggleSortDirection,
     sortRecipeList,
+    favoriteSortCode,
+    favoriteSortDirection,
+    favoriteSortOptions,
+    selectedFavoriteSortOption,
+    setFavoriteSortCode,
+    toggleFavoriteSortDirection,
+    sortFavoriteList,
   }
 })

@@ -7,7 +7,16 @@
     "name": "Nombre:",
     "notSpecified": "No especificado",
     "email": "Email:",
-    "backToHome": "Volver al inicio"
+    "backToHome": "Volver al inicio",
+    "favorites": "Favoritos"
+  },
+  "favorites": {
+    "all": "Todas",
+    "empty": "Aún no tienes favoritos",
+    "emptyCta": "Ir a la portada",
+    "list": {
+      "nav": "Lista de favoritos"
+    }
   },
   "common": {
     "delete": "Eliminar",
@@ -17,7 +26,8 @@
   "header": {
     "theme": "Cambiar tema de la página",
     "language": "Cambiar idioma",
-    "languageMenu": "Menú de selección de idioma"
+    "languageMenu": "Menú de selección de idioma",
+    "favorites": "Favoritos"
   },
   "languages": {
     "es": "Español",
@@ -213,9 +223,15 @@
       "difficulty": "Dificultad",
       "totalTime": "Tiempo total",
       "ratingAvg": "Mejor valoradas",
+      "favoritedAt": "Añadidas recientemente",
       "ascending": "ascendente",
       "descending": "descendente",
       "toggleDirection": "Cambiar dirección del orden ({direction})"
+    },
+    "favorite": {
+      "add": "Añadir a favoritos",
+      "remove": "Quitar de favoritos",
+      "error": "No se pudo actualizar el favorito"
     },
     "rating": {
       "none": "Sin valoraciones",
