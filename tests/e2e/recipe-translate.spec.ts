@@ -468,11 +468,12 @@ test.describe("recipe auto translate", () => {
     await expect(page.locator(".p-toast-message-success")).toBeVisible()
     await expect(pendingReviewMark(page, "es")).toBeVisible()
     await expect(pendingReviewMark(page, "en")).toBeVisible()
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/translate_success_toast_gl_dark.png`,
+    await page.locator(".p-toast-message-success").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_success_toast_closeup_gl_dark.png`,
     })
     await page.screenshot({
-      path: `${ARTIFACTS_DIR}/translate_pending_marks_gl_dark.png`,
+      path: `${ARTIFACTS_DIR}/translate_success_and_marks_gl_dark.png`,
+      fullPage: true,
     })
 
     await openLocaleTab(page, "es")
@@ -509,10 +510,15 @@ test.describe("recipe auto translate", () => {
     await expect(page.getByText(UNTRANSLATED.gl.many(3))).toBeVisible()
     await expect(page.locator(".p-toast-message-warn")).toBeVisible()
     await expect(page.locator(".p-toast-message-success")).toHaveCount(0)
+    await expect(page.locator(".p-confirmpopup")).toHaveCount(0)
     await expect(pendingReviewMark(page, "es")).toBeVisible()
     await expect(pendingReviewMark(page, "en")).toBeVisible()
+    await page.locator(".p-toast-message-warn").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_warn_toast_closeup_gl_dark.png`,
+    })
     await page.screenshot({
-      path: `${ARTIFACTS_DIR}/translate_warn_empty_gl_dark.png`,
+      path: `${ARTIFACTS_DIR}/translate_warn_and_marks_gl_dark.png`,
+      fullPage: true,
     })
 
     await expectLocaleFields(page, "es", {
@@ -545,8 +551,12 @@ test.describe("recipe auto translate", () => {
     await page.getByTestId("recipe-translate-button").click()
     await expect(page.getByText(SUCCESS.es)).toBeVisible()
     await expect(pendingReviewMark(page, "es")).toHaveAttribute("aria-label", PENDING_REVIEW.es)
+    await page.locator(".p-toast-message-success").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_success_toast_closeup_es_dark.png`,
+    })
     await page.screenshot({
       path: `${ARTIFACTS_DIR}/translate_success_es_dark.png`,
+      fullPage: true,
     })
 
     await setLocaleCookie(page, "en")
@@ -560,8 +570,12 @@ test.describe("recipe auto translate", () => {
     await expect(page.getByText(SUCCESS.en)).toBeVisible()
     await expect(page.getByText(UNTRANSLATED.en.one)).toBeVisible()
     await expect(pendingReviewMark(page, "es")).toHaveAttribute("aria-label", PENDING_REVIEW.en)
+    await page.locator(".p-toast-message-warn").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_warn_toast_closeup_en_dark.png`,
+    })
     await page.screenshot({
       path: `${ARTIFACTS_DIR}/translate_warn_en_dark.png`,
+      fullPage: true,
     })
   })
 
