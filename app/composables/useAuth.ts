@@ -57,9 +57,12 @@ export const useAuth = () => {
 
     // Se limpia antes para vaciar la vista al momento, y después por si alguna
     // petición empezó mientras se cerraba la sesión.
+    // Igual con lo guardado para usar sin conexion (recetas, fotos y sesion)
     recipesStore.clearCache()
+    await clearOfflineData()
     await authClient.signOut()
     recipesStore.clearCache()
+    await clearOfflineData()
 
     await navigateTo(localePath("/"))
   }

@@ -331,6 +331,10 @@
         "description": "Recetas profesionais con múltiples componentes (cremas, glaseados, decoracións), precisión milimétrica e equipo avanzado. Tempo: máis de 4 horas, moitas veces en etapas.",
         "explanation": "Exemplo: Entremet de chocolate multicapa"
       }
+    },
+    "offline": {
+      "title": "Sen conexión",
+      "description": "Esta receita aínda non está gardada neste dispositivo. Ábrea cando teñas conexión e despois poderás vela sen ela."
     }
   },
   "upload": {
@@ -351,5 +355,11 @@
     "nextImage": "Imaxe seguinte",
     "expandImage": "Ampliar imaxe",
     "collapseImage": "Pechar imaxe"
+  },
+  "pwa": {
+    "updateAvailable": "Hai unha nova versión de Dulce Toxo",
+    "reload": "Recargar",
+    "dismiss": "Pechar",
+    "offline": "Sen conexión: podes ver as receitas que xa abriches"
   }
 }

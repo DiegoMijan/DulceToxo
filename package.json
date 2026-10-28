@@ -76,6 +76,7 @@
     "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.5",
+    "@vite-pwa/nuxt": "1.1.1",
     "eslint": "^10.13.0",
     "eslint-plugin-typed-rocks": "^1.0.8",
     "eslint-plugin-unused-imports": "^4.4.1",
@@ -83,7 +84,13 @@
     "openapi-typescript": "^7.13.0",
     "sass-embedded": "^1.106.1",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "workbox-cacheable-response": "7.4.1",
+    "workbox-core": "7.4.1",
+    "workbox-expiration": "7.4.1",
+    "workbox-precaching": "7.4.1",
+    "workbox-routing": "7.4.1",
+    "workbox-strategies": "7.4.1"
   },
   "overrides": {
     "@typescript-eslint/parser": "^8.72.0",

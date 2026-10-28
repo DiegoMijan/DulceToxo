@@ -39,7 +39,44 @@ export default defineNuxtConfig({
     "@nuxt/eslint",
     "@primevue/nuxt-module",
     "pinia-plugin-persistedstate/nuxt",
+    "@vite-pwa/nuxt",
   ],
+  // PWA: instalable y lectura sin conexion de lo ya visitado. La logica de cache esta
+  // en app/service-worker/sw.ts (estrategia injectManifest).
+  pwa: {
+    strategies: "injectManifest",
+    srcDir: "service-worker",
+    filename: "sw.ts",
+    registerType: "prompt",
+    injectManifest: {
+      // El modulo sustituye los patrones por defecto: hay que listarlos todos
+      globPatterns: [
+        "_nuxt/**/*.{js,css,woff,woff2}",
+        "_fonts/**/*.{woff,woff2}",
+        "img/*.{webp,svg,png}",
+        "*.{ico,png}",
+      ],
+    },
+    manifest: {
+      name: "Dulce Toxo",
+      short_name: "Dulce Toxo",
+      description: "Recetas de reposteria",
+      lang: "gl",
+      display: "standalone",
+      start_url: "/",
+      theme_color: "#3a183a",
+      background_color: "#3a183a",
+      icons: [
+        { src: "pwa-64x64.png", sizes: "64x64", type: "image/png" },
+        { src: "pwa-192x192.png", sizes: "192x192", type: "image/png" },
+        { src: "pwa-512x512.png", sizes: "512x512", type: "image/png" },
+        { src: "maskable-icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      ],
+    },
+    client: {
+      installPrompt: false,
+    },
+  },
   piniaPluginPersistedstate: {
     storage: "localStorage",
   },
@@ -54,6 +91,12 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: "Dulce Toxo 🧁",
+      link: [
+        { rel: "manifest", href: "/manifest.webmanifest" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon-180x180.png" },
+      ],
+      // El tema por defecto es oscuro; app.vue lo cambia segun el modo de color
+      meta: [{ name: "theme-color", content: "#3a183a" }],
     },
   },
   css: ["~/assets/css/main.css", "primeicons/primeicons.css"],
