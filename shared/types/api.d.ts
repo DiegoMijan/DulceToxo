@@ -1334,6 +1334,8 @@ export interface components {
       rating_count: number
       /** @description True when the authenticated user has favorited this recipe. */
       is_favorite: boolean
+      /** @description Cloudinary public_id of the main image (lowest order). Null when the recipe has no images. */
+      main_image_public_id: string | null
       /** @description Title and slug keyed by locale. A key is omitted when that translation is missing in the database. */
       locale: {
         es?: components["schemas"]["RecipeListLocale"]
@@ -1356,6 +1358,8 @@ export interface components {
       rating_avg: number | null
       rating_count: number
       is_favorite: boolean
+      /** @description Cloudinary public_id of the main image (lowest order). Null when the recipe has no images. */
+      main_image_public_id: string | null
       /** @description Title and slug keyed by locale. A key is omitted when that translation is missing in the database. */
       locale: {
         es?: components["schemas"]["RecipeListLocale"]
@@ -1546,6 +1550,8 @@ export interface components {
       rating_count: number
       /** @description True when the authenticated user has favorited this recipe. */
       is_favorite: boolean
+      /** @description Cloudinary public_id of the main image (lowest order). Null when the recipe has no images. */
+      main_image_public_id: string | null
       /** @description Title and slug keyed by locale. A key is omitted when that translation is missing in the database. */
       locale: {
         es?: components["schemas"]["RecipeListLocale"]

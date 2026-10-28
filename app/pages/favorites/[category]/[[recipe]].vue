@@ -92,6 +92,7 @@
     return sortedFavorites.value.map((item) => ({
       id: item.id,
       title: item.locale[localeKey]?.title || "",
+      imagePublicId: item.main_image_public_id,
     }))
   })
 

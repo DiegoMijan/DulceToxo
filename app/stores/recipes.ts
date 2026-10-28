@@ -396,6 +396,10 @@ export const useRecipes = defineStore("recipes", () => {
       rating_avg: detail?.rating_avg ?? listed?.item.rating_avg ?? null,
       rating_count: detail?.rating_count ?? listed?.item.rating_count ?? 0,
       is_favorite: true,
+      main_image_public_id:
+        (detail ? getMainRecipeImage(detail.images)?.public_id : undefined)
+        ?? listed?.item.main_image_public_id
+        ?? null,
       locale: localeContent,
       favorited_at: Date.now(),
       category: {
