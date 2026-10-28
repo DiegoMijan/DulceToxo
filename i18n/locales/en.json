@@ -242,10 +242,10 @@
         "generic": "An unexpected error occurred"
       },
       "translate": {
-        "button": "Translate to Spanish and English",
+        "button": "Translate to Galician and English",
         "confirmOverwrite": "Current translations will be overwritten",
         "confirm": "Translate",
-        "success": "Translation completed. Review the Spanish and English tabs before saving",
+        "success": "Translation completed. Review the Galician and English tabs before saving",
         "untranslated": "No texts were left untranslated | 1 text was left untranslated | {n} texts were left untranslated",
         "pendingReview": "Translation pending review",
         "error": {

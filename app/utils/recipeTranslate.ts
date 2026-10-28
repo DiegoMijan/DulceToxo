@@ -1,3 +1,4 @@
+import { RECIPE_TARGET_LOCALES, type RecipeTargetLocale } from "./recipeLocales"
 import { slugFromTitle } from "./slugFromTitle"
 
 export interface TranslateRow {
@@ -15,19 +16,19 @@ export interface TranslateLocaleContent {
   instructions: TranslateRow[]
 }
 
-export const collectTranslateTexts = (galician: TranslateLocaleContent): string[] => [
-  galician.title,
-  galician.description,
-  ...galician.ingredients.map((row) => row.description),
-  ...galician.instructions.map((row) => row.description),
+export const collectTranslateTexts = (source: TranslateLocaleContent): string[] => [
+  source.title,
+  source.description,
+  ...source.ingredients.map((row) => row.description),
+  ...source.instructions.map((row) => row.description),
 ]
 
 export const countUntranslatedTexts = (
   sourceTexts: string[],
-  translations: { es: string[]; en: string[] },
+  translations: Record<RecipeTargetLocale, string[]>,
 ): number => {
   let count = 0
-  for (const target of [translations.es, translations.en]) {
+  for (const target of RECIPE_TARGET_LOCALES.map((locale) => translations[locale])) {
     for (let index = 0; index < sourceTexts.length; index++) {
       const source = sourceTexts[index]?.trim() ?? ""
       if (!source) continue
@@ -71,25 +72,25 @@ const nextInstruction = (
 })
 
 export const applyTranslatedLocale = (
-  galician: TranslateLocaleContent,
+  source: TranslateLocaleContent,
   current: TranslateLocaleContent,
   translated: string[],
 ): TranslateLocaleContent => {
   const title = translated[0] ?? ""
   const description = translated[1] ?? ""
   const ingredientStart = 2
-  const instructionStart = ingredientStart + galician.ingredients.length
+  const instructionStart = ingredientStart + source.ingredients.length
 
   return {
     title,
     description,
     slug: slugFromTitle(title),
-    ingredients: galician.ingredients.map((source, index) =>
-      nextIngredient(source, current.ingredients[index], translated[ingredientStart + index] ?? ""),
+    ingredients: source.ingredients.map((row, index) =>
+      nextIngredient(row, current.ingredients[index], translated[ingredientStart + index] ?? ""),
     ),
-    instructions: galician.instructions.map((source, index) =>
+    instructions: source.instructions.map((row, index) =>
       nextInstruction(
-        source,
+        row,
         current.instructions[index],
         translated[instructionStart + index] ?? "",
       ),

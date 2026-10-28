@@ -6,6 +6,11 @@ import {
   countUntranslatedTexts,
   type TranslateLocaleContent,
 } from "~/utils/recipeTranslate"
+import {
+  RECIPE_SOURCE_LOCALE,
+  RECIPE_TARGET_LOCALES,
+  type RecipeTargetLocale,
+} from "~/utils/recipeLocales"
 
 type LocaleKey = "es" | "en" | "gl"
 type TranslateResponse = components["schemas"]["TranslateResponse"]
@@ -55,16 +60,11 @@ const writeLocale = (locale: RecipeLocaleForm | undefined, next: TranslateLocale
 const isValidTranslateResponse = (
   result: TranslateResponse,
   length: number,
-): result is TranslateResponse & { translations: { es: string[]; en: string[] } } => {
-  const spanish = result.translations?.es
-  const english = result.translations?.en
-  return (
-    Array.isArray(spanish) &&
-    Array.isArray(english) &&
-    spanish.length === length &&
-    english.length === length
-  )
-}
+): result is TranslateResponse & { translations: Record<RecipeTargetLocale, string[]> } =>
+  RECIPE_TARGET_LOCALES.every((locale) => {
+    const texts = result.translations?.[locale]
+    return Array.isArray(texts) && texts.length === length
+  })
 
 const translateErrorSummary = (error: unknown, t: (key: string) => string): string => {
   const status = getFetchStatus(error)
@@ -78,21 +78,21 @@ export const useRecipeTranslate = () => {
   const toast = useToast()
   const { t } = useI18n()
 
-  const translateFromGalician = async (
+  const translateFromSource = async (
     locales: Record<LocaleKey, RecipeLocaleForm> | undefined,
   ): Promise<RecipeTranslateOutcome> => {
     if (!locales || translating.value) return { applied: false }
 
-    const galician = readLocale(locales.gl)
-    const texts = collectTranslateTexts(galician)
+    const source = readLocale(locales[RECIPE_SOURCE_LOCALE])
+    const texts = collectTranslateTexts(source)
     translating.value = true
 
     try {
       const result = await $fetch<TranslateResponse>("/api/translate", {
         method: "POST",
         body: {
-          source: "gl",
-          targets: ["es", "en"],
+          source: RECIPE_SOURCE_LOCALE,
+          targets: [...RECIPE_TARGET_LOCALES],
           texts,
         },
       })
@@ -106,14 +106,12 @@ export const useRecipeTranslate = () => {
         return { applied: false }
       }
 
-      writeLocale(
-        locales.es,
-        applyTranslatedLocale(galician, readLocale(locales.es), result.translations.es),
-      )
-      writeLocale(
-        locales.en,
-        applyTranslatedLocale(galician, readLocale(locales.en), result.translations.en),
-      )
+      for (const target of RECIPE_TARGET_LOCALES) {
+        writeLocale(
+          locales[target],
+          applyTranslatedLocale(source, readLocale(locales[target]), result.translations[target]),
+        )
+      }
 
       const untranslatedCount = countUntranslatedTexts(texts, result.translations)
       toast.add({
@@ -139,5 +137,5 @@ export const useRecipeTranslate = () => {
     }
   }
 
-  return { translating, translateFromGalician }
+  return { translating, translateFromSource }
 }
