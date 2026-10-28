@@ -267,7 +267,8 @@
         "heading": "Heading",
         "id": "ID (to show in the URL)",
         "slug": "Slug (URL)"
-      }
+      },
+      "actions": "Actions"
     },
     "prepTime": "Preparation time: {time} min",
     "cookTime": "Cooking time: {time} min",
