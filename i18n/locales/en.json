@@ -205,8 +205,8 @@
     },
     "delete": {
       "button": "Delete recipe",
-      "confirmHeader": "Delete recipe",
-      "confirmMessage": "Are you sure you want to delete \"{title}\"?",
+      "confirmHeader": "Careful!",
+      "confirmMessage": "Are you sure you want to delete \"{title}\"? This cannot be undone.",
       "success": "Recipe deleted successfully",
       "error": "Could not delete the recipe"
     },
@@ -268,7 +268,13 @@
         "id": "ID (to show in the URL)",
         "slug": "Slug (URL)"
       },
-      "actions": "Actions"
+      "actions": "Actions",
+      "unsaved": {
+        "header": "Unsaved changes",
+        "message": "You have unsaved changes in this recipe. If you leave now, they will be lost.",
+        "stay": "Keep editing",
+        "leave": "Leave without saving"
+      }
     },
     "prepTime": "Preparation time: {time} min",
     "cookTime": "Cooking time: {time} min",

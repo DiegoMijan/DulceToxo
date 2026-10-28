@@ -59,7 +59,8 @@
       group: "recipe-delete",
       header: t("recipe.delete.confirmHeader"),
       message: t("recipe.delete.confirmMessage", { title: recipeTitle }),
-      icon: "pi pi-exclamation-triangle",
+      icon: "pi pi-exclamation-triangle text-red-500",
+      defaultFocus: "reject",
       rejectProps: {
         label: t("common.cancel"),
         severity: "secondary",
