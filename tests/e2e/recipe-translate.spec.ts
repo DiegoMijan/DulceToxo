@@ -183,6 +183,10 @@ const fillCell = async (row: Locator, columnIndex: number, text: string) => {
   await input.press("Enter")
 }
 
+test.use({
+  video: { mode: "on", size: { width: 1280, height: 720 } },
+})
+
 test.describe("recipe auto translate", () => {
   test("new recipe translates in one request, keeps headings and empty rows, and stays dirty", async ({
     page,
