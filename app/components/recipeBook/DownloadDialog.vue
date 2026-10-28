@@ -187,8 +187,7 @@
     data-testid="recipe-book-dialog"
   >
     <div
-      class="flex min-h-0 flex-col"
-      :class="isMobile ? 'h-screen' : 'max-h-[min(40rem,85vh)]'"
+      class="flex min-h-0 flex-col max-h-[min(40rem,85vh)] max-[640px]:h-dvh max-[640px]:max-h-dvh"
     >
       <div class="flex items-start justify-between gap-3 border-b border-french-lilac-200 px-5 py-4 dark:border-french-lilac-800">
         <h2
@@ -311,3 +310,24 @@
     </div>
   </Dialog>
 </template>
+
+<style>
+@media screen and (max-width: 640px) {
+  .p-dialog-mask:has(.recipe-book-dialog) {
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    padding: 0 !important;
+  }
+
+  .p-dialog.recipe-book-dialog {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-width: 100vw !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+}
+</style>
