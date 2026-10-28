@@ -21,6 +21,25 @@
 
   const listboxId = "command-palette-listbox"
   const activeOptionId = computed(() => activeItem.value?.optionId)
+  const dialogPt = computed(() => {
+    const mobile = isMobile.value
+    return {
+      root: {
+        class: mobile
+          ? "command-palette-dialog !m-0 h-screen !max-h-screen w-screen !max-w-none overflow-hidden rounded-none border-0 bg-french-lilac-50 shadow-none dark:bg-french-lilac-950"
+          : "command-palette-dialog w-full max-w-2xl overflow-hidden rounded-2xl border border-french-lilac-200 bg-french-lilac-50 shadow-xl dark:border-french-lilac-800 dark:bg-french-lilac-950",
+        style: mobile
+          ? { width: "100vw", height: "100vh", maxWidth: "100vw", margin: 0, top: 0 }
+          : { marginTop: "12vh" },
+      },
+      content: {
+        class: mobile ? "h-full p-0 bg-transparent" : "p-0 bg-transparent",
+      },
+      mask: {
+        class: "bg-french-lilac-950/40 backdrop-blur-sm dark:bg-black/60",
+      },
+    }
+  })
 
   const handleShow = async () => {
     await loadIdleData()
@@ -91,18 +110,7 @@
     :draggable="false"
     :maximized="isMobile"
     :position="isMobile ? 'center' : 'top'"
-    :pt="{
-      root: {
-        class: 'command-palette-dialog w-full max-w-2xl overflow-hidden rounded-2xl border border-french-lilac-200 bg-french-lilac-50 shadow-xl dark:border-french-lilac-800 dark:bg-french-lilac-950',
-        style: isMobile ? undefined : { marginTop: '12vh' },
-      },
-      content: {
-        class: 'p-0 bg-transparent',
-      },
-      mask: {
-        class: 'bg-french-lilac-950/40 backdrop-blur-sm dark:bg-black/60',
-      },
-    }"
+    :pt="dialogPt"
     :aria-label="t('search.dialog')"
     @show="handleShow"
     @hide="close"
