@@ -21,8 +21,9 @@
   <Button
     v-if="isAdmin"
     type="button"
-    class="w-full mb-4"
+    class="w-full my-4"
     size="small"
+    outlined
     :aria-label="t('recipe.edit.newRecipe')"
     @click="handleCreateRecipe"
   >
