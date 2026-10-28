@@ -8,6 +8,7 @@
   import en from "@/../public/img/gb.svg"
   import { FormField as PrimeVueFormField } from "@primevue/forms"
   import type { RecipeDetail, RecipeListItem } from "~/stores/recipes"
+  import type { RecipeLocaleForm } from "#shared/types/Recipe"
   import type { components } from "#shared/types/api"
 
   type LocaleKey = "es" | "en" | "gl"
@@ -70,6 +71,8 @@
   const loading = ref(Boolean(recipeParam) && !cachedRecipeDetail)
   const loadingRecipes = ref(false)
   const saving = ref(false)
+  const { translating, translateFromGalician } = useRecipeTranslate()
+  const formLocked = computed(() => saving.value || translating.value)
   const selectedRecipeId = ref<string>(recipeParam || NEW_RECIPE_ID)
   const currentRecipe = ref<RecipeDetail | null>(cachedRecipeDetail ?? null)
   const slugErrors = ref<Record<LocaleKey, string | null>>({ es: null, en: null, gl: null })
@@ -432,8 +435,13 @@
     }
   }
 
+  const handleTranslate = async () => {
+    const locales = form.value?.states?.locales as Record<LocaleKey, RecipeLocaleForm> | undefined
+    await translateFromGalician(locales)
+  }
+
   const handleRecipeChange = async (event: SelectChangeEvent) => {
-    if (saving.value) return
+    if (formLocked.value) return
 
     await uploadRef.value?.discardSessionUploads()
     const newId = event.value as string
@@ -449,7 +457,7 @@
   }
 
   const onCancel = async () => {
-    if (saving.value) return
+    if (formLocked.value) return
 
     slugErrors.value = { es: null, en: null, gl: null }
     await uploadRef.value?.discardSessionUploads()
@@ -461,7 +469,7 @@
   }
 
   const onBack = () => {
-    if (saving.value || !currentRecipe.value) return
+    if (formLocked.value || !currentRecipe.value) return
     const categoryUrlName = categories.value.find((c) => c.id === currentRecipe.value!.category_id)
       ?.locale[locale.value as LocaleKey]?.url_name
     const recipeSlug = currentRecipe.value.locales[locale.value as LocaleKey]?.slug
@@ -516,15 +524,15 @@
     :resolver
     :initialValues
     class="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg flex flex-col flex-1 overflow-hidden"
-    :aria-busy="saving || loading || loadingRecipes"
+    :aria-busy="formLocked || loading || loadingRecipes"
     @submit="onSubmit"
   >
     <fieldset
-      :disabled="saving"
-      :inert="saving ? true : undefined"
+      :disabled="formLocked"
+      :inert="formLocked ? true : undefined"
       :class="[
         'm-0 flex min-w-0 flex-1 flex-col border-0 p-0',
-        { 'pointer-events-none opacity-60': saving },
+        { 'pointer-events-none opacity-60': formLocked },
       ]"
     >
       <legend class="sr-only">{{ t('recipe.edit.button') }}</legend>
@@ -545,7 +553,7 @@
               option-label="title"
               :placeholder="t('recipe.edit.recipeSelected')"
               :loading="loadingRecipes"
-              :disabled="saving"
+              :disabled="formLocked"
               class="w-full"
               @change="handleRecipeChange"
             >
@@ -601,7 +609,7 @@
           <Rating
             :model-value="$form.difficulty?.value"
             name="difficulty"
-            :disabled="saving"
+            :disabled="formLocked"
           >
             <template #onicon>
               <NuxtIcon
@@ -635,7 +643,7 @@
                 ref="uploadRef"
                 v-model:publicIds="$form.images.value"
                 :persistedPublicIds="currentRecipe?.images.map((img) => img.public_id) ?? []"
-                :disabled="saving"
+                :disabled="formLocked"
                 @change="triggerImagesChange"
               />
             </template>
@@ -663,7 +671,7 @@
                     class="bg-transparent border-0 inline-flex flex-col gap-2 cursor-pointer disabled:cursor-not-allowed"
                     v-bind="a11yAttrs.header"
                     type="button"
-                    :disabled="saving"
+                    :disabled="formLocked"
                     @click="activateCallback"
                   >
                     <span
@@ -699,8 +707,10 @@
                   :locale="step.locale"
                   :formInstance="$form"
                   :slug-error="slugErrors[step.locale]"
-                  :disabled="saving"
+                  :disabled="formLocked"
+                  :translating="translating"
                   @change="triggerLocalesChange"
+                  @translate="handleTranslate"
                 />
               </StepPanel>
             </StepPanels>
@@ -724,7 +734,7 @@
                 showClear
                 class="w-full"
                 :placeholder="t('recipe.edit.categorySelected')"
-                :disabled="saving"
+                :disabled="formLocked"
               />
             </template>
           </FormField>
@@ -742,7 +752,7 @@
                 :max="10000"
                 fluid
                 :useGrouping="false"
-                :disabled="saving"
+                :disabled="formLocked"
               />
             </template>
           </FormField>
@@ -760,7 +770,7 @@
                 :max="10000"
                 fluid
                 :useGrouping="false"
-                :disabled="saving"
+                :disabled="formLocked"
               />
             </template>
           </FormField>
@@ -774,7 +784,7 @@
           severity="secondary"
           text
           class="mr-auto!"
-          :disabled="saving"
+          :disabled="formLocked"
           @click="onBack"
         >
           <i class="pi pi-arrow-left mr-2" />
@@ -784,7 +794,7 @@
           type="button"
           severity="danger"
           outlined
-          :disabled="!formStates.isDirty || saving"
+          :disabled="!formStates.isDirty || formLocked"
           @click="onCancel"
         >
           <i class="pi pi-times mr-2" />
@@ -792,7 +802,8 @@
         </Button>
         <Button
           type="submit"
-          :disabled="!formStates.isDirty || saving"
+          data-testid="recipe-edit-save"
+          :disabled="!formStates.isDirty || formLocked"
           :loading="saving"
         >
           <i

@@ -113,6 +113,76 @@ export const signUp = async (email: string, name: string) => {
   }
 }
 
+export const TRANSLATE_FILLED_RECIPE_ID = "e2e-translate-filled"
+export const TRANSLATE_BLANK_RECIPE_ID = "e2e-translate-blank"
+
+export const deleteE2eTranslateRecipes = (dbPath: string) => {
+  runSql(
+    dbPath,
+    `
+    DELETE FROM recipe_favorites WHERE recipe_id LIKE 'e2e-translate-%';
+    DELETE FROM recipe_ratings WHERE recipe_id LIKE 'e2e-translate-%';
+    DELETE FROM recipe_images WHERE recipe_id LIKE 'e2e-translate-%';
+    DELETE FROM recipe_ingredients WHERE recipe_id LIKE 'e2e-translate-%';
+    DELETE FROM recipe_steps WHERE recipe_id LIKE 'e2e-translate-%';
+    DELETE FROM recipe_locales WHERE recipe_id LIKE 'e2e-translate-%';
+    DELETE FROM recipes WHERE id LIKE 'e2e-translate-%';
+    `,
+  )
+}
+
+export const createE2eTranslateRecipes = (dbPath: string) => {
+  deleteE2eTranslateRecipes(dbPath)
+  runSql(
+    dbPath,
+    `
+    INSERT INTO recipes (id, category_id, difficulty, prep_time, cook_time, author_id, created_at, updated_at)
+    SELECT '${TRANSLATE_FILLED_RECIPE_ID}', 'cupcakes', 2, 10, 20, id, 1790000000000, 1790000000000
+    FROM users WHERE email = '${ADMIN_EMAIL}';
+
+    INSERT INTO recipes (id, category_id, difficulty, prep_time, cook_time, author_id, created_at, updated_at)
+    SELECT '${TRANSLATE_BLANK_RECIPE_ID}', 'cupcakes', 2, 10, 20, id, 1790000000001, 1790000000001
+    FROM users WHERE email = '${ADMIN_EMAIL}';
+
+    INSERT INTO recipe_locales (id, recipe_id, locale, slug, title, description) VALUES
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 'e2e-translate-bolo', 'Bolo de limón', 'Un bolo de proba'),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-es', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 'e2e-translate-bizcocho', 'Bizcocho de limón', 'Un bizcocho de prueba'),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-en', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 'e2e-translate-sponge', 'Lemon sponge', 'A test sponge cake'),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-gl', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 'e2e-translate-tarta', 'Tarta de queixo', 'Unha tarta de proba'),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-es', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 'e2e-translate-tarta-es', '', ''),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-en', '${TRANSLATE_BLANK_RECIPE_ID}', 'en', 'e2e-translate-tarta-en', '', '');
+
+    INSERT INTO recipe_ingredients (id, recipe_id, locale, "order", description, is_heading) VALUES
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-ing-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 1, 'Para o recheo', 1),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-ing-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 2, '200 g de queixo', 0),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-ing-3', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 3, '', 0),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-es-ing-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 1, 'Para el relleno', 1),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-es-ing-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 2, '200 g de queso', 0),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-es-ing-3', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 3, 'texto previo', 0),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-en-ing-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 1, 'For the filling', 1),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-en-ing-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 2, '200 g of cheese', 0),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-en-ing-3', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 3, 'previous text', 0),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-gl-ing-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 1, 'Para a base', 1),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-gl-ing-2', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 2, '100 g de galletas', 0),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-es-ing-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 1, '', 1),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-es-ing-2', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 2, '', 0),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-en-ing-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'en', 1, '', 1),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-en-ing-2', '${TRANSLATE_BLANK_RECIPE_ID}', 'en', 2, '', 0);
+
+    INSERT INTO recipe_steps (id, recipe_id, locale, "order", description) VALUES
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-step-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 1, 'Mesturar os ingredientes'),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-step-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 2, ''),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-es-step-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 1, 'Mezclar los ingredientes'),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-es-step-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 2, 'paso previo'),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-en-step-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 1, 'Mix the ingredients'),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-en-step-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 2, 'previous step'),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-gl-step-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 1, 'Triturar as galletas'),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-es-step-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 1, ''),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-en-step-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'en', 1, '');
+    `,
+  )
+}
+
 export const prepareE2eUsers = async () => {
   const dbPath = resolveLocalDbPath()
   deleteE2eUsers(dbPath)

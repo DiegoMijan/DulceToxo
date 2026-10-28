@@ -827,6 +827,15 @@ export interface paths {
             "application/json": components["schemas"]["ErrorResponse"]
           }
         }
+        /** @description Monthly translation quota exceeded */
+        429: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
         /** @description Translation provider failed */
         502: {
           headers: {
@@ -836,7 +845,7 @@ export interface paths {
             "application/json": components["schemas"]["ErrorResponse"]
           }
         }
-        /** @description GOOGLE_TRANSLATE_API_KEY is not configured */
+        /** @description AZURE_TRANSLATOR_KEY or AZURE_TRANSLATOR_REGION is not configured */
         503: {
           headers: {
             [name: string]: unknown

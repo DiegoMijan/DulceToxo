@@ -196,6 +196,16 @@
         "saveFailed": "Erro ao gardar a receita",
         "generic": "Ocorreu un erro inesperado"
       },
+      "translate": {
+        "button": "Traducir a castelán e inglés",
+        "confirmOverwrite": "Sobrescribiranse as traducións actuais",
+        "confirm": "Traducir",
+        "error": {
+          "notConfigured": "A tradución automática non está configurada",
+          "quotaExceeded": "Esgotouse a cota de tradución deste mes",
+          "failed": "Non se puido traducir, téntao de novo"
+        }
+      },
       "form": {
         "confirmDelete": "¿Desexa eliminar este elemento?",
         "title": "Título",

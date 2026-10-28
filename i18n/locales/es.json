@@ -196,6 +196,16 @@
         "saveFailed": "Error al guardar la receta",
         "generic": "Ha ocurrido un error inesperado"
       },
+      "translate": {
+        "button": "Traducir a castellano e inglés",
+        "confirmOverwrite": "Se sobrescribirán las traducciones actuales",
+        "confirm": "Traducir",
+        "error": {
+          "notConfigured": "La traducción automática no está configurada",
+          "quotaExceeded": "Se ha agotado la cuota de traducción de este mes",
+          "failed": "No se pudo traducir, inténtalo de nuevo"
+        }
+      },
       "form": {
         "confirmDelete": "¿Desea eliminar este elemento?",
         "title": "Título",
