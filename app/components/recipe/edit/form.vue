@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { RECIPE_TARGET_LOCALES, type RecipeTargetLocale } from "~/utils/recipeLocales"
   import type { FormFieldState, FormSubmitEvent } from "@primevue/forms/form"
   import { valibotResolver } from "@primevue/forms/resolvers/valibot"
   import type { SelectChangeEvent } from "primevue/select"
@@ -71,9 +72,14 @@
   const loading = ref(Boolean(recipeParam) && !cachedRecipeDetail)
   const loadingRecipes = ref(false)
   const saving = ref(false)
-  const { translating, translateFromGalician } = useRecipeTranslate()
+  const { translating, translateFromSource } = useRecipeTranslate()
   const formLocked = computed(() => saving.value || translating.value)
-  const pendingReview = ref({ es: false, en: false })
+  const noPendingReview = (): Record<RecipeTargetLocale, boolean> =>
+    Object.fromEntries(RECIPE_TARGET_LOCALES.map((locale) => [locale, false])) as Record<
+      RecipeTargetLocale,
+      boolean
+    >
+  const pendingReview = ref(noPendingReview())
   const selectedRecipeId = ref<string>(recipeParam || NEW_RECIPE_ID)
   const currentRecipe = ref<RecipeDetail | null>(cachedRecipeDetail ?? null)
   const slugErrors = ref<Record<LocaleKey, string | null>>({ es: null, en: null, gl: null })
@@ -83,7 +89,7 @@
     initialValues.value = values
     formKey.value += 1
     activeStep.value = 1
-    pendingReview.value = { es: false, en: false }
+    pendingReview.value = noPendingReview()
   }
 
   const allRecipes = ref<RecipeListItem[]>([])
@@ -213,9 +219,10 @@
     cachedRecipeDetail ? mapDetailToFormValues(cachedRecipeDetail) : createInitialValues(),
   )
 
+  // Primero el idioma maestro (RECIPE_SOURCE_LOCALE), despues los que se traducen de el
   const steps = ref<{ id: number; locale: LocaleKey; img: string }[]>([
-    { id: 1, locale: "gl", img: gl },
-    { id: 2, locale: "es", img: es },
+    { id: 1, locale: "es", img: es },
+    { id: 2, locale: "gl", img: gl },
     { id: 3, locale: "en", img: en },
   ])
 
@@ -437,26 +444,27 @@
     }
   }
 
-  const isPendingReview = (locale: LocaleKey): boolean => {
-    if (locale === "gl") return false
-    return pendingReview.value[locale]
-  }
+  const isTargetLocale = (locale: LocaleKey): locale is RecipeTargetLocale =>
+    (RECIPE_TARGET_LOCALES as readonly LocaleKey[]).includes(locale)
+
+  const isPendingReview = (locale: LocaleKey): boolean =>
+    isTargetLocale(locale) && pendingReview.value[locale]
 
   const clearPendingReview = (locale: LocaleKey) => {
-    if (locale === "es" || locale === "en") {
-      pendingReview.value[locale] = false
-    }
+    if (isTargetLocale(locale)) pendingReview.value[locale] = false
   }
 
   const markTranslatedLocalesForReview = () => {
-    pendingReview.value = { es: true, en: true }
+    pendingReview.value = Object.fromEntries(
+      RECIPE_TARGET_LOCALES.map((locale) => [locale, true]),
+    ) as Record<RecipeTargetLocale, boolean>
     const currentLocale = steps.value.find((step) => step.id === activeStep.value)?.locale
     if (currentLocale) clearPendingReview(currentLocale)
   }
 
   const handleTranslate = async () => {
     const locales = form.value?.states?.locales as Record<LocaleKey, RecipeLocaleForm> | undefined
-    const outcome = await translateFromGalician(locales)
+    const outcome = await translateFromSource(locales)
     if (!outcome.applied) return
     markTranslatedLocalesForReview()
   }

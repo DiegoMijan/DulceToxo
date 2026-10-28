@@ -2,6 +2,7 @@
   import { FormField as PrimeVueFormField } from "@primevue/forms"
   import type { DataTableCellEditCompleteEvent, DataTableRowReorderEvent } from "primevue/datatable"
   import { FormField } from "#components"
+  import { RECIPE_SOURCE_LOCALE, RECIPE_TARGET_LOCALES, type RecipeTargetLocale } from "~/utils/recipeLocales"
 
   type FormInstance = {
     [key: string]: {
@@ -56,7 +57,10 @@
     slugField.value = slugFromTitle(input.value)
   }
 
-  const localeFormHasText = (localeKey: "es" | "en"): boolean => {
+  // Solo el idioma maestro cambia la estructura y lanza la traduccion
+  const isSourceLocale = computed(() => locale === RECIPE_SOURCE_LOCALE)
+
+  const localeFormHasText = (localeKey: RecipeTargetLocale): boolean => {
     const data = form.value[localeKey]
     if (!data) return false
     return localeHasText({
@@ -70,7 +74,7 @@
 
   const handleTranslateClick = (event: Event) => {
     if (disabled || translating) return
-    if (!localeFormHasText("es") && !localeFormHasText("en")) {
+    if (!RECIPE_TARGET_LOCALES.some(localeFormHasText)) {
       emit("translate")
       return
     }
@@ -115,11 +119,11 @@
   }
 
   const handleHeadingChange = (data: Ingredient, value: boolean) => {
-    if (disabled || locale !== "gl") return
+    if (disabled || !isSourceLocale.value) return
 
     data.is_heading = value
 
-    ;(["es", "en"] as const).forEach((otherLocale) => {
+    RECIPE_TARGET_LOCALES.forEach((otherLocale) => {
       const match = form.value[otherLocale]?.ingredients?.value?.find(
         (item: Ingredient) => item.order === data.order,
       )
@@ -147,7 +151,7 @@
 
       newItem.description = "Falta traducir"
 
-      ;["es", "en"].forEach((local) => {
+      RECIPE_TARGET_LOCALES.forEach((local) => {
         form.value[local]?.[type]?.value.push({ ...newItem })
       })
       emit("change", locale, type)
@@ -164,7 +168,7 @@
           order: index + 1,
         }))
 
-      ;["es", "en"].forEach((local) => {
+      RECIPE_TARGET_LOCALES.forEach((local) => {
         if (form.value[local]?.[type]?.value) {
           form.value[local][type].value = form.value[local][type].value
             .filter((item: Ingredient | Step) => item.id !== data.id)
@@ -209,7 +213,7 @@
     class="flex flex-col gap-6 mt-2"
   >
     <div
-      v-if="locale === 'gl'"
+      v-if="isSourceLocale"
       class="flex justify-start"
     >
       <Button
@@ -300,7 +304,7 @@
       <div class="flex justify-between items-center mb-2">
         <h1 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300">{{ t('recipe.edit.form.ingredients') }}</h1>
         <Button
-          v-if="locale === 'gl'"
+          v-if="isSourceLocale"
           size="small"
           rounded
           data-testid="recipe-add-ingredient"
@@ -336,7 +340,7 @@
         @row-reorder="(event: DataTableRowReorderEvent) =>onRowReorder(event, 'ingredients')"
       >
         <Column
-          v-if="locale === 'gl'"
+          v-if="isSourceLocale"
           rowReorder
           headerStyle="width: 3rem"
           :reorderableColumn="false"
@@ -355,7 +359,7 @@
             <Checkbox
               :modelValue="Boolean((data as Ingredient).is_heading)"
               binary
-              :disabled="disabled || locale !== 'gl'"
+              :disabled="disabled || !isSourceLocale"
               :aria-label="t('recipe.edit.form.heading')"
               @click.stop
               @update:model-value="(value: boolean) => handleHeadingChange(data as Ingredient, value)"
@@ -378,7 +382,7 @@
           </template>
         </Column>
         <Column
-          v-if="locale === 'gl'"
+          v-if="isSourceLocale"
           headerStyle="width: 5rem; text-align: center"
           bodyStyle="text-align: center; overflow: visible"
         >
@@ -406,7 +410,7 @@
       <div class="flex justify-between items-center mb-2">
         <h1 class="text-lg font-semibold text-french-lilac-700 dark:text-french-lilac-300">{{ t('recipe.edit.form.instructions') }}</h1>
         <Button
-          v-if="locale === 'gl'"
+          v-if="isSourceLocale"
           size="small"
           rounded
           data-testid="recipe-add-instruction"
@@ -442,7 +446,7 @@
         @row-reorder="(event: DataTableRowReorderEvent) =>onRowReorder(event, 'instructions')"
       >
         <Column
-          v-if="locale === 'gl'"
+          v-if="isSourceLocale"
           rowReorder
           headerStyle="width: 3rem"
           :reorderableColumn="false"
@@ -468,7 +472,7 @@
           </template>
         </Column>
         <Column
-          v-if="locale === 'gl'"
+          v-if="isSourceLocale"
           headerStyle="width: 5rem; text-align: center"
           bodyStyle="text-align: center; overflow: visible"
         >

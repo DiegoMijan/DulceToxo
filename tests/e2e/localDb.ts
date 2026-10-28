@@ -145,39 +145,39 @@ export const createE2eTranslateRecipes = (dbPath: string) => {
     FROM users WHERE email = '${ADMIN_EMAIL}';
 
     INSERT INTO recipe_locales (id, recipe_id, locale, slug, title, description) VALUES
-      ('${TRANSLATE_FILLED_RECIPE_ID}-gl', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 'e2e-translate-bolo', 'Bolo de limón', 'Un bolo de proba'),
       ('${TRANSLATE_FILLED_RECIPE_ID}-es', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 'e2e-translate-bizcocho', 'Bizcocho de limón', 'Un bizcocho de prueba'),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 'e2e-translate-bolo', 'Bolo de limón', 'Un bolo de proba'),
       ('${TRANSLATE_FILLED_RECIPE_ID}-en', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 'e2e-translate-sponge', 'Lemon sponge', 'A test sponge cake'),
-      ('${TRANSLATE_BLANK_RECIPE_ID}-gl', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 'e2e-translate-tarta', 'Tarta de queixo', 'Unha tarta de proba'),
-      ('${TRANSLATE_BLANK_RECIPE_ID}-es', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 'e2e-translate-tarta-es', '', ''),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-es', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 'e2e-translate-tarta', 'Tarta de queso', 'Una tarta de prueba'),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-gl', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 'e2e-translate-tarta-gl', '', ''),
       ('${TRANSLATE_BLANK_RECIPE_ID}-en', '${TRANSLATE_BLANK_RECIPE_ID}', 'en', 'e2e-translate-tarta-en', '', '');
 
     INSERT INTO recipe_ingredients (id, recipe_id, locale, "order", description, is_heading) VALUES
-      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-ing-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 1, 'Para o recheo', 1),
-      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-ing-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 2, '200 g de queixo', 0),
-      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-ing-3', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 3, '', 0),
       ('${TRANSLATE_FILLED_RECIPE_ID}-es-ing-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 1, 'Para el relleno', 1),
       ('${TRANSLATE_FILLED_RECIPE_ID}-es-ing-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 2, '200 g de queso', 0),
-      ('${TRANSLATE_FILLED_RECIPE_ID}-es-ing-3', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 3, 'texto previo', 0),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-es-ing-3', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 3, '', 0),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-ing-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 1, 'Para o recheo', 1),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-ing-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 2, '200 g de queixo', 0),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-ing-3', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 3, 'texto previo', 0),
       ('${TRANSLATE_FILLED_RECIPE_ID}-en-ing-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 1, 'For the filling', 1),
       ('${TRANSLATE_FILLED_RECIPE_ID}-en-ing-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 2, '200 g of cheese', 0),
       ('${TRANSLATE_FILLED_RECIPE_ID}-en-ing-3', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 3, 'previous text', 0),
-      ('${TRANSLATE_BLANK_RECIPE_ID}-gl-ing-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 1, 'Para a base', 1),
-      ('${TRANSLATE_BLANK_RECIPE_ID}-gl-ing-2', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 2, '100 g de galletas', 0),
-      ('${TRANSLATE_BLANK_RECIPE_ID}-es-ing-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 1, '', 1),
-      ('${TRANSLATE_BLANK_RECIPE_ID}-es-ing-2', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 2, '', 0),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-es-ing-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 1, 'Para la base', 1),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-es-ing-2', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 2, '100 g de galletas', 0),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-gl-ing-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 1, '', 1),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-gl-ing-2', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 2, '', 0),
       ('${TRANSLATE_BLANK_RECIPE_ID}-en-ing-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'en', 1, '', 1),
       ('${TRANSLATE_BLANK_RECIPE_ID}-en-ing-2', '${TRANSLATE_BLANK_RECIPE_ID}', 'en', 2, '', 0);
 
     INSERT INTO recipe_steps (id, recipe_id, locale, "order", description) VALUES
-      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-step-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 1, 'Mesturar os ingredientes'),
-      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-step-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 2, ''),
       ('${TRANSLATE_FILLED_RECIPE_ID}-es-step-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 1, 'Mezclar los ingredientes'),
-      ('${TRANSLATE_FILLED_RECIPE_ID}-es-step-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 2, 'paso previo'),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-es-step-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'es', 2, ''),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-step-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 1, 'Mesturar os ingredientes'),
+      ('${TRANSLATE_FILLED_RECIPE_ID}-gl-step-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'gl', 2, 'paso previo'),
       ('${TRANSLATE_FILLED_RECIPE_ID}-en-step-1', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 1, 'Mix the ingredients'),
       ('${TRANSLATE_FILLED_RECIPE_ID}-en-step-2', '${TRANSLATE_FILLED_RECIPE_ID}', 'en', 2, 'previous step'),
-      ('${TRANSLATE_BLANK_RECIPE_ID}-gl-step-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 1, 'Triturar as galletas'),
-      ('${TRANSLATE_BLANK_RECIPE_ID}-es-step-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 1, ''),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-es-step-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'es', 1, 'Triturar las galletas'),
+      ('${TRANSLATE_BLANK_RECIPE_ID}-gl-step-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'gl', 1, ''),
       ('${TRANSLATE_BLANK_RECIPE_ID}-en-step-1', '${TRANSLATE_BLANK_RECIPE_ID}', 'en', 1, '');
     `,
   )

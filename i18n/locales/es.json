@@ -242,10 +242,10 @@
         "generic": "Ha ocurrido un error inesperado"
       },
       "translate": {
-        "button": "Traducir a castellano e inglés",
+        "button": "Traducir a gallego e inglés",
         "confirmOverwrite": "Se sobrescribirán las traducciones actuales",
         "confirm": "Traducir",
-        "success": "Traducción completada. Revisa las pestañas de castellano e inglés antes de guardar",
+        "success": "Traducción completada. Revisa las pestañas de gallego e inglés antes de guardar",
         "untranslated": "Ningún texto quedó sin traducir | 1 texto quedó sin traducir | {n} textos quedaron sin traducir",
         "pendingReview": "Traducción pendiente de revisar",
         "error": {
