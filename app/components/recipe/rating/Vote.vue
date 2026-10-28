@@ -6,7 +6,8 @@
 
   const { t } = useI18n()
   const toast = useToast()
-  const recipesStore = useRecipes()
+  const { mutateAsync: upsertRating } = useUpsertRating()
+  const { mutateAsync: deleteRating } = useDeleteRating()
 
   const saving = ref(false)
   const ratingKey = ref(0)
@@ -23,15 +24,14 @@
     saving.value = true
     try {
       if (value == null) {
-        await recipesStore.deleteRating(recipeId)
+        await deleteRating(recipeId)
         return
       }
 
       const nextValue = Math.round(value)
       if (nextValue < 1 || nextValue > 5) return
-      await recipesStore.upsertRating(recipeId, nextValue)
+      await upsertRating({ recipeId, value: nextValue })
     } catch (error) {
-      // Sesión caducada: el store ya redirige al login, sin toast de error.
       if (isUnauthorizedError(error)) return
       ratingKey.value += 1
       toast.add({

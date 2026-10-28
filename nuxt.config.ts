@@ -30,6 +30,7 @@ export default defineNuxtConfig({
   modules: [
     "@vueuse/nuxt",
     "@pinia/nuxt",
+    "@pinia/colada-nuxt",
     "@formkit/auto-animate/nuxt",
     "magic-regexp/nuxt",
     "@nuxtjs/i18n",

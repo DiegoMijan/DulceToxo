@@ -15,7 +15,8 @@
     "format:vue-templates": "eslint \"**/*.vue\" --fix --rule 'vue/html-indent: error' --rule 'vue/html-quotes: error' --rule 'vue/html-self-closing: error' --rule 'vue/max-attributes-per-line: error'",
     "format:all": "npm run format && npm run format:vue-templates",
     "api:types": "bun scripts/api-types.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "measure:colada": "bun scripts/measure-colada.ts"
   },
   "dependencies": {
     "@antfu/utils": "^9.3.0",
@@ -25,6 +26,8 @@
     "@nuxt/image": "^2.2.0",
     "@nuxtjs/color-mode": "^4.0.1",
     "@nuxtjs/i18n": "^10.6.0",
+    "@pinia/colada": "1.4.8",
+    "@pinia/colada-nuxt": "1.2.0",
     "@pinia/nuxt": "^1.0.3",
     "@primeuix/themes": "^3.1.0",
     "@primevue/forms": "^5.0.4",

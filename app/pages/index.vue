@@ -18,7 +18,7 @@ const { t } = useI18n()
 const categoriesStore = useCategories()
 const { categoriesByLocale } = storeToRefs(categoriesStore)
 
-await categoriesStore.getCategories(true)
+await categoriesStore.getCategories()
 
 const isModalOpen = ref(false)
 

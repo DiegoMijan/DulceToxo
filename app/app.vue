@@ -1,8 +1,11 @@
 <script setup lang="ts">
-  const { getCategories } = useCategories()
+  import { useQuery } from "@pinia/colada"
+  import { categoriesQuery } from "~/queries/options"
 
-  onMounted(async () => {
-    await getCategories(true)
+  const { refresh } = useQuery(categoriesQuery)
+
+  onMounted(() => {
+    void refresh()
   })
 </script>
 

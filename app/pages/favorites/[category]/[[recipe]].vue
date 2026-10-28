@@ -1,6 +1,9 @@
 <script setup lang="ts">
   import type { LocaleKey } from "#shared/types/Recipe"
-  import type { FavoriteListItem, RecipeDetail } from "~/stores/recipes"
+  import type { FavoriteListItem } from "~/stores/recipes"
+  import { useQuery } from "@pinia/colada"
+  import { categoriesQuery, favoritesQuery, recipeQuery } from "~/queries/options"
+  import { invalidateUserScopedQueries } from "~/utils/userQueryCache"
 
   defineI18nRoute({
     paths: {
@@ -38,16 +41,20 @@
   })
   const categoryMissing = computed(() => !isAllCategory.value && !categoryId.value)
 
-  const selectedSlug = ref<string | undefined>(recipeSlugParam.value)
-  const recipeDetail = ref<RecipeDetail | null>(null)
-  const loading = ref(true)
-  const recipeNotFound = ref(false)
-  let recipeLoadGeneration = 0
+  const { refresh: refreshCategories } = useQuery(categoriesQuery)
+  await refreshCategories()
 
-  const favoriteItems = computed(() => recipesStore.favorites ?? [])
+  const {
+    data: favoriteItems,
+    isPending: favoritesPending,
+    refresh: refreshFavorites,
+  } = useQuery(favoritesQuery)
+  await refreshFavorites()
+
+  const selectedSlug = ref<string | undefined>(recipeSlugParam.value)
 
   const filteredFavorites = computed(() => {
-    const list = favoriteItems.value
+    const list = favoriteItems.value ?? []
     if (isAllCategory.value) return list
     if (!categoryId.value) return []
     return list.filter((recipe) => recipe.category.id === categoryId.value)
@@ -55,7 +62,8 @@
 
   const sortedFavorites = computed(() => sortFavoriteList(filteredFavorites.value))
 
-  const hasAnyFavorites = computed(() => favoriteItems.value.length > 0)
+  const hasAnyFavorites = computed(() => (favoriteItems.value ?? []).length > 0)
+  const listLoading = computed(() => favoritesPending.value && !favoriteItems.value)
 
   const recipePath = (slug: string) => favoritesPath(categoryUrlName.value, slug)
 
@@ -71,66 +79,35 @@
     }
   }
 
-  const loadRecipeBySlug = async (slug: string | undefined) => {
-    const generation = ++recipeLoadGeneration
-    recipeNotFound.value = false
-
-    if (!slug) {
-      if (generation === recipeLoadGeneration) {
-        recipeDetail.value = null
-      }
-      return
-    }
-
-    const recipeId = recipesStore.findFavoriteIdBySlug(slug)
-    if (!recipeId) {
-      if (generation === recipeLoadGeneration) {
-        recipeDetail.value = null
-        recipeNotFound.value = true
-      }
-      return
-    }
-
-    if (recipeDetail.value?.id === recipeId) return
-
-    const detail = await recipesStore.getRecipeDetail(recipeId)
-    if (generation !== recipeLoadGeneration) return
-
-    recipeDetail.value = detail
-    if (!detail) {
-      recipeNotFound.value = true
-    }
+  const firstSlug = sortedFavorites.value[0] ? slugForFavorite(sortedFavorites.value[0]) : undefined
+  if (firstSlug && !recipeSlugParam.value) {
+    selectedSlug.value = firstSlug
+    await goToFavorite(firstSlug, true)
   }
 
-  const initializeData = async () => {
-    recipeNotFound.value = false
+  const recipeId = computed(() => {
+    const slug = recipeSlugParam.value ?? selectedSlug.value
+    if (!slug) return null
+    return recipesStore.findFavoriteIdBySlug(slug)
+  })
 
-    await categoriesStore.getCategories()
-    await recipesStore.getFavorites()
-
-    const firstSlug = sortedFavorites.value[0]
-      ? slugForFavorite(sortedFavorites.value[0])
-      : undefined
-    const slug = recipeSlugParam.value ?? firstSlug
-
-    if (slug && slug !== recipeSlugParam.value) {
-      selectedSlug.value = slug
-      await goToFavorite(slug, true)
-    }
-
-    await loadRecipeBySlug(slug)
-    loading.value = false
+  const { data: recipeDetail, isPending: detailPending, refresh: refreshDetail } = useQuery(() =>
+    recipeQuery(recipeId.value ?? ""),
+  )
+  if (recipeId.value) {
+    await refreshDetail()
   }
 
-  await initializeData()
+  const detailLoading = computed(() => detailPending.value && !recipeDetail.value)
+  const recipeNotFound = computed(() => {
+    const slug = recipeSlugParam.value
+    if (!slug) return false
+    if (favoritesPending.value && !favoriteItems.value) return false
+    return !recipeId.value
+  })
 
   watch(selectedSlug, async (newSlug) => {
-    if (newSlug === recipeSlugParam.value) {
-      await loadRecipeBySlug(newSlug)
-      return
-    }
-
-    await loadRecipeBySlug(newSlug)
+    if (newSlug === recipeSlugParam.value) return
     await goToFavorite(newSlug)
   })
 
@@ -144,7 +121,8 @@
 
   watch(categoryUrlName, async (newUrlName, oldUrlName) => {
     if (newUrlName === oldUrlName) return
-    await initializeData()
+    await refreshFavorites()
+    if (recipeId.value) await refreshDetail()
   })
 
   const handleCategorySelect = async (nextCategoryId: string | null) => {
@@ -155,8 +133,8 @@
 
     const nextList = sortFavoriteList(
       nextCategoryId
-        ? favoriteItems.value.filter((recipe) => recipe.category.id === nextCategoryId)
-        : favoriteItems.value,
+        ? (favoriteItems.value ?? []).filter((recipe) => recipe.category.id === nextCategoryId)
+        : (favoriteItems.value ?? []),
     )
     const currentId = recipeDetail.value?.id
     const keepCurrent = Boolean(currentId && nextList.some((recipe) => recipe.id === currentId))
@@ -213,14 +191,10 @@
     () => user.value?.id,
     async (nextUserId, previousUserId) => {
       if (nextUserId === previousUserId) return
-      if (!nextUserId) {
-        recipeDetail.value = null
-        return
-      }
-      recipesStore.clearDetailsCache()
-      await recipesStore.getFavorites(true)
-      if (!recipeDetail.value) return
-      recipeDetail.value = await recipesStore.getRecipeDetail(recipeDetail.value.id, true)
+      if (!nextUserId) return
+      await invalidateUserScopedQueries()
+      await refreshFavorites()
+      if (recipeId.value) await refreshDetail()
     },
   )
 
@@ -232,9 +206,9 @@
   }
 
   watch(
-    () => recipesStore.favorites,
+    favoriteItems,
     async (list, previous) => {
-      if (loading.value || !list) return
+      if (listLoading.value || !list) return
       const currentId = recipeDetail.value?.id
       if (!currentId) return
       if (list.some((recipe) => recipe.id === currentId)) return
@@ -246,7 +220,6 @@
       const next = remaining.find((recipe) => recipe.id === candidate?.id) ?? remaining[0]
 
       if (!next) {
-        recipeDetail.value = null
         selectedSlug.value = undefined
         await goToFavorite(undefined)
         return
@@ -264,7 +237,7 @@
     <template #left-menu>
       <RecipeSortSelect variant="favorites" />
       <div
-        v-if="loading"
+        v-if="listLoading"
         class="flex justify-center items-center py-8"
       >
         <ProgressSpinner
@@ -288,7 +261,7 @@
     </template>
     <template #content>
       <div
-        v-if="loading && !recipeDetail"
+        v-if="detailLoading && !recipeDetail"
         class="flex justify-center items-center h-full"
       >
         <ProgressSpinner

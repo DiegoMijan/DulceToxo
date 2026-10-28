@@ -1,5 +1,7 @@
 <script setup lang="ts">
-  import type { RecipeDetail } from "~/stores/recipes"
+  import { useQuery } from "@pinia/colada"
+  import { categoriesQuery, categoryRecipesQuery, recipeQuery } from "~/queries/options"
+  import { invalidateUserScopedQueries } from "~/utils/userQueryCache"
 
   definePageMeta({
     key: (route) => String(route.params.category),
@@ -20,79 +22,46 @@
     return typeof value === "string" ? value : undefined
   })
 
+  const { refresh: refreshCategories } = useQuery(categoriesQuery)
+  await refreshCategories()
+
   const categoryId = computed(() => categoriesStore.getCategoryIdByUrlName(categoryUrlName.value))
 
+  const { data: recipeList, isPending: listPending, refresh: refreshList } = useQuery(() =>
+    categoryRecipesQuery(categoryId.value ?? ""),
+  )
+  if (categoryId.value) {
+    await refreshList()
+  }
+
   const selectedSlug = ref<string | undefined>(recipeSlugParam.value)
-  const recipeDetail = ref<RecipeDetail | null>(null)
-  const loading = ref(true)
-  const recipeNotFound = ref(false)
-  let recipeLoadGeneration = 0
+
+  const recipeId = computed(() => {
+    const catId = categoryId.value
+    const slug = recipeSlugParam.value
+    if (!catId || !slug) return null
+    return recipesStore.findRecipeIdBySlug(catId, slug)
+  })
+
+  const { data: recipeDetail, isPending: detailPending, refresh: refreshDetail } = useQuery(() =>
+    recipeQuery(recipeId.value ?? ""),
+  )
+  if (recipeId.value) {
+    await refreshDetail()
+  }
+
+  const listLoading = computed(() => listPending.value && !recipeList.value)
+  const detailLoading = computed(() => detailPending.value && !recipeDetail.value)
+  const recipeNotFound = computed(() => {
+    if (!recipeSlugParam.value || !categoryId.value) return false
+    if (listPending.value && !recipeList.value) return false
+    return !recipeId.value
+  })
 
   const recipePath = (slug: string) => localePath(`/${categoryUrlName.value}/${slug}`)
 
-  const loadRecipeBySlug = async (slug: string | undefined) => {
-    const generation = ++recipeLoadGeneration
-    recipeNotFound.value = false
-
-    if (!slug || !categoryId.value) {
-      if (generation === recipeLoadGeneration) {
-        recipeDetail.value = null
-      }
-      return
-    }
-
-    const recipeId = recipesStore.findRecipeIdBySlug(categoryId.value, slug)
-    if (!recipeId) {
-      if (generation === recipeLoadGeneration) {
-        recipeDetail.value = null
-        recipeNotFound.value = true
-      }
-      return
-    }
-
-    if (recipeDetail.value?.id === recipeId) return
-
-    const detail = await recipesStore.getRecipeDetail(recipeId)
-    if (generation !== recipeLoadGeneration) return
-
-    recipeDetail.value = detail
-    if (!detail) {
-      recipeNotFound.value = true
-    }
-  }
-
-  const initializeData = async () => {
-    recipeNotFound.value = false
-
-    await categoriesStore.getCategories()
-
-    const catId = categoryId.value
-    if (!catId) {
-      loading.value = false
-      recipeDetail.value = null
-      return
-    }
-
-    const hasList = recipesStore.recipesByCategory.has(catId)
-    if (!hasList) {
-      loading.value = true
-    }
-
-    await recipesStore.getRecipesByCategory(catId)
-    await loadRecipeBySlug(recipeSlugParam.value)
-
-    loading.value = false
-  }
-
-  await initializeData()
-
   watch(selectedSlug, async (newSlug) => {
-    if (newSlug === recipeSlugParam.value) {
-      await loadRecipeBySlug(newSlug)
-      return
-    }
-
-    await loadRecipeBySlug(newSlug)
+    if (newSlug === recipeSlugParam.value) return
 
     if (!newSlug) {
       const categoryPath = localePath(`/${categoryUrlName.value}`)
@@ -118,7 +87,9 @@
 
   watch(categoryUrlName, async (newUrlName, oldUrlName) => {
     if (newUrlName === oldUrlName) return
-    await initializeData()
+    await refreshCategories()
+    if (categoryId.value) await refreshList()
+    if (recipeId.value) await refreshDetail()
   })
 
   const navigateToLocalizedCategory = async () => {
@@ -162,13 +133,9 @@
     () => user.value?.id,
     async (nextUserId, previousUserId) => {
       if (nextUserId === previousUserId) return
-      if (!nextUserId) {
-        recipeDetail.value = null
-        return
-      }
-      recipesStore.clearDetailsCache()
-      if (!recipeDetail.value) return
-      recipeDetail.value = await recipesStore.getRecipeDetail(recipeDetail.value.id, true)
+      if (!nextUserId) return
+      await invalidateUserScopedQueries()
+      if (recipeId.value) await refreshDetail()
     },
   )
 </script>
@@ -182,7 +149,7 @@
         :category-id="categoryId"
       />
       <div
-        v-if="loading"
+        v-if="listLoading"
         class="flex justify-center items-center py-8"
       >
         <ProgressSpinner
@@ -198,12 +165,14 @@
         <RecipeList
           v-model="selectedSlug"
           :category-id="categoryId"
+          :items="recipeList ?? []"
+          :loading="false"
         />
       </div>
     </template>
     <template #content>
       <div
-        v-if="loading && !recipeDetail"
+        v-if="detailLoading"
         class="flex justify-center items-center h-full"
       >
         <ProgressSpinner

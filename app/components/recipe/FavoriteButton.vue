@@ -7,7 +7,7 @@
 
   const { t } = useI18n()
   const toast = useToast()
-  const recipesStore = useRecipes()
+  const { mutateAsync: toggleFavorite } = useToggleFavorite()
 
   const saving = ref(false)
 
@@ -22,7 +22,7 @@
 
     saving.value = true
     try {
-      await recipesStore.toggleFavorite(recipeId)
+      await toggleFavorite({ recipeId, next: !isFavorite })
     } catch (error) {
       if (isUnauthorizedError(error)) return
       toast.add({

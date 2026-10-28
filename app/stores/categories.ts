@@ -1,66 +1,63 @@
-export const useCategories = defineStore(
-  "categories",
-  () => {
-    const { locale } = useI18n()
+import { useQueryCache } from "@pinia/colada"
+import type { CategoryWithLocales } from "#shared/types/Recipe"
+import { categoriesQuery } from "~/queries/options"
 
-    // Cache is the full category list, not keyed by locale: GET /categories returns
-    // gl+es+en on each item and views pick the field with locale.value. If the backend
-    // ever returns a single locale, key this cache per locale or names/url_name will
-    // stay in the old language after a locale change.
-    const categories = ref<CategoryWithLocales[]>([])
+export const useCategories = defineStore("categories", () => {
+  const { locale } = useI18n()
+  const queryCache = useQueryCache()
 
-    const categoriesByLocale = computed(() => {
-      return categories.value.map((category) => {
-        const localeContent = category.locale[locale.value]
-        return {
-          id: category.id,
-          name: localeContent?.name ?? "",
-          url_name: localeContent?.url_name ?? "",
-        }
-      })
-    })
+  const categories = computed<CategoryWithLocales[]>(
+    () => queryCache.getQueryData(categoriesQuery.key) ?? [],
+  )
 
-    const getCategories = async (force = false) => {
-      if (!force && categories.value.length > 0) return
-      try {
-        const data = await $fetch<CategoryWithLocales[]>("/api/categories")
-        categories.value = data || []
-      } catch {
-        // Keep persisted data on fetch failure
+  const categoriesByLocale = computed(() => {
+    return categories.value.map((category) => {
+      const localeContent = category.locale[locale.value]
+      return {
+        id: category.id,
+        name: localeContent?.name ?? "",
+        url_name: localeContent?.url_name ?? "",
       }
-    }
+    })
+  })
 
-    const findCategoryByUrlName = (urlName: string): CategoryWithLocales | undefined => {
-      return categories.value.find((category) =>
-        Object.values(category.locale).some((entry) => entry?.url_name === urlName),
-      )
+  const getCategories = async (force = false) => {
+    const entry = queryCache.ensure(categoriesQuery)
+    if (force) {
+      queryCache.invalidate(entry)
+      await queryCache.fetch(entry)
+      return
     }
+    await queryCache.refresh(entry)
+  }
 
-    const getCategoryIdByUrlName = (urlName: string): Nullable<string> => {
-      return findCategoryByUrlName(urlName)?.id || null
-    }
+  const findCategoryByUrlName = (urlName: string): CategoryWithLocales | undefined => {
+    return categories.value.find((category) =>
+      Object.values(category.locale).some((entry) => entry?.url_name === urlName),
+    )
+  }
 
-    const getCategoryUrlNameById = (id: Nullable<string>): Nullable<string> => {
-      return (
-        categories.value.find((category) => category.id === id)?.locale[locale.value]?.url_name ||
-        null
-      )
-    }
+  const getCategoryIdByUrlName = (urlName: string): Nullable<string> => {
+    return findCategoryByUrlName(urlName)?.id || null
+  }
 
-    const getCategoryUrlNameByLocalizedName = (name: string): Nullable<string> => {
-      return categoriesByLocale.value.find((category) => category.name === name)?.url_name || null
-    }
+  const getCategoryUrlNameById = (id: Nullable<string>): Nullable<string> => {
+    return (
+      categories.value.find((category) => category.id === id)?.locale[locale.value]?.url_name ||
+      null
+    )
+  }
 
-    return {
-      categories,
-      categoriesByLocale,
-      getCategories,
-      getCategoryIdByUrlName,
-      getCategoryUrlNameById,
-      getCategoryUrlNameByLocalizedName,
-    }
-  },
-  {
-    persist: true,
-  },
-)
+  const getCategoryUrlNameByLocalizedName = (name: string): Nullable<string> => {
+    return categoriesByLocale.value.find((category) => category.name === name)?.url_name || null
+  }
+
+  return {
+    categories,
+    categoriesByLocale,
+    getCategories,
+    getCategoryIdByUrlName,
+    getCategoryUrlNameById,
+    getCategoryUrlNameByLocalizedName,
+  }
+})

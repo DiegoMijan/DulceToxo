@@ -1,4 +1,5 @@
 import { createAuthClient } from "better-auth/vue"
+import { clearUserScopedQueries } from "~/utils/userQueryCache"
 
 const authClient = createAuthClient()
 
@@ -52,14 +53,13 @@ export const useAuth = () => {
   }
 
   const signOut = async () => {
-    const recipesStore = useRecipes()
     const localePath = useLocalePath()
 
-    // Se limpia antes para vaciar la vista al momento, y después por si alguna
-    // petición empezó mientras se cerraba la sesión.
-    recipesStore.clearCache()
+    // User-scoped queries (my_rating, is_favorite, favorites lists) are cleared
+    // instead of a manual details cache. Categories stay: they are not per-user.
+    clearUserScopedQueries()
     await authClient.signOut()
-    recipesStore.clearCache()
+    clearUserScopedQueries()
 
     await navigateTo(localePath("/"))
   }
