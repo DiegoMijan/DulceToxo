@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/vue"
-import { clearUserScopedQueries } from "~/utils/userQueryCache"
+import { clearUserScopedQueries, invalidateUserScopedQueries } from "~/utils/userQueryCache"
 
 const authClient = createAuthClient()
 
@@ -25,6 +25,7 @@ export const useAuth = () => {
     // promesa (el store reactivo de useSession tarda un tick en refrescar), y el
     // middleware "auth" rebotaría a login aunque el inicio de sesión fue correcto.
     await session.value.refetch()
+    await invalidateUserScopedQueries()
     return { user: data?.user }
   }
 
@@ -49,6 +50,7 @@ export const useAuth = () => {
       throw new Error(error.value)
     }
     await session.value.refetch()
+    await invalidateUserScopedQueries()
     return { user: data?.user }
   }
 
