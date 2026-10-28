@@ -30,10 +30,10 @@
     class="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
     data-testid="recipe-header-bar"
   >
-    <div class="flex min-w-0 flex-row flex-wrap items-center gap-x-0 gap-y-2 text-sm text-stone-600 dark:text-stone-300">
+    <div class="flex min-w-0 flex-row flex-wrap items-center gap-x-3 gap-y-2 text-sm text-stone-600 sm:gap-x-0 dark:text-stone-300">
       <span
         v-tooltip.top="prepLabel"
-        class="inline-flex items-center gap-1.5 whitespace-nowrap py-1 pr-3"
+        class="inline-flex items-center gap-1.5 whitespace-nowrap py-1 sm:pr-3"
         :aria-label="prepLabel"
       >
         <NuxtIcon
@@ -44,12 +44,12 @@
         <span>{{ t("recipe.timeMinutes", { time: recipe.prep_time }) }}</span>
       </span>
       <span
-        class="mr-3 h-4 w-px shrink-0 self-center bg-stone-300 dark:bg-stone-600"
+        class="mx-3 hidden h-4 w-px shrink-0 self-center bg-stone-300 sm:inline-block dark:bg-stone-600"
         aria-hidden="true"
       />
       <span
         v-tooltip.top="cookLabel"
-        class="inline-flex items-center gap-1.5 whitespace-nowrap py-1 pr-3"
+        class="inline-flex items-center gap-1.5 whitespace-nowrap py-1 sm:pr-3"
         :aria-label="cookLabel"
       >
         <NuxtIcon
@@ -60,13 +60,13 @@
         <span>{{ t("recipe.timeMinutes", { time: recipe.cook_time }) }}</span>
       </span>
       <span
-        class="mr-3 h-4 w-px shrink-0 self-center bg-stone-300 dark:bg-stone-600"
+        class="mx-3 hidden h-4 w-px shrink-0 self-center bg-stone-300 sm:inline-block dark:bg-stone-600"
         aria-hidden="true"
       />
       <button
         v-tooltip.top="t('recipe.difficultyTooltip')"
         type="button"
-        class="inline-flex cursor-pointer items-center gap-2 whitespace-nowrap border-0 bg-transparent py-1 pr-3 text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-french-lilac-500 [&_.p-rating-option]:cursor-pointer"
+        class="inline-flex cursor-pointer items-center gap-2 whitespace-nowrap border-0 bg-transparent py-1 text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-french-lilac-500 sm:pr-3 [&_.p-rating-option]:cursor-pointer"
         :aria-label="t('recipe.difficultyTooltip')"
         @click="handleOpenDifficulty"
       >
@@ -93,7 +93,7 @@
         </Rating>
       </button>
       <span
-        class="mr-3 h-4 w-px shrink-0 self-center bg-stone-300 dark:bg-stone-600"
+        class="mx-3 hidden h-4 w-px shrink-0 self-center bg-stone-300 sm:inline-block dark:bg-stone-600"
         aria-hidden="true"
       />
       <RecipeRatingSummary
