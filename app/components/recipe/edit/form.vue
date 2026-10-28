@@ -494,7 +494,7 @@
         group: "unsaved-changes",
         header: t("recipe.edit.unsaved.header"),
         message: t("recipe.edit.unsaved.message"),
-        icon: "pi pi-exclamation-triangle",
+        icon: "pi pi-exclamation-triangle text-amber-500!",
         defaultFocus: "reject",
         rejectProps: {
           label: t("recipe.edit.unsaved.stay"),
