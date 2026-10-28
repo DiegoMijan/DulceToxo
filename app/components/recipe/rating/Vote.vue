@@ -75,6 +75,7 @@
         text
         rounded
         size="small"
+        class="disabled:cursor-not-allowed!"
         :disabled="saving"
         :aria-label="t('recipe.rating.remove')"
         :title="t('recipe.rating.remove')"

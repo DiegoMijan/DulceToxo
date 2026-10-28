@@ -41,7 +41,7 @@
       class="relative"
     >
       <button
-        class="flex items-center space-x-2 px-3 py-2 rounded-lg text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/20"
+        class="flex items-center space-x-2 px-3 py-2 rounded-lg text-white hover:bg-white/10 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/20"
         :aria-label="$t('auth.profile.title')"
         data-testid="header-profile-menu"
         @click="isDropdownOpen = !isDropdownOpen"
@@ -84,7 +84,7 @@
             
             <NuxtLink
               to="/dashboard"
-              class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
               @click="closeDropdown"
             >
               <NuxtIcon
@@ -96,7 +96,7 @@
 
             <NuxtLink
               :to="favoritesIndexPath()"
-              class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
               data-testid="header-favorites-link"
               @click="closeDropdown"
             >
@@ -110,7 +110,7 @@
             <NuxtLink
               v-if="isAdmin"
               :to="localePath('/edit')"
-              class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
               @click="closeDropdown"
             >
               <NuxtIcon
@@ -122,7 +122,7 @@
             
             <button
               :disabled="isSigningOut"
-              class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="header-sign-out"
               @click="handleSignOut"
             >

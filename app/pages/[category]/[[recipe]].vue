@@ -12,7 +12,7 @@
 
   const categoriesStore = useCategories()
   const recipesStore = useRecipes()
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
 
   const categoryUrlName = computed(() => String(route.params.category ?? ""))
   const recipeSlugParam = computed(() => {
@@ -193,7 +193,8 @@
       <div
         v-else-if="categoryId"
         data-testid="recipe-sidebar-list"
-        class="mt-8 w-full min-w-0"
+        class="w-full min-w-0"
+        :class="{ 'mt-8': !isAdmin }"
       >
         <RecipeList
           v-model="selectedSlug"
