@@ -138,7 +138,6 @@
             class="h-12 w-12 shrink-0 rounded-lg object-cover"
             width="48"
             height="48"
-            loading="lazy"
             decoding="async"
           >
           <span class="min-w-0 flex-1 truncate text-sm text-stone-800 dark:text-stone-100">
