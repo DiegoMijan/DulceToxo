@@ -74,10 +74,10 @@
 </script>
 
 <template>
-  <div class="w-full h-full pl-10 pr-10 overflow-auto text-center">
+  <div class="w-full h-full lg:pl-10 lg:pr-10 overflow-auto text-center">
     <section class="flex flex-col gap-4 mb-10 text-center">
       <h1
-        class="title text-5xl font-bold flex flex-row gap-2 items-center justify-center"
+        class="title text-3xl sm:text-4xl lg:text-5xl font-bold flex flex-row gap-2 items-center justify-center"
         data-testid="recipe-title"
       >
         {{ localeData?.title }}
@@ -92,7 +92,7 @@
       </div>
       <p
         v-if="localeData?.description"
-        class="text-surface-400 text-lg max-w-2xl mx-auto"
+        class="text-surface-400 text-base lg:text-lg max-w-2xl mx-auto"
       >
         {{ localeData.description }}
       </p>
