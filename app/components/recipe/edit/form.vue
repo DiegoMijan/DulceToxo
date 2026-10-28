@@ -507,6 +507,56 @@
     }
   }
 
+  // Acciones flotantes: el mismo pie del formulario, visible solo cuando el pie no esta en pantalla
+  const footerRef = useTemplateRef<HTMLElement>("footerRef")
+  const footerVisible = useElementVisibility(footerRef)
+  const showFloatingActions = computed(() => !loading.value && !footerVisible.value)
+
+  const submitForm = () => {
+    footerRef.value?.closest("form")?.requestSubmit()
+  }
+
+  type FloatingAction = {
+    key: string
+    label: string
+    icon: string
+    severity?: "secondary" | "danger"
+    disabled: boolean
+    command: () => void
+  }
+
+  const floatingActions = computed<FloatingAction[]>(() => {
+    const noChanges = !formStates.value.isDirty || formLocked.value
+    const actions: FloatingAction[] = [
+      {
+        key: "save",
+        label: t("recipe.edit.save"),
+        icon: saving.value ? "pi pi-spin pi-spinner" : "pi pi-save",
+        disabled: noChanges,
+        command: submitForm,
+      },
+      {
+        key: "cancel",
+        label: t("recipe.edit.cancelChanges"),
+        icon: "pi pi-times",
+        severity: "danger",
+        disabled: noChanges,
+        command: () => void onCancel(),
+      },
+    ]
+    if (!isNewRecipe.value && currentRecipe.value) {
+      actions.push({
+        key: "back",
+        label: t("recipe.edit.back"),
+        icon: "pi pi-arrow-left",
+        severity: "secondary",
+        disabled: formLocked.value,
+        command: onBack,
+      })
+    }
+    return actions
+  })
+
   const onBack = () => {
     if (formLocked.value || !currentRecipe.value) return
     const categoryUrlName = categories.value.find((c) => c.id === currentRecipe.value!.category_id)
@@ -823,7 +873,11 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap justify-end gap-3 px-6 md:px-8 py-5 bg-french-lilac-50 dark:bg-gray-900/40 border-t border-french-lilac-100 dark:border-gray-700">
+      <div
+        ref="footerRef"
+        class="flex flex-wrap justify-end gap-3 px-6 md:px-8 py-5 bg-french-lilac-50 dark:bg-gray-900/40 border-t border-french-lilac-100 dark:border-gray-700"
+        data-testid="recipe-edit-footer"
+      >
         <Button
           v-if="!isNewRecipe && currentRecipe"
           type="button"
@@ -860,5 +914,35 @@
         </Button>
       </div>
     </fieldset>
+    <Transition
+      enter-from-class="opacity-0 translate-y-3"
+      enter-active-class="transition duration-200"
+      leave-to-class="opacity-0 translate-y-3"
+      leave-active-class="transition duration-150"
+    >
+      <SpeedDial
+        v-if="showFloatingActions"
+        :model="floatingActions"
+        direction="up"
+        :transition-delay="40"
+        show-icon="pi pi-cog"
+        :button-props="{ rounded: true, size: 'large', 'aria-label': t('recipe.edit.actions') }"
+        class="fixed! right-6 bottom-6 z-30 lg:right-10 lg:bottom-10"
+        data-testid="recipe-edit-speeddial"
+      >
+        <template #item="{ item, onClick }">
+          <Button
+            v-tooltip.left="item.label"
+            rounded
+            :icon="item.icon"
+            :severity="item.severity"
+            :disabled="item.disabled"
+            :aria-label="item.label"
+            :data-testid="`recipe-edit-speeddial-${item.key}`"
+            @click="onClick"
+          />
+        </template>
+      </SpeedDial>
+    </Transition>
   </Form>
 </template>
