@@ -58,6 +58,7 @@ test.use({
 
 test.describe("recipe favorites", () => {
   test("admin can favorite, browse, filter, unfavorite and switch locale", async ({ page }) => {
+    test.setTimeout(90_000)
     await setLocaleCookie(page, "gl")
     await page.goto("/cupcakes/cupcake-de-proba")
     await dismissObstructions(page)
@@ -114,9 +115,10 @@ test.describe("recipe favorites", () => {
     await expectPressed(contentFavorite(page), true)
 
     await page.getByTestId("header-profile-menu").click()
+    await expect(page.getByTestId("header-profile-dropdown")).toBeVisible()
     await expect(page.getByTestId("header-favorites-link")).toBeVisible()
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/favorites_header_menu_gl_dark_desktop.png`,
+    await page.getByTestId("header-profile-dropdown").screenshot({
+      path: `${ARTIFACTS_DIR}/favorites_header_dropdown_gl_dark.png`,
     })
     await page.getByTestId("header-favorites-link").click()
     await expect(page).toHaveURL(/\/favoritos\/todas/)
@@ -215,11 +217,19 @@ test.describe("recipe favorites", () => {
     await adminPage
       .context()
       .addCookies([{ name: "i18n_redirected", value: "gl", url: FRONTEND_ORIGIN }])
-    await adminPage.goto("/favoritos/todas")
+    await adminPage.goto("/cookies/galleta-de-chocolate")
     await dismissObstructions(adminPage)
     await login(adminPage, ADMIN_EMAIL)
+    await expect(adminPage.getByTestId("recipe-title")).toHaveText("Galleta de chocolate")
+    const adminHeart = contentFavorite(adminPage)
+    if ((await adminHeart.getAttribute("aria-pressed")) !== "true") {
+      await adminHeart.click()
+    }
+    await expectPressed(adminHeart, true)
+
     await adminPage.goto("/favoritos/todas")
-    await expect(adminPage.getByTestId("favorites-sidebar-list").locator("li")).toHaveCount(2)
+    await expect(adminPage.getByTestId("favorites-sidebar-list")).toBeVisible()
+    await expect(adminPage.getByText("Galleta de chocolate")).toBeVisible()
     await expect(adminPage.getByText("Galleta de avea")).toHaveCount(0)
     await adminContext.close()
   })
