@@ -166,7 +166,13 @@ const expectLocaleFields = async (
 
 const tableRows = (page: Page, section: "ingredients" | "instructions") => {
   const index = section === "ingredients" ? 0 : 1
-  return page.locator(".p-datatable").nth(index).locator("tbody tr")
+  return page.getByRole("tabpanel").locator(".p-datatable").nth(index).locator("tbody tr")
+}
+
+const acceptTranslateConfirm = async (page: Page, label: string) => {
+  const popup = page.locator(".p-confirmpopup")
+  await expect(popup).toBeVisible()
+  await popup.getByRole("button", { name: label, exact: true }).click()
 }
 
 const fillCell = async (row: Locator, columnIndex: number, text: string) => {
@@ -207,7 +213,7 @@ test.describe("recipe auto translate", () => {
 
     await page.getByTestId("recipe-translate-button").click()
     await expect(page.getByText(OVERWRITE_MESSAGE.gl)).toBeVisible()
-    await page.getByRole("button", { name: "Traducir", exact: true }).click()
+    await acceptTranslateConfirm(page, "Traducir")
 
     await expect(page.getByTestId("recipe-edit-save")).toBeEnabled()
     expect(requests).toHaveLength(1)
@@ -272,10 +278,9 @@ test.describe("recipe auto translate", () => {
     await page.getByTestId("recipe-translate-button").click()
     await expect(page.getByText(OVERWRITE_MESSAGE.gl)).toBeVisible()
     await page.screenshot({
-      path: `${ARTIFACTS_DIR}/translate_confirm_overwrite_gl_dark.png`,
-      fullPage: true,
+      path: `${ARTIFACTS_DIR}/translate_confirm_popup_gl_dark.png`,
     })
-    await page.getByRole("button", { name: "Traducir", exact: true }).click()
+    await acceptTranslateConfirm(page, "Traducir")
 
     expect(requests).toHaveLength(1)
     expect((requests[0] as { texts: string[] }).texts).toEqual([
@@ -302,6 +307,10 @@ test.describe("recipe auto translate", () => {
     await expect(tableRows(page, "ingredients").nth(0)).toContainText("ES:Para o recheo")
     await expect(tableRows(page, "ingredients").nth(2)).not.toContainText("ES:")
     await expect(tableRows(page, "instructions").nth(1)).not.toContainText("ES:")
+    await page.screenshot({
+      path: `${ARTIFACTS_DIR}/translate_result_es_dark.png`,
+      fullPage: true,
+    })
 
     await expectLocaleFields(page, "en", {
       title: "EN:Bolo de limón",
@@ -309,6 +318,10 @@ test.describe("recipe auto translate", () => {
       description: "EN:Un bolo de proba",
     })
     await expect(page.getByTestId("recipe-edit-save")).toBeEnabled()
+    await page.screenshot({
+      path: `${ARTIFACTS_DIR}/translate_result_en_dark.png`,
+      fullPage: true,
+    })
   })
 
   test("existing recipe with empty es/en translates without confirmation", async ({ page }) => {
@@ -338,19 +351,19 @@ test.describe("recipe auto translate", () => {
 
     const originalTitle = await page.locator('input[name="locales.es.title"]').inputValue()
     await page.getByTestId("recipe-translate-button").click()
-    await page.getByRole("button", { name: "Traducir", exact: true }).click()
+    await acceptTranslateConfirm(page, "Traducir")
     await expect(page.getByText(ERRORS.gl.notConfigured)).toBeVisible()
     await expect(page.locator('input[name="locales.es.title"]')).toHaveValue(originalTitle)
 
     await mockTranslateStatus(page, 429)
     await page.getByTestId("recipe-translate-button").click()
-    await page.getByRole("button", { name: "Traducir", exact: true }).click()
+    await acceptTranslateConfirm(page, "Traducir")
     await expect(page.getByText(ERRORS.gl.quotaExceeded)).toBeVisible()
     await expect(page.locator('input[name="locales.es.title"]')).toHaveValue(originalTitle)
 
     await mockTranslateStatus(page, 502)
     await page.getByTestId("recipe-translate-button").click()
-    await page.getByRole("button", { name: "Traducir", exact: true }).click()
+    await acceptTranslateConfirm(page, "Traducir")
     await expect(page.getByText(ERRORS.gl.failed)).toBeVisible()
     await expect(page.locator('input[name="locales.es.title"]')).toHaveValue(originalTitle)
     await expect(page.getByTestId("recipe-edit-save")).toBeDisabled()

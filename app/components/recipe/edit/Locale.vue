@@ -210,7 +210,7 @@
   >
     <div
       v-if="locale === 'gl'"
-      class="flex justify-end"
+      class="flex justify-start"
     >
       <Button
         type="button"
