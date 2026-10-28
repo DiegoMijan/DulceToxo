@@ -2,6 +2,8 @@
   export type RecipeBookItem = {
     id: string
     title: string
+    // Foto principal que trae la lista; sin ella se usa el detalle si ya se abrio la receta
+    imagePublicId?: string | null
   }
 
   const { items } = defineProps<{
@@ -22,13 +24,14 @@
 
   const selectedCount = computed(() => selectedIds.value.length)
 
-  const thumbnailSrc = (id: string): string => {
-    const detail = recipesStore.recipesCache.get(id)
-    const mainImage = detail ? getMainRecipeImage(detail.images) : undefined
-    if (!mainImage) return "/img/ejemplo_receta.jpg"
-    if (mainImage.public_id.startsWith("/")) return mainImage.public_id
+  const thumbnailSrc = (item: RecipeBookItem): string => {
+    const detail = recipesStore.recipesCache.get(item.id)
+    const publicId =
+      (detail ? getMainRecipeImage(detail.images)?.public_id : undefined) ?? item.imagePublicId
+    if (!publicId) return "/img/ejemplo_receta.jpg"
+    if (publicId.startsWith("/")) return publicId
     return img(
-      mainImage.public_id,
+      publicId,
       { width: 96, height: 96, fit: "cover", quality: 70, format: "jpg" },
       { provider: "cloudinary" },
     )
@@ -130,11 +133,13 @@
             @update:model-value="(value: boolean) => handleToggle(item.id, value)"
           />
           <img
-            :src="thumbnailSrc(item.id)"
+            :src="thumbnailSrc(item)"
             :alt="t('recipeBook.thumbnailAlt', { title: item.title })"
             class="h-12 w-12 shrink-0 rounded-lg object-cover"
             width="48"
             height="48"
+            loading="lazy"
+            decoding="async"
           >
           <span class="min-w-0 flex-1 truncate text-sm text-stone-800 dark:text-stone-100">
             {{ item.title }}
