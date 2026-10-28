@@ -215,15 +215,23 @@ for index, name in enumerate(names):
     await page.getByTestId("recipe-book-close").click()
 
     await page.setViewportSize({ width: 390, height: 844 })
+    await page.waitForFunction(() => window.matchMedia("(max-width: 640px)").matches)
     await page.getByTestId("recipe-book-download-button").click()
-    await expect(page.getByTestId("recipe-book-dialog")).toBeVisible()
+    const mobileDialog = page.getByTestId("recipe-book-dialog")
+    await expect(mobileDialog).toBeVisible()
+    const mobileBox = await mobileDialog.boundingBox()
+    expect(mobileBox).toBeTruthy()
+    expect(mobileBox!.x).toBeLessThan(2)
+    expect(mobileBox!.y).toBeLessThan(2)
+    expect(mobileBox!.width).toBeGreaterThan(380)
+    expect(mobileBox!.height).toBeGreaterThan(800)
     await page.screenshot({
-      path: `${ARTIFACTS_DIR}/recetario_modal_movil_390_gl_oscuro.png`,
+      path: `${ARTIFACTS_DIR}/recetario_modal_movil_fullscreen_gl.png`,
     })
     await page.keyboard.press("Escape")
 
     await page.setViewportSize({ width: 1440, height: 900 })
-    await page.getByLabel("Cambiar tema de la página").click()
+    await page.locator(".theme-toggle").click()
     await page.getByTestId("recipe-book-download-button").click()
     await expect(page.getByTestId("recipe-book-dialog")).toBeVisible()
     await page.screenshot({

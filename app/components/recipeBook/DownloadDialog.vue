@@ -47,17 +47,31 @@
     return {
       root: {
         class: mobile
-          ? "recipe-book-dialog !m-0 h-screen !max-h-screen w-screen !max-w-none overflow-hidden rounded-none border-0 bg-french-lilac-50 shadow-none dark:bg-french-lilac-950"
+          ? "recipe-book-dialog !fixed !inset-0 !m-0 !h-dvh !max-h-dvh !w-screen !max-w-none overflow-hidden !rounded-none !border-0 bg-french-lilac-50 !shadow-none dark:bg-french-lilac-950"
           : "recipe-book-dialog w-full max-w-xl overflow-hidden rounded-2xl border border-french-lilac-200 bg-french-lilac-50 shadow-xl dark:border-french-lilac-800 dark:bg-french-lilac-950",
         style: mobile
-          ? { width: "100vw", height: "100vh", maxWidth: "100vw", margin: 0, top: 0 }
+          ? {
+              width: "100vw",
+              height: "100dvh",
+              maxWidth: "100vw",
+              maxHeight: "100dvh",
+              margin: 0,
+              top: 0,
+              left: 0,
+              borderRadius: 0,
+            }
           : undefined,
       },
       content: {
         class: mobile ? "h-full p-0 bg-transparent" : "p-0 bg-transparent",
       },
       mask: {
-        class: "bg-french-lilac-950/40 backdrop-blur-sm dark:bg-black/60",
+        class: mobile
+          ? "!items-stretch !justify-stretch !p-0 bg-french-lilac-950/40 backdrop-blur-sm dark:bg-black/60"
+          : "bg-french-lilac-950/40 backdrop-blur-sm dark:bg-black/60",
+        style: mobile
+          ? { alignItems: "stretch", justifyContent: "stretch", padding: 0 }
+          : undefined,
       },
     }
   })
@@ -166,6 +180,7 @@
     :closable="false"
     :draggable="false"
     :maximized="isMobile"
+    :breakpoints="{ '640px': '100vw' }"
     :pt="dialogPt"
     aria-labelledby="recipe-book-dialog-title"
     :aria-busy="generating"
