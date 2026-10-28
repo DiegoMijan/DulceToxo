@@ -196,7 +196,7 @@ export default defineNuxtConfig({
         "Checkbox", "Column", "ConfirmDialog", "ConfirmPopup", "DataTable", "DatePicker", "Dialog",
         "Divider", "Drawer", "FileUpload", "Form", "FormField", "Gallery", "GalleryContent",
         "GalleryFullScreen", "GalleryHeader", "GalleryItem", "InputNumber", "InputText", "Listbox",
-        "Menu", "Message", "Password", "ProgressSpinner", "Rating", "Select", "Skeleton", "Step",
+        "Menu", "Message", "Password", "ProgressBar", "ProgressSpinner", "Rating", "Select", "Skeleton", "Step",
         "StepList", "StepPanel", "StepPanels", "Stepper", "Textarea", "Toast",
       ],
     },

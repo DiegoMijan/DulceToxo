@@ -57,6 +57,14 @@
 
   const hasAnyFavorites = computed(() => favoriteItems.value.length > 0)
 
+  const bookItems = computed(() => {
+    const localeKey = locale.value as LocaleKey
+    return sortedFavorites.value.map((item) => ({
+      id: item.id,
+      title: item.locale[localeKey]?.title || "",
+    }))
+  })
+
   const recipePath = (slug: string) => favoritesPath(categoryUrlName.value, slug)
 
   const slugForFavorite = (recipe: FavoriteListItem): string =>
@@ -263,6 +271,12 @@
   <NuxtLayout name="sidebar">
     <template #left-menu>
       <RecipeSortSelect variant="favorites" />
+      <RecipeBookDownloadButton
+        :items="bookItems"
+        :dialog-title="t('recipeBook.titleFavorites')"
+        :collection-name="t('recipeBook.favoritesCollection')"
+        :file-stem="t('recipeBook.favoritesFileStem')"
+      />
       <div
         v-if="loading"
         class="flex justify-center items-center py-8"
@@ -275,7 +289,7 @@
       <div
         v-else-if="hasAnyFavorites"
         data-testid="favorites-sidebar-list"
-        class="mt-8 w-full min-w-0"
+        class="w-full min-w-0"
       >
         <RecipeList
           v-model="selectedSlug"

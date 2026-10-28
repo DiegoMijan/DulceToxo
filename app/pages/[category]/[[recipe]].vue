@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import type { LocaleKey } from "#shared/types/Recipe"
   import type { RecipeDetail } from "~/stores/recipes"
 
   definePageMeta({
@@ -13,6 +14,7 @@
   const categoriesStore = useCategories()
   const recipesStore = useRecipes()
   const { user, isAdmin } = useAuth()
+  const { sortRecipeList } = useRecipeSort()
 
   const categoryUrlName = computed(() => String(route.params.category ?? ""))
   const recipeSlugParam = computed(() => {
@@ -158,6 +160,23 @@
     await navigateToLocalizedCategory()
   })
 
+  const bookItems = computed(() => {
+    if (!categoryId.value) return []
+    const localeKey = locale.value as LocaleKey
+    return sortRecipeList(recipesStore.recipesByCategory.get(categoryId.value) ?? []).map(
+      (item) => ({
+        id: item.id,
+        title: item.locale[localeKey]?.title || "",
+      }),
+    )
+  })
+
+  const collectionName = computed(
+    () =>
+      categoriesStore.categoriesByLocale.find((category) => category.id === categoryId.value)
+        ?.name ?? "",
+  )
+
   watch(
     () => user.value?.id,
     async (nextUserId, previousUserId) => {
@@ -177,6 +196,12 @@
   <NuxtLayout name="sidebar">
     <template #left-menu>
       <RecipeSortSelect />
+      <RecipeBookDownloadButton
+        :items="bookItems"
+        :dialog-title="t('recipeBook.titleCategory', { name: collectionName })"
+        :collection-name="collectionName"
+        :file-stem="collectionName"
+      />
       <RecipeNewButton
         v-if="categoryId"
         :category-id="categoryId"
@@ -194,7 +219,7 @@
         v-else-if="categoryId"
         data-testid="recipe-sidebar-list"
         class="w-full min-w-0"
-        :class="{ 'mt-8': !isAdmin }"
+        :class="{ 'mt-4': !isAdmin }"
       >
         <RecipeList
           v-model="selectedSlug"

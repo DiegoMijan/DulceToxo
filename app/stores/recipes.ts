@@ -15,6 +15,12 @@ export type FavoriteStatus = components["schemas"]["FavoriteStatus"]
 export type RecipeSearchItem = components["schemas"]["RecipeSearchItem"]
 
 const LOCALE_KEYS: LocaleKey[] = ["es", "en", "gl"]
+const RECIPE_BATCH_SIZE = 60
+
+export type LoadRecipesForPdfOptions = {
+  signal?: AbortSignal
+  onProgress?: (completed: number, total: number) => void
+}
 
 export const useRecipes = defineStore("recipes", () => {
   const { locale } = useI18n()
@@ -131,6 +137,72 @@ export const useRecipes = defineStore("recipes", () => {
       } finally {
         loadingDetail.value = false
       }
+    })
+  }
+
+  const fetchRecipeBatch = async (
+    ids: string[],
+    generation: number,
+    signal?: AbortSignal,
+  ): Promise<Map<string, RecipeDetail>> => {
+    const data = await $fetch<RecipeDetail[]>("/api/recipes/batch", {
+      method: "POST",
+      body: { ids },
+      signal,
+    })
+    const fetched = new Map<string, RecipeDetail>()
+    for (const detail of data ?? []) {
+      rememberDetail(generation, detail)
+      fetched.set(detail.id, detail)
+    }
+    return fetched
+  }
+
+  const loadRecipesForPdf = async (
+    ids: string[],
+    options: LoadRecipesForPdfOptions = {},
+  ): Promise<RecipeDetail[]> => {
+    const uniqueIds = uniqueIdsPreserveOrder(ids)
+    if (uniqueIds.length === 0) return []
+    throwIfAborted(options.signal)
+
+    const cached = new Map<string, RecipeDetail>()
+    const missing: string[] = []
+    for (const id of uniqueIds) {
+      const hit = recipesCache.value.get(id)
+      if (hit) cached.set(id, hit)
+      else missing.push(id)
+    }
+
+    let processed = uniqueIds.length - missing.length
+    options.onProgress?.(processed, uniqueIds.length)
+
+    const fetched = new Map<string, RecipeDetail>()
+    if (missing.length === 0) {
+      return uniqueIds.flatMap((id) => {
+        const detail = cached.get(id)
+        return detail ? [detail] : []
+      })
+    }
+
+    const generation = cacheGeneration
+    try {
+      for (const chunk of chunkIds(missing, RECIPE_BATCH_SIZE)) {
+        throwIfAborted(options.signal)
+        const batch = await fetchRecipeBatch(chunk, generation, options.signal)
+        for (const [id, detail] of batch) fetched.set(id, detail)
+        processed += chunk.length
+        options.onProgress?.(Math.min(processed, uniqueIds.length), uniqueIds.length)
+      }
+    } catch (error) {
+      if (isAbortError(error)) throw error
+      if (await handleUnauthorized(error)) return []
+      throw error
+    }
+
+    return uniqueIds.flatMap((id) => {
+      const detail = cached.get(id) ?? fetched.get(id)
+      return detail ? [detail] : []
     })
   }
 
@@ -468,6 +540,7 @@ export const useRecipes = defineStore("recipes", () => {
     loadingFavorites,
     getRecipesByCategory,
     getRecipeDetail,
+    loadRecipesForPdf,
     getFavorites,
     searchRecipes,
     getRecipesListByLocale,
