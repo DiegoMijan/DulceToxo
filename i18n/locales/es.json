@@ -213,6 +213,9 @@
         "button": "Traducir a castellano e inglés",
         "confirmOverwrite": "Se sobrescribirán las traducciones actuales",
         "confirm": "Traducir",
+        "success": "Traducción completada. Revisa las pestañas de castellano e inglés antes de guardar",
+        "untranslated": "Ningún texto quedó sin traducir | 1 texto quedó sin traducir | {n} textos quedaron sin traducir",
+        "pendingReview": "Traducción pendiente de revisar",
         "error": {
           "notConfigured": "La traducción automática no está configurada",
           "quotaExceeded": "Se ha agotado la cuota de traducción de este mes",
