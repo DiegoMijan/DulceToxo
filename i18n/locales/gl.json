@@ -205,8 +205,8 @@
     },
     "delete": {
       "button": "Eliminar receita",
-      "confirmHeader": "Eliminar receita",
-      "confirmMessage": "Seguro que queres eliminar \"{title}\"?",
+      "confirmHeader": "Coidado!",
+      "confirmMessage": "Seguro que queres eliminar \"{title}\"? Esta acción non se pode desfacer.",
       "success": "Receita eliminada correctamente",
       "error": "Non se puido eliminar a receita"
     },
@@ -268,7 +268,13 @@
         "id": "ID (para mostrar na URL)",
         "slug": "Slug (URL)"
       },
-      "actions": "Accións"
+      "actions": "Accións",
+      "unsaved": {
+        "header": "Cambios sen gardar",
+        "message": "Tes cambios sen gardar nesta receita. Se saes agora, perderanse.",
+        "stay": "Seguir editando",
+        "leave": "Saír sen gardar"
+      }
     },
     "prepTime": "Tempo de preparación: {time} min",
     "cookTime": "Tempo de cocción: {time} min",

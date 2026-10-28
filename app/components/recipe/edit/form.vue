@@ -479,8 +479,62 @@
     if (currentLocale) clearPendingReview(currentLocale)
   })
 
+  // Aviso de cambios sin guardar al salir del editor: otra pagina, Volver, atras del navegador
+  // o elegir otra receta en el selector. Cambiar de idioma o guardar una receta nueva
+  // (/edit -> /edit/:id) no lo muestra: la pagina no se remonta y no se pierde nada.
+  const confirm = useConfirm()
+  const router = useRouter()
+  const routeBaseName = useRouteBaseName()
+
+  const hasUnsavedChanges = () => Boolean(formStates.value.isDirty) && !saving.value
+
+  const confirmDiscardChanges = () =>
+    new Promise<boolean>((resolve) => {
+      confirm.require({
+        group: "unsaved-changes",
+        header: t("recipe.edit.unsaved.header"),
+        message: t("recipe.edit.unsaved.message"),
+        icon: "pi pi-exclamation-triangle text-amber-500!",
+        defaultFocus: "reject",
+        rejectProps: {
+          label: t("recipe.edit.unsaved.stay"),
+          severity: "secondary",
+          outlined: true,
+        },
+        acceptProps: {
+          label: t("recipe.edit.unsaved.leave"),
+          severity: "danger",
+        },
+        accept: () => resolve(true),
+        reject: () => resolve(false),
+        onHide: () => resolve(false),
+      })
+    })
+
+  // Si hay cambios, pregunta; al salir se descartan las fotos subidas en esta sesion
+  const confirmLeave = async (): Promise<boolean> => {
+    if (!hasUnsavedChanges()) return true
+    const discard = await confirmDiscardChanges()
+    if (discard) await uploadRef.value?.discardSessionUploads()
+    return discard
+  }
+
+  const removeLeaveGuard = router.beforeEach((to, from) => {
+    if (routeBaseName(to) === routeBaseName(from)) return true
+    return confirmLeave()
+  })
+  onBeforeUnmount(removeLeaveGuard)
+
+  // Cerrar o recargar la pestana: aviso nativo del navegador (su texto no se puede cambiar)
+  useEventListener(window, "beforeunload", (event: BeforeUnloadEvent) => {
+    if (!hasUnsavedChanges()) return
+    event.preventDefault()
+    event.returnValue = ""
+  })
+
   const handleRecipeChange = async (event: SelectChangeEvent) => {
     if (formLocked.value) return
+    if (!(await confirmLeave())) return
 
     await uploadRef.value?.discardSessionUploads()
     const newId = event.value as string
@@ -914,6 +968,7 @@
         </Button>
       </div>
     </fieldset>
+    <ConfirmDialog group="unsaved-changes" />
     <Transition
       enter-from-class="opacity-0 translate-y-3"
       enter-active-class="transition duration-200"
