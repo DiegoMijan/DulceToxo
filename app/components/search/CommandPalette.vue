@@ -13,6 +13,7 @@
     moveActive,
     setActiveItem,
     reset,
+    clearRecent,
   } = useRecipeSearch()
 
   const { t } = useI18n()
@@ -62,6 +63,11 @@
   }
 
   const handleKeyDown = (event: KeyboardEvent) => {
+    const target = event.target
+    if (event.key === "Enter" && target instanceof HTMLElement && target.closest("button")) {
+      return
+    }
+
     if (event.key === "ArrowDown") {
       event.preventDefault()
       moveActive(1)
@@ -76,6 +82,11 @@
       event.preventDefault()
       void handleSelectActive()
     }
+  }
+
+  const handleClearRecent = () => {
+    clearRecent()
+    searchInput.value?.focus()
   }
 
   const handleShortcut = (event: KeyboardEvent) => {
@@ -188,10 +199,23 @@
           role="group"
           class="mb-2"
           :aria-label="group.label"
+          :data-testid="`command-palette-group-${group.id}`"
         >
-          <p class="px-3 py-2 text-xs font-semibold tracking-wide text-french-lilac-500 uppercase dark:text-french-lilac-300">
-            {{ group.label }}
-          </p>
+          <div class="flex items-center justify-between gap-2 px-3 py-2">
+            <p class="text-xs font-semibold tracking-wide text-french-lilac-500 uppercase dark:text-french-lilac-300">
+              {{ group.label }}
+            </p>
+            <button
+              v-if="group.id === 'recent'"
+              type="button"
+              class="inline-flex cursor-pointer items-center rounded-md px-2 py-0.5 text-xs font-medium text-french-lilac-600 transition-colors hover:bg-french-lilac-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-french-lilac-500 dark:text-french-lilac-200 dark:hover:bg-french-lilac-800"
+              :aria-label="t('search.clearRecentAria')"
+              data-testid="command-palette-clear-recent"
+              @click.stop="handleClearRecent"
+            >
+              {{ t('search.clearRecent') }}
+            </button>
+          </div>
           <SearchPaletteRow
             v-for="item in group.items"
             :key="item.optionId"

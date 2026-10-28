@@ -1,8 +1,9 @@
 import type { LocaleKey } from "#shared/types/Recipe"
 import type { CategoryIcon } from "~/utils/categoryIcons"
 import type { FavoriteListItem, RecipeSearchItem } from "~/stores/recipes"
+import type { RecentRecipe } from "~/utils/recentRecipes"
 
-export type PaletteItemKind = "category" | "favorite" | "recipe" | "ingredient"
+export type PaletteItemKind = "category" | "favorite" | "recent" | "recipe" | "ingredient"
 
 export type PaletteItem = {
   id: string
@@ -34,6 +35,7 @@ export const useRecipeSearch = () => {
   const localePath = useLocalePath()
   const categoriesStore = useCategories()
   const recipesStore = useRecipes()
+  const recentRecipes = useRecentRecipes()
   const { categoriesByLocale } = storeToRefs(categoriesStore)
   const { favorites } = storeToRefs(recipesStore)
 
@@ -59,6 +61,21 @@ export const useRecipeSearch = () => {
 
   const recipePath = (urlName: string | undefined, slug: string): string =>
     localePath(`/${urlName || ""}/${slug}`)
+
+  const toRecentItem = (recipe: RecentRecipe): PaletteItem => {
+    const slug = recipe.slug[localeKey.value] || recipe.slug.gl || recipe.id
+    const urlName = recipe.category_url_name[localeKey.value] || recipe.category_url_name.gl
+    return {
+      id: recipe.id,
+      kind: "recent",
+      optionId: `palette-option-recent-${recipe.id}`,
+      label: recipe.title[localeKey.value] || recipe.title.gl || slug,
+      categoryLabel: categoryNameById.value.get(recipe.category_id),
+      to: recipePath(urlName, slug),
+      isFavorite: (favorites.value ?? []).some((favorite) => favorite.id === recipe.id),
+      icon: "material-symbols:schedule",
+    }
+  }
 
   const toFavoriteItem = (recipe: FavoriteListItem): PaletteItem => {
     const slug = recipe.locale[localeKey.value]?.slug || recipe.id
@@ -111,13 +128,17 @@ export const useRecipeSearch = () => {
     (favorites.value ?? []).slice(0, MAX_FAVORITES).map((recipe) => toFavoriteItem(recipe)),
   )
 
+  const recentItems = computed<PaletteItem[]>(() =>
+    recentRecipes.items.value.map((recipe) => toRecentItem(recipe)),
+  )
+
   const idleGroups = computed<PaletteGroup[]>(() => {
     const groups: PaletteGroup[] = []
-    if (categoryItems.value.length > 0) {
+    if (recentItems.value.length > 0) {
       groups.push({
-        id: "categories",
-        label: t("search.categories"),
-        items: categoryItems.value,
+        id: "recent",
+        label: t("search.recent"),
+        items: recentItems.value,
       })
     }
     if (favoriteItems.value.length > 0) {
@@ -125,6 +146,13 @@ export const useRecipeSearch = () => {
         id: "favorites",
         label: t("search.favorites"),
         items: favoriteItems.value,
+      })
+    }
+    if (categoryItems.value.length > 0) {
+      groups.push({
+        id: "categories",
+        label: t("search.categories"),
+        items: categoryItems.value,
       })
     }
     return groups
@@ -165,6 +193,7 @@ export const useRecipeSearch = () => {
   }
 
   const loadIdleData = async () => {
+    recentRecipes.reload()
     await Promise.all([categoriesStore.getCategories(), recipesStore.getFavorites()])
   }
 
@@ -243,5 +272,6 @@ export const useRecipeSearch = () => {
     moveActive,
     setActiveItem,
     reset,
+    clearRecent: recentRecipes.clear,
   }
 }

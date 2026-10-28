@@ -83,6 +83,7 @@ test.describe("recipe command palette", () => {
 
     await page.goto("/")
     await openPalette(page)
+    await expect(page.getByTestId("command-palette-group-recent")).toHaveCount(0)
     await expect(page.getByText("Categorías", { exact: true })).toBeVisible()
     await expect(page.getByText("Favoritos", { exact: true })).toBeVisible()
     await expect(
