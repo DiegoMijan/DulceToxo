@@ -15,6 +15,7 @@
   const recipesStore = useRecipes()
   const { user, isAdmin } = useAuth()
   const { sortRecipeList } = useRecipeSort()
+  const { findIdBySlug, removeById, removeBySlug } = useRecentRecipes()
 
   const categoryUrlName = computed(() => String(route.params.category ?? ""))
   const recipeSlugParam = computed(() => {
@@ -43,23 +44,28 @@
       return
     }
 
-    const recipeId = recipesStore.findRecipeIdBySlug(categoryId.value, slug)
+    const listedId = recipesStore.findRecipeIdBySlug(categoryId.value, slug)
+    const recentId = findIdBySlug(slug)
+    const recipeId = listedId ?? recentId
     if (!recipeId) {
       if (generation === recipeLoadGeneration) {
         recipeDetail.value = null
         recipeNotFound.value = true
+        removeBySlug(slug)
       }
       return
     }
 
-    if (recipeDetail.value?.id === recipeId) return
+    const forceRefresh = Boolean(recentId)
+    if (recipeDetail.value?.id === recipeId && !forceRefresh) return
 
-    const detail = await recipesStore.getRecipeDetail(recipeId)
+    const detail = await recipesStore.getRecipeDetail(recipeId, forceRefresh)
     if (generation !== recipeLoadGeneration) return
 
     recipeDetail.value = detail
     if (!detail) {
       recipeNotFound.value = true
+      removeById(recipeId)
     }
   }
 

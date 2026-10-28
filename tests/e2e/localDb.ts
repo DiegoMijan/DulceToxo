@@ -276,3 +276,140 @@ export const seedSearchFixtures = (dbPath: string, adminEmail: string) => {
     `,
   )
 }
+
+export const RECENT_E2E_PREFIX = "recent-e2e-"
+
+export const RECENT_E2E_RECIPES = [
+  {
+    id: `${RECENT_E2E_PREFIX}1`,
+    categoryId: "cupcakes",
+    title: { gl: "Recente un", es: "Reciente uno", en: "Recent one" },
+    slug: { gl: "recente-un", es: "reciente-uno", en: "recent-one" },
+    categoryPath: { gl: "cupcakes", es: "cupcakes", en: "cupcakes" },
+    categoryName: { gl: "Cupcakes", es: "Cupcakes", en: "Cupcakes" },
+  },
+  {
+    id: `${RECENT_E2E_PREFIX}2`,
+    categoryId: "cupcakes",
+    title: { gl: "Recente dous", es: "Reciente dos", en: "Recent two" },
+    slug: { gl: "recente-dous", es: "reciente-dos", en: "recent-two" },
+    categoryPath: { gl: "cupcakes", es: "cupcakes", en: "cupcakes" },
+    categoryName: { gl: "Cupcakes", es: "Cupcakes", en: "Cupcakes" },
+  },
+  {
+    id: `${RECENT_E2E_PREFIX}3`,
+    categoryId: "cupcakes",
+    title: { gl: "Recente tres", es: "Reciente tres", en: "Recent three" },
+    slug: { gl: "recente-tres", es: "reciente-tres", en: "recent-three" },
+    categoryPath: { gl: "cupcakes", es: "cupcakes", en: "cupcakes" },
+    categoryName: { gl: "Cupcakes", es: "Cupcakes", en: "Cupcakes" },
+  },
+  {
+    id: `${RECENT_E2E_PREFIX}4`,
+    categoryId: "cookies",
+    title: { gl: "Recente catro", es: "Reciente cuatro", en: "Recent four" },
+    slug: { gl: "recente-catro", es: "reciente-cuatro", en: "recent-four" },
+    categoryPath: { gl: "cookies", es: "galletas", en: "cookies" },
+    categoryName: { gl: "Cookies", es: "Galletas", en: "Cookies" },
+  },
+  {
+    id: `${RECENT_E2E_PREFIX}5`,
+    categoryId: "cheesecakes",
+    title: { gl: "Recente cinco", es: "Reciente cinco", en: "Recent five" },
+    slug: { gl: "recente-cinco", es: "reciente-cinco", en: "recent-five" },
+    categoryPath: { gl: "tortas-de-queixo", es: "tartas-de-queso", en: "cheesecakes" },
+    categoryName: { gl: "Tortas de queixo", es: "Tartas de queso", en: "Cheesecakes" },
+  },
+  {
+    id: `${RECENT_E2E_PREFIX}6`,
+    categoryId: "sponge-cakes",
+    title: { gl: "Recente seis", es: "Reciente seis", en: "Recent six" },
+    slug: { gl: "recente-seis", es: "reciente-seis", en: "recent-six" },
+    categoryPath: { gl: "bolos", es: "bizcochos", en: "sponge-cakes" },
+    categoryName: { gl: "Bolos", es: "Bizcochos", en: "Sponge Cakes" },
+  },
+  {
+    id: `${RECENT_E2E_PREFIX}7`,
+    categoryId: "brownies",
+    title: { gl: "Recente sete", es: "Reciente siete", en: "Recent seven" },
+    slug: { gl: "recente-sete", es: "reciente-siete", en: "recent-seven" },
+    categoryPath: { gl: "brownies", es: "brownies", en: "brownies" },
+    categoryName: { gl: "Brownies", es: "Brownies", en: "Brownies" },
+  },
+] as const
+
+export const RECENT_E2E_GONE = {
+  id: `${RECENT_E2E_PREFIX}gone`,
+  categoryId: "cold-cakes",
+  title: { gl: "Recente desaparecida", es: "Reciente desaparecida", en: "Recent missing" },
+  slug: { gl: "recente-desaparecida", es: "reciente-desaparecida", en: "recent-missing" },
+  categoryPath: { gl: "tortas-frias", es: "tartas-frias", en: "cold-cakes" },
+  categoryName: { gl: "Tortas frías", es: "Tartas frías", en: "Cold Cakes" },
+} as const
+
+export const deleteRecentFixtures = (dbPath: string) => {
+  runSql(
+    dbPath,
+    `
+    DELETE FROM recipe_favorites WHERE recipe_id LIKE '${RECENT_E2E_PREFIX}%';
+    DELETE FROM recipe_ratings WHERE recipe_id LIKE '${RECENT_E2E_PREFIX}%';
+    DELETE FROM recipe_ingredients WHERE recipe_id LIKE '${RECENT_E2E_PREFIX}%';
+    DELETE FROM recipe_steps WHERE recipe_id LIKE '${RECENT_E2E_PREFIX}%';
+    DELETE FROM recipe_images WHERE recipe_id LIKE '${RECENT_E2E_PREFIX}%';
+    DELETE FROM recipe_locales WHERE recipe_id LIKE '${RECENT_E2E_PREFIX}%';
+    DELETE FROM recipes WHERE id LIKE '${RECENT_E2E_PREFIX}%';
+    `,
+  )
+}
+
+export const deleteRecipeById = (dbPath: string, recipeId: string) => {
+  const id = recipeId.replaceAll("'", "''")
+  runSql(
+    dbPath,
+    `
+    DELETE FROM recipe_favorites WHERE recipe_id = '${id}';
+    DELETE FROM recipe_ratings WHERE recipe_id = '${id}';
+    DELETE FROM recipe_ingredients WHERE recipe_id = '${id}';
+    DELETE FROM recipe_steps WHERE recipe_id = '${id}';
+    DELETE FROM recipe_images WHERE recipe_id = '${id}';
+    DELETE FROM recipe_locales WHERE recipe_id = '${id}';
+    DELETE FROM recipes WHERE id = '${id}';
+    `,
+  )
+}
+
+export const seedRecentFixtures = (dbPath: string, adminEmail: string) => {
+  deleteRecentFixtures(dbPath)
+  const adminId = getUserIdByEmail(dbPath, adminEmail)
+  const now = Date.now()
+  const recipes = [...RECENT_E2E_RECIPES, RECENT_E2E_GONE]
+
+  const recipeRows = recipes
+    .map(
+      (recipe, index) =>
+        `('${recipe.id}', '${recipe.categoryId}', 2, 10, 20, '${adminId}', ${now + index}, ${now + index})`,
+    )
+    .join(",\n      ")
+
+  const localeRows = recipes
+    .flatMap((recipe) =>
+      (["gl", "es", "en"] as const).map(
+        (locale) =>
+          `('${recipe.id}-${locale}', '${recipe.id}', '${locale}', '${recipe.slug[locale]}', '${recipe.title[locale]}', '${recipe.title[locale]}')`,
+      ),
+    )
+    .join(",\n      ")
+
+  runSql(
+    dbPath,
+    `
+    INSERT INTO recipes (id, category_id, difficulty, prep_time, cook_time, author_id, created_at, updated_at)
+    VALUES
+      ${recipeRows};
+
+    INSERT INTO recipe_locales (id, recipe_id, locale, slug, title, description)
+    VALUES
+      ${localeRows};
+    `,
+  )
+}

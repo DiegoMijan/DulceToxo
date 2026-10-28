@@ -42,7 +42,7 @@
     @mouseenter="handleMouseEnter"
   >
     <span
-      v-if="item.kind === 'category'"
+      v-if="item.kind === 'category' || item.kind === 'recent'"
       class="flex h-8 w-8 shrink-0 items-center justify-center text-xl"
       aria-hidden="true"
     >
@@ -58,6 +58,7 @@
         v-else-if="resolvedIcon"
         :name="resolvedIcon"
         class="text-2xl"
+        :class="item.kind === 'recent' ? 'text-french-lilac-600 dark:text-french-lilac-300' : undefined"
       />
     </span>
 
