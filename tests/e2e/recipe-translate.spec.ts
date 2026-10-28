@@ -590,6 +590,9 @@ test.describe("recipe auto translate", () => {
     await expect(pendingReviewMark(page, "es")).toBeVisible()
     await expect(pendingReviewMark(page, "en")).toBeVisible()
     await expect(page.getByText(SUCCESS.gl)).toBeVisible()
+    await page.locator(".p-toast-message-success").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_success_toast_closeup_gl_light.png`,
+    })
     await page.screenshot({
       path: `${ARTIFACTS_DIR}/translate_pending_marks_gl_light.png`,
       fullPage: true,
