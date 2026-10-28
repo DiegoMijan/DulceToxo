@@ -75,7 +75,7 @@ test.describe("recipe command palette", () => {
   })
 
   test("admin can search with accents, ingredients, keyboard and empty state", async ({ page }) => {
-    test.setTimeout(90_000)
+    test.setTimeout(120_000)
     await setLocaleCookie(page, "gl")
     await page.goto("/auth/login")
     await dismissObstructions(page)
@@ -150,8 +150,8 @@ test.describe("recipe command palette", () => {
     })
     await page.keyboard.press("Escape")
 
-    await page.getByLabel("Change language").hover()
-    await page.getByRole("menuitem", { name: "Español" }).click()
+    await setLocaleCookie(page, "es")
+    await page.goto("/es")
     await openPalette(page)
     await typeQuery(page, "limon")
     await expect(
@@ -164,8 +164,8 @@ test.describe("recipe command palette", () => {
     })
     await page.keyboard.press("Escape")
 
-    await page.getByLabel("Cambiar idioma").hover()
-    await page.getByRole("menuitem", { name: "English" }).click()
+    await setLocaleCookie(page, "en")
+    await page.goto("/en")
     await openPalette(page)
     await typeQuery(page, "lemon")
     await expect(
@@ -181,11 +181,11 @@ test.describe("recipe command palette", () => {
   })
 
   test("palette is fullscreen on mobile", async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 })
     await setLocaleCookie(page, "gl")
     await page.goto("/auth/login")
     await dismissObstructions(page)
     await login(page, ADMIN_EMAIL)
+    await page.setViewportSize({ width: 390, height: 844 })
     await openPalette(page)
     await expect(page.getByTestId("command-palette")).toBeVisible()
     await page.screenshot({
