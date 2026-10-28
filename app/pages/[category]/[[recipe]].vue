@@ -3,7 +3,9 @@
   import type { RecipeDetail } from "~/stores/recipes"
 
   definePageMeta({
-    key: (route) => String(route.params.category),
+    // Clave fija: ni cambiar de receta, ni de categoria, ni de idioma (que traduce la categoria
+    // en la URL) remonta la pagina; los watch de la ruta recargan los datos.
+    key: () => "recipes",
     middleware: "auth",
   })
 
@@ -33,6 +35,26 @@
   const recipeOffline = ref(false)
   const online = useOnline()
   let recipeLoadGeneration = 0
+
+  // URL en cada idioma (categoria y receta traducidas): al cambiar de idioma i18n navega
+  // directamente a la URL traducida, sin pasar por la del idioma anterior ni remontar la pagina.
+  const setI18nParams = useSetI18nParams()
+  watchEffect(() => {
+    const category = categoriesStore.categories.find((item) => item.id === categoryId.value)
+    if (!category) return
+    const detail = selectedSlug.value ? recipeDetail.value : null
+    setI18nParams(
+      Object.fromEntries(
+        LOCALE_KEYS.map((code) => [
+          code,
+          {
+            category: category.locale[code]?.url_name || categoryUrlName.value,
+            ...(detail ? { recipe: detail.locales[code]?.slug || selectedSlug.value } : {}),
+          },
+        ]),
+      ),
+    )
+  })
 
   const recipePath = (slug: string) => localePath(`/${categoryUrlName.value}/${slug}`)
 
