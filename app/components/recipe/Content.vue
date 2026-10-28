@@ -36,7 +36,16 @@
 
   const { downloadRecipePdf } = useRecipePdf()
   const categoriesStore = useCategories()
+  const { addRecipeView } = useRecentRecipes()
   const { categoriesByLocale } = storeToRefs(categoriesStore)
+
+  watch(
+    () => recipe.id,
+    () => {
+      addRecipeView(recipe)
+    },
+    { immediate: true },
+  )
 
   const categoryName = computed(
     () =>

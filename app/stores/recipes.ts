@@ -127,6 +127,12 @@ export const useRecipes = defineStore("recipes", () => {
         return rememberDetail(generation, data || null)
       } catch (error) {
         if (await handleUnauthorized(error)) return null
+        if (isNotFoundError(error)) {
+          if (generation === cacheGeneration) {
+            recipesCache.value.delete(recipeId)
+          }
+          return null
+        }
         return recipesCache.value.get(recipeId) || null
       } finally {
         loadingDetail.value = false
