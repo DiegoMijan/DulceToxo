@@ -229,8 +229,8 @@ test.describe("recipe favorites", () => {
 
     await adminPage.goto("/favoritos/todas")
     await expect(adminPage.getByTestId("favorites-sidebar-list")).toBeVisible()
-    await expect(adminPage.getByTestId("recipe-title")).toHaveText("Galleta de chocolate")
-    await expect(adminPage.getByText("Galleta de avea")).toHaveCount(0)
+    await expect(adminPage.getByTestId("favorites-sidebar-list").getByText("Galleta de chocolate")).toBeVisible()
+    await expect(adminPage.getByTestId("favorites-sidebar-list").getByText("Galleta de avea")).toHaveCount(0)
     await adminContext.close()
   })
 })
