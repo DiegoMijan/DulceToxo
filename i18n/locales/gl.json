@@ -27,7 +27,20 @@
     "theme": "Cambiar tema da páxina",
     "language": "Cambiar idioma",
     "languageMenu": "Menú de selección de idioma",
-    "favorites": "Favoritos"
+    "favorites": "Favoritos",
+    "search": "Buscar receitas",
+    "searchShortcut": "Buscar receitas ({shortcut})"
+  },
+  "search": {
+    "dialog": "Buscador de receitas",
+    "placeholder": "Buscar receitas...",
+    "close": "Pechar",
+    "categories": "Categorías",
+    "favorites": "Favoritos",
+    "recipes": "Receitas",
+    "byIngredient": "Por ingrediente",
+    "noResults": "Non hai receitas que coincidan con «{query}»",
+    "loading": "Buscando"
   },
   "languages": {
     "es": "Castelán",

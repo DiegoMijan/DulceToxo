@@ -765,6 +765,70 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/recipes/search": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Search recipes by title and ingredients
+     * @description Searches authenticated-user-visible recipes in one locale. Matching is case-insensitive and accent-insensitive. Every remaining word (length >= 2) must appear in the title or in an ingredient description. Results are ranked by title matches first, then rating and title. Requires authentication.
+     */
+    get: {
+      parameters: {
+        query: {
+          /** @description Search text, 2 to 100 characters after trim */
+          q: string
+          /** @description Locale used for title and ingredient matching */
+          locale: "gl" | "es" | "en"
+          /** @description Maximum number of results. Defaults to 20. */
+          limit?: number
+        }
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody?: never
+      responses: {
+        /** @description Matching recipes, ranked for the current query */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["RecipeSearchItem"][]
+          }
+        }
+        /** @description Validation error. Body `data` is the Valibot issues array from safeParse. */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+      }
+    }
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/translate": {
     parameters: {
       query?: never
@@ -827,6 +891,15 @@ export interface paths {
             "application/json": components["schemas"]["ErrorResponse"]
           }
         }
+        /** @description Monthly translation quota exceeded */
+        429: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
         /** @description Translation provider failed */
         502: {
           headers: {
@@ -836,7 +909,7 @@ export interface paths {
             "application/json": components["schemas"]["ErrorResponse"]
           }
         }
-        /** @description GOOGLE_TRANSLATE_API_KEY is not configured */
+        /** @description AZURE_TRANSLATOR_KEY or AZURE_TRANSLATOR_REGION is not configured */
         503: {
           headers: {
             [name: string]: unknown
@@ -1392,6 +1465,45 @@ export interface components {
     }
     CreateRecipeResponse: {
       id: string
+    }
+    RecipeSearchItem: {
+      id: string
+      difficulty: number
+      /** @description Preparation time in minutes */
+      prep_time: number
+      /** @description Cooking time in minutes */
+      cook_time: number
+      /** @description Unix timestamp in ms */
+      created_at: number
+      /** @description Unix timestamp in ms */
+      updated_at: number
+      /** @description Average rounded to one decimal. Null when there are no votes. */
+      rating_avg: number | null
+      rating_count: number
+      /** @description True when the authenticated user has favorited this recipe. */
+      is_favorite: boolean
+      /** @description Title and slug keyed by locale. A key is omitted when that translation is missing in the database. */
+      locale: {
+        es?: components["schemas"]["RecipeListLocale"]
+        en?: components["schemas"]["RecipeListLocale"]
+        gl?: components["schemas"]["RecipeListLocale"]
+      }
+      category: {
+        id: string
+        /** @description Category url_name keyed by locale. A key is omitted when that translation is missing. */
+        url_name: {
+          es?: string
+          en?: string
+          gl?: string
+        }
+      }
+      /**
+       * @description title if any search word matches the title; otherwise ingredients
+       * @enum {string}
+       */
+      matched_in: "title" | "ingredients"
+      /** @description First matching ingredient description when matched_in is ingredients; otherwise null. */
+      matched_ingredient: string | null
     }
     TranslateRequest: {
       /** @enum {string} */

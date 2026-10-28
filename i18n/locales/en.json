@@ -27,7 +27,20 @@
     "theme": "Change page theme",
     "language": "Change language",
     "languageMenu": "Language selection menu",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "search": "Search recipes",
+    "searchShortcut": "Search recipes ({shortcut})"
+  },
+  "search": {
+    "dialog": "Recipe search",
+    "placeholder": "Search recipes...",
+    "close": "Close",
+    "categories": "Categories",
+    "favorites": "Favorites",
+    "recipes": "Recipes",
+    "byIngredient": "By ingredient",
+    "noResults": "No recipes matching “{query}”",
+    "loading": "Searching"
   },
   "languages": {
     "es": "Spanish",
