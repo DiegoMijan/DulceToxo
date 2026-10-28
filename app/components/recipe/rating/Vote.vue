@@ -51,10 +51,13 @@
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-1">
-    <span class="text-sm font-medium text-stone-700 dark:text-stone-200">
-      {{ t("recipe.rating.yours") }}
-    </span>
+  <div
+    class="flex flex-col items-center gap-2"
+    data-testid="recipe-rating-prompt"
+  >
+    <h2 class="title text-xl font-semibold text-stone-800 dark:text-stone-100">
+      {{ t("recipe.rating.prompt") }}
+    </h2>
     <div class="flex flex-row items-center gap-2">
       <!--
         La key incluye recipeId: el Rating de PrimeVue guarda un estado de hover
@@ -75,7 +78,7 @@
         text
         rounded
         size="small"
-        class="disabled:cursor-not-allowed!"
+        class="cursor-pointer disabled:cursor-not-allowed!"
         :disabled="saving"
         :aria-label="t('recipe.rating.remove')"
         :title="t('recipe.rating.remove')"

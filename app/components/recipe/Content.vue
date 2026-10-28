@@ -14,7 +14,6 @@
   const ingredients = computed(() => recipe.ingredients[currentLocale.value] || [])
   const steps = computed(() => recipe.steps[currentLocale.value] || [])
 
-  const difficultyDrawerVisible = ref(false)
   const { isLoggedIn } = useAuth()
 
   const images = computed(() => {
@@ -46,7 +45,7 @@
 
   const paddedStepNumber = (index: number): string => String(index + 1).padStart(2, "0")
 
-  const downloadPdf = async () => {
+  const handleDownloadPdf = async () => {
     const recipeForPdf = {
       id: recipe.id,
       title: localeData.value?.title || "",
@@ -92,74 +91,20 @@
       >
         {{ localeData?.title }}
       </h1>
+      <RecipeHeaderBar
+        :recipe="recipe"
+        :is-logged-in="isLoggedIn"
+        @download-pdf="handleDownloadPdf"
+      />
+      <div data-testid="recipe-gallery">
+        <RecipeImageCarousel :images="images" />
+      </div>
       <p
         v-if="localeData?.description"
         class="text-surface-400 text-lg max-w-2xl mx-auto"
       >
         {{ localeData.description }}
       </p>
-      <div class="sub-title flex flex-row flex-wrap gap-3 text-sm justify-center items-center">
-        <span class="separator-right pr-3">
-          {{ t("recipe.prepTime", { time: recipe.prep_time }) }}
-        </span>
-        <span class="separator-right pr-3">
-          {{ t("recipe.cookTime", { time: recipe.cook_time }) }}
-        </span>
-        <span
-          v-tooltip.top="$t('recipe.difficultyTooltip')"
-          class="separator-right pr-3 flex flex-row gap-2 justify-center cursor-pointer"
-          @click="difficultyDrawerVisible = true"
-        >
-          {{ t("recipe.difficulty") }}
-          <Rating
-            disabled
-            :stars="recipe.difficulty"
-          >
-            <template #onicon>
-              <NuxtIcon
-                class="text-lg"
-                name="icon-park-twotone:chef-hat-one"
-              />
-            </template>
-            <template #officon>
-              <NuxtIcon
-                class="text-lg"
-                name="icon-park-twotone:chef-hat-one"
-              />
-            </template>
-          </Rating>
-        </span>
-        <RecipeRatingSummary
-          :rating-avg="recipe.rating_avg"
-          :rating-count="recipe.rating_count"
-          :prompt-login="!isLoggedIn"
-        />
-      </div>
-      <RecipeRatingVote
-        v-if="isLoggedIn"
-        :recipe-id="recipe.id"
-        :my-rating="recipe.my_rating"
-      />
-      <div class="flex flex-row flex-wrap items-center justify-center gap-2">
-        <RecipeFavoriteButton
-          v-if="isLoggedIn"
-          :recipe-id="recipe.id"
-          :is-favorite="recipe.is_favorite"
-        />
-        <Button
-          severity="secondary"
-          outlined
-          size="small"
-          @click="downloadPdf"
-        >
-          <i class="pi pi-file-pdf mr-2" />
-          {{ t("recipe.downloadPdf") }}
-        </Button>
-      </div>
-      <RecipeImageCarousel
-        class="mt-4"
-        :images="images"
-      />
     </section>
     <section class="flex flex-col gap-10 lg:flex-row lg:gap-12">
       <div class="flex min-w-0 flex-1 flex-col">
@@ -227,10 +172,15 @@
         </ol>
       </div>
     </section>
-    <RecipeDifficultyDrawer
-      v-model:visible="difficultyDrawerVisible"
-      :difficulty-selected="recipe.difficulty"
-    />
+    <section
+      v-if="isLoggedIn"
+      class="mt-12 flex flex-col items-center border-t border-stone-200 pt-8 dark:border-stone-700"
+    >
+      <RecipeRatingVote
+        :recipe-id="recipe.id"
+        :my-rating="recipe.my_rating"
+      />
+    </section>
   </div>
   <RecipeAdminActions
     :recipe-id="recipe.id"
@@ -238,10 +188,3 @@
     :recipe-title="localeData?.title || ''"
   />
 </template>
-
-<style scoped lang="scss">
-  .separator-right {
-    border-right: 2px solid white !important;
-    border-right-color: white !important;
-  }
-</style>
