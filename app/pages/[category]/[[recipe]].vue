@@ -199,7 +199,11 @@
 </script>
 
 <template>
-  <NuxtLayout name="sidebar">
+  <NuxtLayout
+    name="sidebar"
+    :menu-count="bookItems.length"
+    :content-empty="Boolean(categoryId) && !selectedSlug"
+  >
     <template #left-menu>
       <RecipeSortSelect />
       <RecipeBookDownloadButton

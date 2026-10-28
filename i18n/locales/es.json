@@ -200,7 +200,8 @@
     "notFound": "Receta no encontrada",
     "notFoundDescription": "La receta que buscas no existe o ha sido eliminada.",
     "list": {
-      "nav": "Lista de recetas"
+      "nav": "Lista de recetas",
+      "open": "Recetas ({count})"
     },
     "delete": {
       "button": "Eliminar receta",

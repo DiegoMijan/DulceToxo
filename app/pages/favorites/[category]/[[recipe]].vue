@@ -274,7 +274,11 @@
 </script>
 
 <template>
-  <NuxtLayout name="sidebar">
+  <NuxtLayout
+    name="sidebar"
+    :menu-count="filteredFavorites.length"
+    :content-empty="hasAnyFavorites && !categoryMissing && !selectedSlug"
+  >
     <template #left-menu>
       <RecipeSortSelect variant="favorites" />
       <RecipeBookDownloadButton
