@@ -328,6 +328,7 @@
     max-height: 100dvh !important;
     margin: 0 !important;
     border-radius: 0 !important;
+    transform: none !important;
   }
 }
 </style>

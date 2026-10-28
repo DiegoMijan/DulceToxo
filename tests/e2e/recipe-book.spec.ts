@@ -219,6 +219,7 @@ for index, name in enumerate(names):
     await page.getByTestId("recipe-book-download-button").click()
     const mobileDialog = page.getByTestId("recipe-book-dialog")
     await expect(mobileDialog).toBeVisible()
+    await expect(mobileDialog).not.toHaveClass(/p-dialog-enter/)
     const mobileBox = await mobileDialog.boundingBox()
     expect(mobileBox).toBeTruthy()
     expect(mobileBox!.x).toBeLessThan(2)
