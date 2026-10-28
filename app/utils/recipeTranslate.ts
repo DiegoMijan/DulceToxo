@@ -22,6 +22,22 @@ export const collectTranslateTexts = (galician: TranslateLocaleContent): string[
   ...galician.instructions.map((row) => row.description),
 ]
 
+export const countUntranslatedTexts = (
+  sourceTexts: string[],
+  translations: { es: string[]; en: string[] },
+): number => {
+  let count = 0
+  for (const target of [translations.es, translations.en]) {
+    for (let index = 0; index < sourceTexts.length; index++) {
+      const source = sourceTexts[index]?.trim() ?? ""
+      if (!source) continue
+      const translated = target[index]?.trim() ?? ""
+      if (!translated) count += 1
+    }
+  }
+  return count
+}
+
 const rowHasText = (row: TranslateRow): boolean => row.description.trim().length > 0
 
 export const localeHasText = (locale: TranslateLocaleContent): boolean => {

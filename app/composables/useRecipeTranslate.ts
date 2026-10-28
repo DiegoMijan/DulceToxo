@@ -3,11 +3,14 @@ import type { components } from "#shared/types/api"
 import {
   applyTranslatedLocale,
   collectTranslateTexts,
+  countUntranslatedTexts,
   type TranslateLocaleContent,
 } from "~/utils/recipeTranslate"
 
 type LocaleKey = "es" | "en" | "gl"
 type TranslateResponse = components["schemas"]["TranslateResponse"]
+
+export type RecipeTranslateOutcome = { applied: false } | { applied: true; untranslatedCount: number }
 
 interface WritableField<T> {
   value: T
@@ -77,8 +80,8 @@ export const useRecipeTranslate = () => {
 
   const translateFromGalician = async (
     locales: Record<LocaleKey, RecipeLocaleForm> | undefined,
-  ) => {
-    if (!locales || translating.value) return
+  ): Promise<RecipeTranslateOutcome> => {
+    if (!locales || translating.value) return { applied: false }
 
     const galician = readLocale(locales.gl)
     const texts = collectTranslateTexts(galician)
@@ -100,7 +103,7 @@ export const useRecipeTranslate = () => {
           summary: t("recipe.edit.translate.error.failed"),
           life: 5000,
         })
-        return
+        return { applied: false }
       }
 
       writeLocale(
@@ -111,12 +114,26 @@ export const useRecipeTranslate = () => {
         locales.en,
         applyTranslatedLocale(galician, readLocale(locales.en), result.translations.en),
       )
+
+      const untranslatedCount = countUntranslatedTexts(texts, result.translations)
+      toast.add({
+        severity: untranslatedCount > 0 ? "warn" : "success",
+        summary: t("recipe.edit.translate.success"),
+        detail:
+          untranslatedCount > 0
+            ? t("recipe.edit.translate.untranslated", untranslatedCount)
+            : undefined,
+        life: 6000,
+      })
+
+      return { applied: true, untranslatedCount }
     } catch (error: unknown) {
       toast.add({
         severity: "error",
         summary: translateErrorSummary(error, t),
         life: 5000,
       })
+      return { applied: false }
     } finally {
       translating.value = false
     }

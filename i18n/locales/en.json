@@ -213,6 +213,9 @@
         "button": "Translate to Spanish and English",
         "confirmOverwrite": "Current translations will be overwritten",
         "confirm": "Translate",
+        "success": "Translation completed. Review the Spanish and English tabs before saving",
+        "untranslated": "No texts were left untranslated | 1 text was left untranslated | {n} texts were left untranslated",
+        "pendingReview": "Translation pending review",
         "error": {
           "notConfigured": "Automatic translation is not configured",
           "quotaExceeded": "This month's translation quota has been used up",

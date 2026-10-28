@@ -73,6 +73,7 @@
   const saving = ref(false)
   const { translating, translateFromGalician } = useRecipeTranslate()
   const formLocked = computed(() => saving.value || translating.value)
+  const pendingReview = ref({ es: false, en: false })
   const selectedRecipeId = ref<string>(recipeParam || NEW_RECIPE_ID)
   const currentRecipe = ref<RecipeDetail | null>(cachedRecipeDetail ?? null)
   const slugErrors = ref<Record<LocaleKey, string | null>>({ es: null, en: null, gl: null })
@@ -82,6 +83,7 @@
     initialValues.value = values
     formKey.value += 1
     activeStep.value = 1
+    pendingReview.value = { es: false, en: false }
   }
 
   const allRecipes = ref<RecipeListItem[]>([])
@@ -435,10 +437,39 @@
     }
   }
 
+  const isPendingReview = (locale: LocaleKey): boolean => {
+    if (locale === "gl") return false
+    return pendingReview.value[locale]
+  }
+
+  const clearPendingReview = (locale: LocaleKey) => {
+    if (locale === "es" || locale === "en") {
+      pendingReview.value[locale] = false
+    }
+  }
+
+  const markTranslatedLocalesForReview = () => {
+    pendingReview.value = { es: true, en: true }
+    const currentLocale = steps.value.find((step) => step.id === activeStep.value)?.locale
+    if (currentLocale) clearPendingReview(currentLocale)
+  }
+
   const handleTranslate = async () => {
     const locales = form.value?.states?.locales as Record<LocaleKey, RecipeLocaleForm> | undefined
-    await translateFromGalician(locales)
+    const outcome = await translateFromGalician(locales)
+    if (!outcome.applied) return
+    markTranslatedLocalesForReview()
   }
+
+  const handleActivateStep = (locale: LocaleKey, activateCallback: () => void) => {
+    clearPendingReview(locale)
+    activateCallback()
+  }
+
+  watch(activeStep, (stepId) => {
+    const currentLocale = steps.value.find((step) => step.id === stepId)?.locale
+    if (currentLocale) clearPendingReview(currentLocale)
+  })
 
   const handleRecipeChange = async (event: SelectChangeEvent) => {
     if (formLocked.value) return
@@ -672,11 +703,11 @@
                     v-bind="a11yAttrs.header"
                     type="button"
                     :disabled="formLocked"
-                    @click="activateCallback"
+                    @click="handleActivateStep(step.locale, activateCallback)"
                   >
                     <span
                       :class="[
-                        'rounded-full border-2 w-12 h-12 inline-flex items-center justify-center transition-colors',
+                        'relative rounded-full border-2 w-12 h-12 inline-flex items-center justify-center transition-colors',
                         { 'border-fuchsia-600 border-primary bg-fuchsia-50 dark:bg-fuchsia-950': Number(value) === activeStep, 'border-french-lilac-200 dark:border-gray-600': Number(value) !== activeStep },
                         { 'ring-2 ring-red-500': slugErrors[step.locale] }
                       ]"
@@ -686,6 +717,13 @@
                         :alt="step.locale"
                         class="h-4 rounded"
                       >
+                      <span
+                        v-if="isPendingReview(step.locale)"
+                        class="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-[var(--p-primary-color)] ring-2 ring-[var(--p-content-background)]"
+                        :data-testid="`translate-pending-review-${step.locale}`"
+                        role="img"
+                        :aria-label="t('recipe.edit.translate.pendingReview')"
+                      />
                     </span>
                   </button>
                   <Divider

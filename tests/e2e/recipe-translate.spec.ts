@@ -43,6 +43,33 @@ const ERRORS = {
   },
 } as const
 
+const SUCCESS = {
+  gl: "Tradución completada. Revisa as lapelas de castelán e inglés antes de gardar",
+  es: "Traducción completada. Revisa las pestañas de castellano e inglés antes de guardar",
+  en: "Translation completed. Review the Spanish and English tabs before saving",
+} as const
+
+const UNTRANSLATED = {
+  gl: {
+    one: "1 texto quedou sen traducir",
+    many: (n: number) => `${n} textos quedaron sen traducir`,
+  },
+  es: {
+    one: "1 texto quedó sin traducir",
+    many: (n: number) => `${n} textos quedaron sin traducir`,
+  },
+  en: {
+    one: "1 text was left untranslated",
+    many: (n: number) => `${n} texts were left untranslated`,
+  },
+} as const
+
+const PENDING_REVIEW = {
+  gl: "Tradución pendente de revisar",
+  es: "Traducción pendiente de revisar",
+  en: "Translation pending review",
+} as const
+
 let dbPath: string | undefined
 
 test.beforeAll(async () => {
@@ -95,7 +122,10 @@ const openEditor = async (page: Page, path: string) => {
   await expect(page.getByTestId("recipe-translate-button")).toBeVisible()
 }
 
-const mockEchoTranslate = async (page: Page) => {
+const mockTranslateMap = async (
+  page: Page,
+  map: (texts: string[]) => { es: string[]; en: string[] },
+) => {
   const requests: unknown[] = []
   await page.route("**/api/translate", async (route) => {
     if (route.request().method() !== "POST") {
@@ -108,16 +138,21 @@ const mockEchoTranslate = async (page: Page) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({
-        translations: {
-          es: texts.map((text) => (text === "" ? "" : `ES:${text}`)),
-          en: texts.map((text) => (text === "" ? "" : `EN:${text}`)),
-        },
-      }),
+      body: JSON.stringify({ translations: map(texts) }),
     })
   })
   return requests
 }
+
+const echoTranslations = (texts: string[]) => ({
+  es: texts.map((text) => (text === "" ? "" : `ES:${text}`)),
+  en: texts.map((text) => (text === "" ? "" : `EN:${text}`)),
+})
+
+const mockEchoTranslate = async (page: Page) => mockTranslateMap(page, echoTranslations)
+
+const pendingReviewMark = (page: Page, locale: "es" | "en") =>
+  page.getByTestId(`translate-pending-review-${locale}`)
 
 const mockTranslateStatus = async (page: Page, status: number) => {
   await page.route("**/api/translate", async (route) => {
@@ -219,6 +254,10 @@ test.describe("recipe auto translate", () => {
     await expect(page.getByText(OVERWRITE_MESSAGE.gl)).toBeVisible()
     await acceptTranslateConfirm(page, "Traducir")
 
+    await expect(page.getByText(SUCCESS.gl)).toBeVisible()
+    await expect(page.locator(".p-toast-message-success")).toBeVisible()
+    await expect(pendingReviewMark(page, "es")).toBeVisible()
+    await expect(pendingReviewMark(page, "en")).toBeVisible()
     await expect(page.getByTestId("recipe-edit-save")).toBeEnabled()
     expect(requests).toHaveLength(1)
     expect(requests[0]).toMatchObject({
@@ -337,6 +376,12 @@ test.describe("recipe auto translate", () => {
     await expect(page.getByText(OVERWRITE_MESSAGE.gl)).toHaveCount(0)
     expect(requests).toHaveLength(1)
 
+    await expect(page.getByText(SUCCESS.gl)).toBeVisible()
+    await expect(page.locator(".p-toast-message-success")).toBeVisible()
+    await expect(pendingReviewMark(page, "es")).toBeVisible()
+    await expect(pendingReviewMark(page, "en")).toBeVisible()
+    await expect(pendingReviewMark(page, "es")).toHaveAttribute("aria-label", PENDING_REVIEW.gl)
+
     await expectLocaleFields(page, "es", {
       title: "ES:Tarta de queixo",
       slug: "es-tarta-de-queixo",
@@ -346,6 +391,8 @@ test.describe("recipe auto translate", () => {
       tableRows(page, "ingredients").nth(0).locator("input[type='checkbox']"),
     ).toBeChecked()
     await expect(tableRows(page, "ingredients").nth(0)).toContainText("ES:Para a base")
+    await expect(pendingReviewMark(page, "es")).toHaveCount(0)
+    await expect(pendingReviewMark(page, "en")).toBeVisible()
   })
 
   test("503, 429 and 502 show toasts and leave the form untouched", async ({ page }) => {
@@ -407,6 +454,147 @@ test.describe("recipe auto translate", () => {
     await expect(page.getByTestId("recipe-translate-button")).toHaveText(BUTTON_LABEL.gl)
     await page.screenshot({
       path: `${ARTIFACTS_DIR}/translate_button_gl_light.png`,
+      fullPage: true,
+    })
+  })
+
+  test("marks Spanish and English tabs until each one is opened", async ({ page }) => {
+    await setLocaleCookie(page, "gl")
+    await mockEchoTranslate(page)
+    await openEditor(page, `/edit/${TRANSLATE_BLANK_RECIPE_ID}`)
+
+    await page.getByTestId("recipe-translate-button").click()
+    await expect(page.getByText(SUCCESS.gl)).toBeVisible()
+    await expect(page.locator(".p-toast-message-success")).toBeVisible()
+    await expect(pendingReviewMark(page, "es")).toBeVisible()
+    await expect(pendingReviewMark(page, "en")).toBeVisible()
+    await page.locator(".p-toast-message-success").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_success_toast_closeup_gl_dark.png`,
+    })
+    await page.screenshot({
+      path: `${ARTIFACTS_DIR}/translate_success_and_marks_gl_dark.png`,
+      fullPage: true,
+    })
+
+    await openLocaleTab(page, "es")
+    await expect(pendingReviewMark(page, "es")).toHaveCount(0)
+    await expect(pendingReviewMark(page, "en")).toBeVisible()
+
+    await openLocaleTab(page, "en")
+    await expect(pendingReviewMark(page, "es")).toHaveCount(0)
+    await expect(pendingReviewMark(page, "en")).toHaveCount(0)
+  })
+
+  test("warns when translated texts come back empty and ignores empty Galician rows", async ({
+    page,
+  }) => {
+    await setLocaleCookie(page, "gl")
+    await mockTranslateMap(page, (texts) => ({
+      es: texts.map((text, index) => {
+        if (text === "") return ""
+        if (index === 1) return ""
+        return `ES:${text}`
+      }),
+      en: texts.map((text, index) => {
+        if (text === "") return ""
+        if (index === 2 || index === 5) return ""
+        return `EN:${text}`
+      }),
+    }))
+    await openEditor(page, `/edit/${TRANSLATE_FILLED_RECIPE_ID}`)
+
+    await page.getByTestId("recipe-translate-button").click()
+    await acceptTranslateConfirm(page, "Traducir")
+
+    await expect(page.getByText(SUCCESS.gl)).toBeVisible()
+    await expect(page.getByText(UNTRANSLATED.gl.many(3))).toBeVisible()
+    await expect(page.locator(".p-toast-message-warn")).toBeVisible()
+    await expect(page.locator(".p-toast-message-success")).toHaveCount(0)
+    await expect(page.locator(".p-confirmpopup")).toHaveCount(0)
+    await expect(pendingReviewMark(page, "es")).toBeVisible()
+    await expect(pendingReviewMark(page, "en")).toBeVisible()
+    await page.locator(".p-toast-message-warn").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_warn_toast_closeup_gl_dark.png`,
+    })
+    await page.screenshot({
+      path: `${ARTIFACTS_DIR}/translate_warn_and_marks_gl_dark.png`,
+      fullPage: true,
+    })
+
+    await expectLocaleFields(page, "es", {
+      title: "ES:Bolo de limón",
+      slug: "es-bolo-de-limon",
+      description: "",
+    })
+    await expect(tableRows(page, "ingredients").nth(2)).not.toContainText("ES:")
+    await expect(tableRows(page, "instructions").nth(1)).not.toContainText("ES:")
+  })
+
+  test("uses singular warning when one translated text is empty", async ({ page }) => {
+    await setLocaleCookie(page, "gl")
+    await mockTranslateMap(page, (texts) => ({
+      es: texts.map((text, index) => (index === 0 || text === "" ? "" : `ES:${text}`)),
+      en: echoTranslations(texts).en,
+    }))
+    await openEditor(page, `/edit/${TRANSLATE_BLANK_RECIPE_ID}`)
+
+    await page.getByTestId("recipe-translate-button").click()
+    await expect(page.getByText(SUCCESS.gl)).toBeVisible()
+    await expect(page.getByText(UNTRANSLATED.gl.one)).toBeVisible()
+    await expect(page.locator(".p-toast-message-warn")).toBeVisible()
+  })
+
+  test("success and warning toasts follow the interface language", async ({ page }) => {
+    await setLocaleCookie(page, "es")
+    await mockEchoTranslate(page)
+    await openEditor(page, `/es/edit/${TRANSLATE_BLANK_RECIPE_ID}`)
+    await page.getByTestId("recipe-translate-button").click()
+    await expect(page.getByText(SUCCESS.es)).toBeVisible()
+    await expect(pendingReviewMark(page, "es")).toHaveAttribute("aria-label", PENDING_REVIEW.es)
+    await page.locator(".p-toast-message-success").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_success_toast_closeup_es_dark.png`,
+    })
+    await page.screenshot({
+      path: `${ARTIFACTS_DIR}/translate_success_es_dark.png`,
+      fullPage: true,
+    })
+
+    await setLocaleCookie(page, "en")
+    await mockTranslateMap(page, (texts) => ({
+      es: texts.map((text, index) => (index === 1 || text === "" ? "" : `ES:${text}`)),
+      en: echoTranslations(texts).en,
+    }))
+    await page.goto(`/en/edit/${TRANSLATE_BLANK_RECIPE_ID}`)
+    await dismissObstructions(page)
+    await page.getByTestId("recipe-translate-button").click()
+    await expect(page.getByText(SUCCESS.en)).toBeVisible()
+    await expect(page.getByText(UNTRANSLATED.en.one)).toBeVisible()
+    await expect(pendingReviewMark(page, "es")).toHaveAttribute("aria-label", PENDING_REVIEW.en)
+    await page.locator(".p-toast-message-warn").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_warn_toast_closeup_en_dark.png`,
+    })
+    await page.screenshot({
+      path: `${ARTIFACTS_DIR}/translate_warn_en_dark.png`,
+      fullPage: true,
+    })
+  })
+
+  test("pending review marks use theme tokens in light and dark", async ({ page }) => {
+    await setLocaleCookie(page, "gl")
+    await mockEchoTranslate(page)
+    await page.addInitScript(() => {
+      localStorage.setItem("nuxt-color-mode", "light")
+    })
+    await openEditor(page, `/edit/${TRANSLATE_BLANK_RECIPE_ID}`)
+    await page.getByTestId("recipe-translate-button").click()
+    await expect(pendingReviewMark(page, "es")).toBeVisible()
+    await expect(pendingReviewMark(page, "en")).toBeVisible()
+    await expect(page.getByText(SUCCESS.gl)).toBeVisible()
+    await page.locator(".p-toast-message-success").screenshot({
+      path: `${ARTIFACTS_DIR}/translate_success_toast_closeup_gl_light.png`,
+    })
+    await page.screenshot({
+      path: `${ARTIFACTS_DIR}/translate_pending_marks_gl_light.png`,
       fullPage: true,
     })
   })
