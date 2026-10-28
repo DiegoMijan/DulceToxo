@@ -331,6 +331,10 @@
         "description": "Professional recipes with multiple components (creams, glazes, decorations), precise millimeter precision and advanced equipment. Time: more than 4 hours, often in stages.",
         "explanation": "Example: Chocolate multilayer entremet"
       }
+    },
+    "offline": {
+      "title": "You are offline",
+      "description": "This recipe is not saved on this device yet. Open it while online and you will be able to view it offline later."
     }
   },
   "upload": {
@@ -351,5 +355,11 @@
     "nextImage": "Next image",
     "expandImage": "Expand image",
     "collapseImage": "Close image"
+  },
+  "pwa": {
+    "updateAvailable": "A new version of Dulce Toxo is available",
+    "reload": "Reload",
+    "dismiss": "Close",
+    "offline": "Offline: you can view the recipes you have already opened"
   }
 }

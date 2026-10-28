@@ -29,6 +29,9 @@
   const recipeDetail = ref<RecipeDetail | null>(null)
   const loading = ref(true)
   const recipeNotFound = ref(false)
+  // Sin red y sin copia guardada: no es que la receta no exista
+  const recipeOffline = ref(false)
+  const online = useOnline()
   let recipeLoadGeneration = 0
 
   const recipePath = (slug: string) => localePath(`/${categoryUrlName.value}/${slug}`)
@@ -36,6 +39,7 @@
   const loadRecipeBySlug = async (slug: string | undefined) => {
     const generation = ++recipeLoadGeneration
     recipeNotFound.value = false
+    recipeOffline.value = false
 
     if (!slug || !categoryId.value) {
       if (generation === recipeLoadGeneration) {
@@ -50,8 +54,12 @@
     if (!recipeId) {
       if (generation === recipeLoadGeneration) {
         recipeDetail.value = null
-        recipeNotFound.value = true
-        removeBySlug(slug)
+        if (!online.value) {
+          recipeOffline.value = true
+        } else {
+          recipeNotFound.value = true
+          removeBySlug(slug)
+        }
       }
       return
     }
@@ -64,8 +72,12 @@
 
     recipeDetail.value = detail
     if (!detail) {
-      recipeNotFound.value = true
-      removeById(recipeId)
+      if (!online.value) {
+        recipeOffline.value = true
+      } else {
+        recipeNotFound.value = true
+        removeById(recipeId)
+      }
     }
   }
 
@@ -93,6 +105,11 @@
   }
 
   await initializeData()
+
+  // Al volver la conexion se reintenta lo que no se pudo cargar
+  watch(online, async (isOnline) => {
+    if (isOnline && (recipeOffline.value || !recipeDetail.value)) await initializeData()
+  })
 
   watch(selectedSlug, async (newSlug) => {
     if (newSlug === recipeSlugParam.value) {
@@ -246,6 +263,19 @@
           style="width: 60px; height: 60px"
           stroke-width="4"
         />
+      </div>
+      <div
+        v-else-if="recipeOffline"
+        class="flex flex-col justify-center items-center h-full gap-4 text-center px-4"
+        data-testid="recipe-offline"
+      >
+        <i class="pi pi-wifi text-6xl text-french-lilac-300 dark:text-french-lilac-600" />
+        <h2 class="text-2xl font-semibold text-french-lilac-700 dark:text-french-lilac-300">
+          {{ t('recipe.offline.title') }}
+        </h2>
+        <p class="text-gray-500 dark:text-gray-400 max-w-md">
+          {{ t('recipe.offline.description') }}
+        </p>
       </div>
       <div
         v-else-if="recipeNotFound"
