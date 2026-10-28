@@ -100,8 +100,8 @@
   }
 
   const handleProgress = (completed: number, total: number) => {
-    preparingIndex.value = completed
-    preparingTotal.value = total
+    preparingTotal.value = Math.max(preparingTotal.value, total)
+    preparingIndex.value = Math.max(preparingIndex.value, completed)
   }
 
   const handleDownload = async () => {

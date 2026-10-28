@@ -318,8 +318,12 @@ export const recipeBookPdfFileName = (collectionName: string): string => {
 }
 
 export const formatCookbookDate = (locale: string, date = new Date()): string => {
-  const localeTag = locale === "gl" ? "gl-ES" : locale === "es" ? "es-ES" : "en-GB"
-  return new Intl.DateTimeFormat(localeTag, { dateStyle: "long" }).format(date)
+  const preferred = locale === "en" ? "en-GB" : locale === "es" ? "es-ES" : "gl-ES"
+  const fallback = locale === "en" ? "en-GB" : "es-ES"
+  const resolved = new Intl.DateTimeFormat(preferred, { dateStyle: "long" }).resolvedOptions()
+    .locale
+  const tag = resolved.toLowerCase().startsWith(locale) ? preferred : fallback
+  return new Intl.DateTimeFormat(tag, { dateStyle: "long" }).format(date)
 }
 
 export const recipeDetailToPdfRecipe = (
@@ -804,7 +808,7 @@ export const useRecipePdf = () => {
     throwIfAborted(options.signal)
     const details = await recipesStore.loadRecipesForPdf(ids, {
       signal: options.signal,
-      onProgress: options.includePhotos ? undefined : options.onProgress,
+      onProgress: options.onProgress,
     })
     throwIfAborted(options.signal)
     if (details.length === 0) {
