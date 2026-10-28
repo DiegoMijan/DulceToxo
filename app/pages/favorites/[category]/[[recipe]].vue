@@ -209,7 +209,12 @@
     favoriteItems,
     async (list, previous) => {
       if (listLoading.value || !list) return
-      const currentId = recipeDetail.value?.id
+      const slug = recipeSlugParam.value ?? selectedSlug.value
+      const currentId =
+        recipeDetail.value?.id ??
+        (previous ?? []).find((recipe) =>
+          Object.values(recipe.locale).some((entry) => entry?.slug === slug),
+        )?.id
       if (!currentId) return
       if (list.some((recipe) => recipe.id === currentId)) return
 
