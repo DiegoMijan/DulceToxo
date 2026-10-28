@@ -65,6 +65,10 @@
     color: inherit;
   }
 
+  .recipe-rating-stars :deep(.p-rating[data-disabled]:not([data-readonly]) .p-rating-option) {
+    cursor: not-allowed;
+  }
+
   .recipe-rating-stars :deep(.p-rating:not([data-readonly]):not([data-disabled]) .p-rating-option:hover) {
     color: #b45309;
   }

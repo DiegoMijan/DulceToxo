@@ -54,7 +54,7 @@ const cardPt = {
   <NuxtLink
     v-if="categoryPath"
     :to="categoryPath"
-    class="block h-full no-underline text-inherit"
+    class="block h-full no-underline text-inherit cursor-pointer"
     :aria-label="title"
     data-testid="landing-category-card"
   >

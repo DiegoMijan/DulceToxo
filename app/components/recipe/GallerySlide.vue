@@ -66,7 +66,7 @@
     </GalleryContent>
     <GalleryHeader class="pointer-events-none absolute! inset-x-0 top-0 z-10 flex justify-end bg-transparent! p-2!">
       <GalleryFullScreen
-        class="pointer-events-auto rounded-full bg-black/50 text-white"
+        class="pointer-events-auto cursor-pointer rounded-full bg-black/50 text-white"
         :aria-label="t('upload.expandImage')"
       >
         <template #default="{ isFullscreen }">
