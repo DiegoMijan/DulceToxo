@@ -62,6 +62,15 @@
   const slugForFavorite = (recipe: FavoriteListItem): string =>
     recipe.locale[locale.value as LocaleKey]?.slug || recipe.id
 
+  const goToFavorite = async (slug: string | undefined, replace = false) => {
+    const targetPath = slug
+      ? favoritesPath(categoryUrlName.value, slug)
+      : favoritesPath(categoryUrlName.value)
+    if (route.path !== targetPath) {
+      await navigateTo(targetPath, { replace })
+    }
+  }
+
   const loadRecipeBySlug = async (slug: string | undefined) => {
     const generation = ++recipeLoadGeneration
     recipeNotFound.value = false
@@ -98,21 +107,22 @@
 
     await categoriesStore.getCategories()
     await recipesStore.getFavorites()
-    await loadRecipeBySlug(recipeSlugParam.value)
 
+    const firstSlug = sortedFavorites.value[0]
+      ? slugForFavorite(sortedFavorites.value[0])
+      : undefined
+    const slug = recipeSlugParam.value ?? firstSlug
+
+    if (slug && slug !== recipeSlugParam.value) {
+      selectedSlug.value = slug
+      await goToFavorite(slug, true)
+    }
+
+    await loadRecipeBySlug(slug)
     loading.value = false
   }
 
   await initializeData()
-
-  const goToFavorite = async (slug: string | undefined) => {
-    const targetPath = slug
-      ? favoritesPath(categoryUrlName.value, slug)
-      : favoritesPath(categoryUrlName.value)
-    if (route.path !== targetPath) {
-      await navigateTo(targetPath)
-    }
-  }
 
   watch(selectedSlug, async (newSlug) => {
     if (newSlug === recipeSlugParam.value) {
@@ -263,7 +273,7 @@
         />
       </div>
       <div
-        v-else
+        v-else-if="hasAnyFavorites"
         data-testid="favorites-sidebar-list"
         class="mt-8 w-full min-w-0"
       >
