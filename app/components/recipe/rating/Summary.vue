@@ -4,11 +4,13 @@
     ratingCount,
     compact = false,
     promptLogin = false,
+    textOnly = false,
   } = defineProps<{
     ratingAvg: number | null
     ratingCount: number
     compact?: boolean
     promptLogin?: boolean
+    textOnly?: boolean
   }>()
 
   const { t, locale } = useI18n()
@@ -35,7 +37,21 @@
 </script>
 
 <template>
+  <span
+    v-if="textOnly"
+    class="inline-flex items-center gap-1 text-sm text-stone-600 dark:text-stone-300"
+    :aria-label="averageAriaLabel"
+  >
+    <template v-if="hasVotes">
+      <span aria-hidden="true">★</span>
+      <span>{{ summaryText }}</span>
+    </template>
+    <template v-else>
+      {{ t("recipe.rating.none") }}
+    </template>
+  </span>
   <div
+    v-else
     class="flex flex-col items-center gap-1"
     :class="{ 'items-start! gap-0': compact }"
   >
