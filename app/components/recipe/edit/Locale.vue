@@ -18,15 +18,18 @@
     formInstance,
     slugError,
     disabled = false,
+    translating = false,
   } = defineProps<{
     locale: "es" | "en" | "gl"
     formInstance: FormInstance
     slugError?: string | null
     disabled?: boolean
+    translating?: boolean
   }>()
 
   const emit = defineEmits<{
     change: [locale: "es" | "en" | "gl", type: "ingredients" | "instructions"]
+    translate: []
   }>()
 
   const form = defineModel<{
@@ -43,6 +46,51 @@
       input.value = trimmed
       input.dispatchEvent(new Event("input", { bubbles: true }))
     }
+  }
+
+  const handleTitleBlur = (event: FocusEvent) => {
+    handleBlur(event)
+    const slugField = form.value[locale]?.slug
+    if (!slugField || slugField.value.trim()) return
+    const input = event.target as HTMLInputElement
+    slugField.value = slugFromTitle(input.value)
+  }
+
+  const localeFormHasText = (localeKey: "es" | "en"): boolean => {
+    const data = form.value[localeKey]
+    if (!data) return false
+    return localeHasText({
+      slug: data.slug?.value ?? "",
+      title: data.title?.value ?? "",
+      description: data.description?.value ?? "",
+      ingredients: data.ingredients?.value ?? [],
+      instructions: data.instructions?.value ?? [],
+    })
+  }
+
+  const handleTranslateClick = (event: Event) => {
+    if (disabled || translating) return
+    if (!localeFormHasText("es") && !localeFormHasText("en")) {
+      emit("translate")
+      return
+    }
+
+    confirm.require({
+      target: event.currentTarget as HTMLElement,
+      message: t("recipe.edit.translate.confirmOverwrite"),
+      icon: "pi pi-exclamation-triangle",
+      rejectProps: {
+        label: t("common.cancel"),
+        severity: "secondary",
+        outlined: true,
+      },
+      acceptProps: {
+        label: t("recipe.edit.translate.confirm"),
+      },
+      accept: () => {
+        emit("translate")
+      },
+    })
   }
 
   const onRowReorder = (event: DataTableRowReorderEvent, type: "ingredients" | "instructions") => {
@@ -160,6 +208,24 @@
   <div
     class="flex flex-col gap-6 mt-2"
   >
+    <div
+      v-if="locale === 'gl'"
+      class="flex justify-start"
+    >
+      <Button
+        type="button"
+        data-testid="recipe-translate-button"
+        :loading="translating"
+        :disabled="disabled || translating"
+        @click="handleTranslateClick"
+      >
+        <i
+          v-if="!translating"
+          class="pi pi-language mr-2"
+        />
+        {{ t('recipe.edit.translate.button') }}
+      </Button>
+    </div>
     <div class="flex flex-wrap gap-4">
       <FormField
         :fieldName="`locales.${locale}.title`"
@@ -175,7 +241,7 @@
             :value="form?.[locale]?.title?.value"
             class="w-full"
             :disabled="disabled"
-            @blur="handleBlur"
+            @blur="handleTitleBlur"
           />
         </template>
       </FormField>
@@ -237,6 +303,7 @@
           v-if="locale === 'gl'"
           size="small"
           rounded
+          data-testid="recipe-add-ingredient"
           :disabled="disabled"
           @click="addItem('ingredients')"
         >
@@ -342,6 +409,7 @@
           v-if="locale === 'gl'"
           size="small"
           rounded
+          data-testid="recipe-add-instruction"
           :disabled="disabled"
           @click="addItem('instructions')"
         >
