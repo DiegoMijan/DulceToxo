@@ -30,6 +30,8 @@ const HEADER = {
 }
 // About half an A4 page under the title, without overflowing the body.
 const MAX_IMAGE_HEIGHT_MM = 128
+// En el recetario la foto es mas baja para que la mayoria de recetas quepan en una pagina.
+const BOOK_MAX_IMAGE_HEIGHT_MM = 82
 const INVALID_FILENAME_CHARS = /[\\/:*?"<>|]/g
 
 export interface PdfLabels {
@@ -413,7 +415,12 @@ const drawDescription = (doc: jsPDF, y: number, description: string): number => 
   return y + lines.length * DESCRIPTION_LINE_HEIGHT + 6
 }
 
-const drawMainImage = (doc: jsPDF, y: number, imageDataUrl: string): number => {
+const drawMainImage = (
+  doc: jsPDF,
+  y: number,
+  imageDataUrl: string,
+  maxImageHeight = MAX_IMAGE_HEIGHT_MM,
+): number => {
   try {
     const properties = doc.getImageProperties(imageDataUrl)
     const pageBottom = PAGE.height - PAGE.margin - PAGE.footerReserve
@@ -424,7 +431,7 @@ const drawMainImage = (doc: jsPDF, y: number, imageDataUrl: string): number => {
       availableHeight = pageBottom - y
     }
 
-    const maxHeight = Math.min(MAX_IMAGE_HEIGHT_MM, availableHeight)
+    const maxHeight = Math.min(maxImageHeight, availableHeight)
     const ratio = properties.width / properties.height
     let width = CONTENT_WIDTH
     let height = width / ratio
@@ -448,10 +455,11 @@ const drawRecipeContent = (
   recipe: Recipe,
   labels: PdfLabels,
   imageDataUrl?: string | null,
+  maxImageHeight = MAX_IMAGE_HEIGHT_MM,
 ) => {
   let y = drawHeader(doc, recipe.title)
   if (imageDataUrl) {
-    y = drawMainImage(doc, y, imageDataUrl)
+    y = drawMainImage(doc, y, imageDataUrl, maxImageHeight)
   }
   y = drawDescription(doc, y, recipe.description)
   y = drawMetaRow(doc, y, recipe.prepTime, recipe.cookTime, recipe.difficulty, labels)
@@ -695,7 +703,7 @@ export const buildCookbookPdf = (
   for (const entry of recipes) {
     acquirePage()
     const start = doc.getCurrentPageInfo().pageNumber
-    drawRecipeContent(doc, entry.recipe, labels, entry.imageDataUrl)
+    drawRecipeContent(doc, entry.recipe, labels, entry.imageDataUrl, BOOK_MAX_IMAGE_HEIGHT_MM)
     ranges.push({ title: entry.recipe.title, start, end: doc.getNumberOfPages() })
   }
 
