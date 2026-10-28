@@ -677,6 +677,67 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  "/recipes/batch": {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Get recipe details in batch
+     * @description Returns full recipe details for up to 60 ids, in the same order as the request. Missing ids are omitted. Requires authentication.
+     */
+    post: {
+      parameters: {
+        query?: never
+        header?: never
+        path?: never
+        cookie?: never
+      }
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["BatchRecipesRequest"]
+        }
+      }
+      responses: {
+        /** @description Recipe details for the ids that exist, in request order */
+        200: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["RecipeDetail"][]
+          }
+        }
+        /** @description Validation error (empty list, more than 60 ids, or duplicates). Body `data` is the Valibot issues array from safeParse. */
+        400: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+        /** @description Authentication required */
+        401: {
+          headers: {
+            [name: string]: unknown
+          }
+          content: {
+            "application/json": components["schemas"]["ErrorResponse"]
+          }
+        }
+      }
+    }
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   "/recipes": {
     parameters: {
       query?: never
@@ -1418,6 +1479,9 @@ export interface components {
       rating_count: number
       /** @description Current user vote, or null when the user has not voted. */
       my_rating: number | null
+    }
+    BatchRecipesRequest: {
+      ids: string[]
     }
     RecipeLocaleInput: {
       /** @enum {string} */

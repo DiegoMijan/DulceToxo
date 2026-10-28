@@ -46,30 +46,12 @@
   const paddedStepNumber = (index: number): string => String(index + 1).padStart(2, "0")
 
   const handleDownloadPdf = async () => {
-    const recipeForPdf = {
-      id: recipe.id,
-      title: localeData.value?.title || "",
-      description: localeData.value?.description || "",
-      ingredients: ingredients.value.map((ing) => ({
-        id: ing.id,
-        description: ing.description,
-        order: ing.order,
-        is_heading: ing.is_heading ?? false,
-      })),
-      instructions: steps.value.map((step) => ({
-        id: step.id,
-        description: step.description,
-        order: step.order,
-      })),
-      difficulty: recipe.difficulty as 1 | 2 | 3 | 4 | 5,
-      prepTime: recipe.prep_time,
-      cookTime: recipe.cook_time,
-      createdAt: new Date(recipe.created_at),
-      updatedAt: new Date(recipe.updated_at),
-      category: categoryName.value || recipe.category_id,
-    }
     await downloadRecipePdf(
-      recipeForPdf,
+      recipeDetailToPdfRecipe(
+        recipe,
+        currentLocale.value,
+        categoryName.value || recipe.category_id,
+      ),
       {
         prepTime: t("recipe.prepTime", { time: recipe.prep_time }),
         cookTime: t("recipe.cookTime", { time: recipe.cook_time }),

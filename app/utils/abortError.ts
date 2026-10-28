@@ -13,3 +13,8 @@ export const isAbortError = (error: unknown): boolean => {
 
   return false
 }
+
+export const throwIfAborted = (signal?: AbortSignal): void => {
+  if (!signal?.aborted) return
+  throw new DOMException("The operation was aborted.", "AbortError")
+}
