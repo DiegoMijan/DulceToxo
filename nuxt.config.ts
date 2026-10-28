@@ -167,6 +167,14 @@ export default defineNuxtConfig({
   },
   icon: {
     componentName: "NuxtIcon",
+    // Iconos dentro del bundle: sin peticiones a api.iconify.design en cada visita.
+    // Las colecciones salen de los paquetes @iconify-json/* (devDependencies).
+    clientBundle: {
+      scan: {
+        globInclude: ["app/**/*.{vue,ts}"],
+      },
+      sizeLimitKb: 512,
+    },
   },
   runtimeConfig: {
     public: {
