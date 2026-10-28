@@ -140,16 +140,22 @@
         :recipe-id="recipe.id"
         :my-rating="recipe.my_rating"
       />
-      <Button
-        severity="secondary"
-        outlined
-        size="small"
-        class="self-center!"
-        @click="downloadPdf"
-      >
-        <i class="pi pi-file-pdf mr-2" />
-        {{ t("recipe.downloadPdf") }}
-      </Button>
+      <div class="flex flex-row flex-wrap items-center justify-center gap-2">
+        <RecipeFavoriteButton
+          v-if="isLoggedIn"
+          :recipe-id="recipe.id"
+          :is-favorite="recipe.is_favorite"
+        />
+        <Button
+          severity="secondary"
+          outlined
+          size="small"
+          @click="downloadPdf"
+        >
+          <i class="pi pi-file-pdf mr-2" />
+          {{ t("recipe.downloadPdf") }}
+        </Button>
+      </div>
       <RecipeImageCarousel
         class="mt-4"
         :images="images"

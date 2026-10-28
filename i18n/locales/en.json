@@ -7,7 +7,16 @@
     "name": "Name:",
     "notSpecified": "Not specified",
     "email": "Email:",
-    "backToHome": "Back to home"
+    "backToHome": "Back to home",
+    "favorites": "Favorites"
+  },
+  "favorites": {
+    "all": "All",
+    "empty": "You don't have any favorites yet",
+    "emptyCta": "Go to the homepage",
+    "list": {
+      "nav": "Favorites list"
+    }
   },
   "common": {
     "delete": "Delete",
@@ -17,7 +26,8 @@
   "header": {
     "theme": "Change page theme",
     "language": "Change language",
-    "languageMenu": "Language selection menu"
+    "languageMenu": "Language selection menu",
+    "favorites": "Favorites"
   },
   "languages": {
     "es": "Spanish",
@@ -213,9 +223,15 @@
       "difficulty": "Difficulty",
       "totalTime": "Total time",
       "ratingAvg": "Best rated",
+      "favoritedAt": "Added recently",
       "ascending": "ascending",
       "descending": "descending",
       "toggleDirection": "Change sort direction ({direction})"
+    },
+    "favorite": {
+      "add": "Add to favorites",
+      "remove": "Remove from favorites",
+      "error": "Could not update the favorite"
     },
     "rating": {
       "none": "No ratings",

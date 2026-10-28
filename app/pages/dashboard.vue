@@ -4,6 +4,7 @@ definePageMeta({
 })
 
 const { user, signOut } = useAuth()
+const { favoritesIndexPath } = useFavoritesPath()
 const isSigningOut = ref(false)
 
 const handleSignOut = async () => {
@@ -85,7 +86,18 @@ const handleSignOut = async () => {
               </div>
             </div>
 
-            <div class="mt-6">
+            <div class="mt-6 flex flex-wrap gap-3">
+              <NuxtLink
+                :to="favoritesIndexPath()"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-french-lilac-600 hover:bg-french-lilac-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-french-lilac-500 transition-colors"
+                data-testid="dashboard-favorites-link"
+              >
+                <NuxtIcon
+                  name="mdi:heart"
+                  class="mr-2 h-4 w-4"
+                />
+                {{ $t('dashboard.favorites') }}
+              </NuxtLink>
               <NuxtLink
                 to="/"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-french-lilac-700 bg-french-lilac-100 hover:bg-french-lilac-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-french-lilac-500 transition-colors"

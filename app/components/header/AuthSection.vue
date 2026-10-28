@@ -3,6 +3,7 @@
 
   const { user, isLoggedIn, isAdmin, signOut } = useAuth()
   const localePath = useLocalePath()
+  const { favoritesIndexPath } = useFavoritesPath()
 
   const isDropdownOpen = ref(false)
   const isSigningOut = ref(false)
@@ -90,6 +91,19 @@
                 class="inline w-4 h-4 mr-2"
               />
               Dashboard
+            </NuxtLink>
+
+            <NuxtLink
+              :to="favoritesIndexPath()"
+              class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              data-testid="header-favorites-link"
+              @click="closeDropdown"
+            >
+              <NuxtIcon
+                name="mdi:heart"
+                class="inline w-4 h-4 mr-2"
+              />
+              {{ $t('header.favorites') }}
             </NuxtLink>
 
             <NuxtLink

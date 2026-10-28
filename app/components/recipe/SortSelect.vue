@@ -1,4 +1,8 @@
 <script setup lang="ts">
+  const { variant = "category" } = defineProps<{
+    variant?: "category" | "favorites"
+  }>()
+
   const { t } = useI18n()
   const {
     sortCode,
@@ -7,7 +11,43 @@
     selectedSortOption,
     setSortCode,
     toggleSortDirection,
+    favoriteSortCode,
+    favoriteSortDirection,
+    favoriteSortOptions,
+    selectedFavoriteSortOption,
+    setFavoriteSortCode,
+    toggleFavoriteSortDirection,
   } = useRecipeSort()
+
+  const isFavorites = computed(() => variant === "favorites")
+  const activeSortCode = computed(() =>
+    isFavorites.value ? favoriteSortCode.value : sortCode.value,
+  )
+  const activeSortDirection = computed(() =>
+    isFavorites.value ? favoriteSortDirection.value : sortDirection.value,
+  )
+  const activeSortOptions = computed(() =>
+    isFavorites.value ? favoriteSortOptions.value : sortOptions.value,
+  )
+  const activeSelectedOption = computed(() =>
+    isFavorites.value ? selectedFavoriteSortOption.value : selectedSortOption.value,
+  )
+
+  const handleSortCode = (code: string | null) => {
+    if (isFavorites.value) {
+      setFavoriteSortCode(code)
+      return
+    }
+    setSortCode(code)
+  }
+
+  const handleToggleDirection = () => {
+    if (isFavorites.value) {
+      toggleFavoriteSortDirection()
+      return
+    }
+    toggleSortDirection()
+  }
 
   const pt = {
     overlay: {
@@ -18,7 +58,7 @@
   const directionLabel = computed(() =>
     t("recipe.sort.toggleDirection", {
       direction: t(
-        sortDirection.value === "asc" ? "recipe.sort.ascending" : "recipe.sort.descending",
+        activeSortDirection.value === "asc" ? "recipe.sort.ascending" : "recipe.sort.descending",
       ),
     }),
   )
@@ -27,8 +67,8 @@
 <template>
   <div class="flex items-center gap-2 w-full">
     <Select
-      :model-value="sortCode"
-      :options="sortOptions"
+      :model-value="activeSortCode"
+      :options="activeSortOptions"
       option-label="name"
       option-value="code"
       :placeholder="t('recipe.sortBy')"
@@ -36,7 +76,7 @@
       class="w-full"
       size="small"
       :pt
-      @update:model-value="setSortCode"
+      @update:model-value="handleSortCode"
     >
       <template #dropdownicon>
         <NuxtIcon name="tabler:arrows-down-up" />
@@ -52,14 +92,14 @@
       </template>
       <template #value="slotProps">
         <div
-          v-if="selectedSortOption && slotProps.value"
+          v-if="activeSelectedOption && slotProps.value"
           class="flex items-center"
         >
           <NuxtIcon
-            :name="selectedSortOption.icon"
+            :name="activeSelectedOption.icon"
             class="mr-2 text-xl"
           />
-          <div>{{ selectedSortOption.name }}</div>
+          <div>{{ activeSelectedOption.name }}</div>
         </div>
         <span v-else>
           {{ slotProps.placeholder }}
@@ -75,10 +115,10 @@
       class="shrink-0"
       :aria-label="directionLabel"
       :title="directionLabel"
-      @click="toggleSortDirection"
+      @click="handleToggleDirection"
     >
       <NuxtIcon
-        :name="sortDirection === 'asc' ? 'tabler:sort-ascending' : 'tabler:sort-descending'"
+        :name="activeSortDirection === 'asc' ? 'tabler:sort-ascending' : 'tabler:sort-descending'"
         class="text-xl"
       />
     </Button>
