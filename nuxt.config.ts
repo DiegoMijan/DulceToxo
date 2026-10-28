@@ -1,4 +1,3 @@
-import Aura from "@primeuix/themes/aura-compat"
 import tailwindcss from "@tailwindcss/vite"
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -184,34 +183,25 @@ export default defineNuxtConfig({
     },
   },
   primevue: {
+    // El tema va en su propio archivo: si se pone aqui, Nuxt lo serializa en la configuracion
+    // publica (~150 KB en el HTML de cada visita).
+    importTheme: { from: "@/themes/dulcetoxo.ts" },
+    // Solo los componentes que se usan: el modulo mete en el HTML los estilos de todos los
+    // componentes registrados (~490 KB con todos). Listbox se incluye aunque no se use como
+    // componente porque la lista de recetas (recipe/List.vue) reutiliza sus clases p-listbox-*.
+    // Al usar un componente nuevo de PrimeVue hay que anadirlo aqui.
+    components: {
+      include: [
+        "Button", "Card", "Carousel", "CarouselContent", "CarouselItem", "CarouselNext", "CarouselPrev",
+        "Checkbox", "Column", "ConfirmDialog", "ConfirmPopup", "DataTable", "DatePicker", "Dialog",
+        "Divider", "Drawer", "FileUpload", "Form", "FormField", "Gallery", "GalleryContent",
+        "GalleryFullScreen", "GalleryHeader", "GalleryItem", "InputNumber", "InputText", "Listbox",
+        "Menu", "Message", "Password", "ProgressSpinner", "Rating", "Select", "Skeleton", "Step",
+        "StepList", "StepPanel", "StepPanels", "Stepper", "Textarea", "Toast",
+      ],
+    },
     options: {
       ripple: true,
-      theme: {
-        preset: {
-          ...Aura,
-          semantic: {
-            ...Aura.semantic,
-            primary: {
-              // En v5 primary incluye color, contrastColor, hoverColor...: hay que conservarlos
-              ...Aura.semantic.primary,
-              50: "{fuchsia.50}",
-              100: "{fuchsia.100}",
-              200: "{fuchsia.200}",
-              300: "{fuchsia.300}",
-              400: "{fuchsia.400}",
-              500: "{fuchsia.500}",
-              600: "{fuchsia.600}",
-              700: "{fuchsia.700}",
-              800: "{fuchsia.800}",
-              900: "{fuchsia.900}",
-              950: "{fuchsia.950}",
-            },
-          },
-        },
-        options: {
-          darkModeSelector: ".dark",
-        },
-      },
     },
   },
 })
