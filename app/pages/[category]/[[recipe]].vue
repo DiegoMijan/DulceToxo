@@ -27,7 +27,7 @@
 
   const categoryId = computed(() => categoriesStore.getCategoryIdByUrlName(categoryUrlName.value))
 
-  const { data: recipeList, isPending: listPending, refresh: refreshList } = useQuery(() =>
+  const { data: recipeList, isLoading: listFetching, refresh: refreshList } = useQuery(() =>
     categoryRecipesQuery(categoryId.value ?? ""),
   )
   if (categoryId.value) {
@@ -43,18 +43,18 @@
     return recipesStore.findRecipeIdBySlug(catId, slug)
   })
 
-  const { data: recipeDetail, isPending: detailPending, refresh: refreshDetail } = useQuery(() =>
+  const { data: recipeDetail, isLoading: detailFetching, refresh: refreshDetail } = useQuery(() =>
     recipeQuery(recipeId.value ?? ""),
   )
   if (recipeId.value) {
     await refreshDetail()
   }
 
-  const listLoading = computed(() => listPending.value && !recipeList.value)
-  const detailLoading = computed(() => detailPending.value && !recipeDetail.value)
+  const listLoading = computed(() => listFetching.value && !recipeList.value)
+  const detailLoading = computed(() => detailFetching.value && !recipeDetail.value)
   const recipeNotFound = computed(() => {
     if (!recipeSlugParam.value || !categoryId.value) return false
-    if (listPending.value && !recipeList.value) return false
+    if (listFetching.value && !recipeList.value) return false
     return !recipeId.value
   })
 

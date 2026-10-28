@@ -46,7 +46,7 @@
 
   const {
     data: favoriteItems,
-    isPending: favoritesPending,
+    isLoading: favoritesFetching,
     refresh: refreshFavorites,
   } = useQuery(favoritesQuery)
   await refreshFavorites()
@@ -63,7 +63,7 @@
   const sortedFavorites = computed(() => sortFavoriteList(filteredFavorites.value))
 
   const hasAnyFavorites = computed(() => (favoriteItems.value ?? []).length > 0)
-  const listLoading = computed(() => favoritesPending.value && !favoriteItems.value)
+  const listLoading = computed(() => favoritesFetching.value && !favoriteItems.value)
 
   const recipePath = (slug: string) => favoritesPath(categoryUrlName.value, slug)
 
@@ -91,18 +91,18 @@
     return recipesStore.findFavoriteIdBySlug(slug)
   })
 
-  const { data: recipeDetail, isPending: detailPending, refresh: refreshDetail } = useQuery(() =>
+  const { data: recipeDetail, isLoading: detailFetching, refresh: refreshDetail } = useQuery(() =>
     recipeQuery(recipeId.value ?? ""),
   )
   if (recipeId.value) {
     await refreshDetail()
   }
 
-  const detailLoading = computed(() => detailPending.value && !recipeDetail.value)
+  const detailLoading = computed(() => detailFetching.value && !recipeDetail.value)
   const recipeNotFound = computed(() => {
     const slug = recipeSlugParam.value
     if (!slug) return false
-    if (favoritesPending.value && !favoriteItems.value) return false
+    if (favoritesFetching.value && !favoriteItems.value) return false
     return !recipeId.value
   })
 
