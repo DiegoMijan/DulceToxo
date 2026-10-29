@@ -67,6 +67,7 @@
       slug: data.slug?.value ?? "",
       title: data.title?.value ?? "",
       description: data.description?.value ?? "",
+      notes: data.notes?.value ?? "",
       ingredients: data.ingredients?.value ?? [],
       instructions: data.instructions?.value ?? [],
     })
@@ -496,5 +497,25 @@
         </template>
       </DataTable>
     </div>
+    <FormField
+      :fieldName="`locales.${locale}.notes`"
+      :label="t('recipe.edit.form.notes')"
+      :form="formInstance"
+      class="w-full"
+    >
+      <template #field>
+        <Textarea
+          :name="`locales.${locale}.notes`"
+          :placeholder="t('recipe.edit.form.notesPlaceholder')"
+          :value="form?.[locale]?.notes?.value"
+          class="w-full"
+          rows="4"
+          auto-resize
+          :disabled="disabled"
+          data-testid="recipe-edit-notes"
+          @blur="handleBlur"
+        />
+      </template>
+    </FormField>
   </div>
 </template>

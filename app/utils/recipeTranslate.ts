@@ -12,6 +12,7 @@ export interface TranslateLocaleContent {
   slug: string
   title: string
   description: string
+  notes: string
   ingredients: TranslateRow[]
   instructions: TranslateRow[]
 }
@@ -21,6 +22,8 @@ export const collectTranslateTexts = (source: TranslateLocaleContent): string[] 
   source.description,
   ...source.ingredients.map((row) => row.description),
   ...source.instructions.map((row) => row.description),
+  // Al final, para no mover la posicion del resto de textos
+  source.notes,
 ]
 
 export const countUntranslatedTexts = (
@@ -42,7 +45,7 @@ export const countUntranslatedTexts = (
 const rowHasText = (row: TranslateRow): boolean => row.description.trim().length > 0
 
 export const localeHasText = (locale: TranslateLocaleContent): boolean => {
-  if (locale.title.trim() || locale.description.trim()) return true
+  if (locale.title.trim() || locale.description.trim() || locale.notes.trim()) return true
   return locale.ingredients.some(rowHasText) || locale.instructions.some(rowHasText)
 }
 
@@ -80,10 +83,12 @@ export const applyTranslatedLocale = (
   const description = translated[1] ?? ""
   const ingredientStart = 2
   const instructionStart = ingredientStart + source.ingredients.length
+  const notesIndex = instructionStart + source.instructions.length
 
   return {
     title,
     description,
+    notes: translated[notesIndex] ?? "",
     slug: slugFromTitle(title),
     ingredients: source.ingredients.map((row, index) =>
       nextIngredient(row, current.ingredients[index], translated[ingredientStart + index] ?? ""),

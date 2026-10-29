@@ -3,6 +3,8 @@ const localeFormSchema = (t: (key: string) => string) =>
     slug: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.idRequired"))),
     title: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.titleRequired"))),
     description: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.descriptionRequired"))),
+    // Opcionales: si quedan vacias no se muestran en la ficha
+    notes: v.optional(v.pipe(v.string(), v.maxLength(10000, t("recipe.edit.error.notesTooLong"))), ""),
     ingredients: v.array(v.any()),
     instructions: v.array(v.any()),
   })

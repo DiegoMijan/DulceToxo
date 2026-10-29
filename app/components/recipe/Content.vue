@@ -13,6 +13,8 @@
   const localeData = computed(() => recipe.locales[currentLocale.value])
   const ingredients = computed(() => recipe.ingredients[currentLocale.value] || [])
   const steps = computed(() => recipe.steps[currentLocale.value] || [])
+  // Solo se muestra la seccion si hay texto (el backend devuelve "" cuando no hay notas)
+  const notes = computed(() => localeData.value?.notes?.trim() ?? "")
 
   const { isLoggedIn } = useAuth()
 
@@ -67,6 +69,7 @@
         difficulty: t("recipe.difficulty"),
         ingredients: t("recipe.edit.form.ingredients"),
         instructions: t("recipe.edit.form.instructions"),
+        notes: t("recipe.edit.form.notes"),
       },
       recipe.images,
     )
@@ -161,6 +164,17 @@
             <span class="sub-title pt-1 text-[15px] leading-relaxed">{{ step.description }}</span>
           </li>
         </ol>
+        <template v-if="notes">
+          <div class="mt-10">
+            <RecipeSectionTitle :title="t('recipe.edit.form.notes')" />
+          </div>
+          <p
+            class="sub-title whitespace-pre-line text-left text-[15px] leading-relaxed"
+            data-testid="recipe-notes"
+          >
+            {{ notes }}
+          </p>
+        </template>
       </div>
     </section>
     <section

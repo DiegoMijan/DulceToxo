@@ -10,6 +10,7 @@ export interface Recipe extends State {
   id: Nullable<string>
   title: string
   description: string
+  notes?: string
   ingredients: Ingredient[]
   instructions: Step[]
   images?: Nullable<string[]>
@@ -56,6 +57,13 @@ export type RecipeLocaleForm = {
     value: string
   }
   description: {
+    invalid: boolean
+    error: {
+      message: string | null
+    }
+    value: string
+  }
+  notes: {
     invalid: boolean
     error: {
       message: string | null

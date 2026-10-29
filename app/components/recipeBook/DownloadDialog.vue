@@ -82,6 +82,7 @@
     difficulty: t("recipe.difficulty"),
     ingredients: t("recipe.edit.form.ingredients"),
     instructions: t("recipe.edit.form.instructions"),
+    notes: t("recipe.edit.form.notes"),
   }))
 
   const resetForm = () => {
