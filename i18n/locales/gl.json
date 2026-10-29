@@ -183,7 +183,9 @@
       "nameRequired": "O nome é obrigatorio",
       "passwordsDontMatch": "Os contrasinais non coinciden",
       "weakPassword": "O contrasinal debe ter polo menos 8 caracteres",
-      "invalidEmail": "Por favor, introduce un correo electrónico válido"
+      "invalidEmail": "Por favor, introduce un correo electrónico válido",
+      "tooManyAttempts": "Demasiados intentos. Agarda un minuto e volve probar.",
+      "captcha": "Non se puido comprobar que non es un robot. Téntao de novo."
     },
     "success": {
       "signInSuccess": "Sesión iniciada correctamente",

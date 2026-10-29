@@ -44,12 +44,17 @@
     unmasked.value = true
   })
 
+  // Captcha (solo si hay clave de Turnstile configurada)
+  const captchaToken = ref("")
+  const captchaRef = useTemplateRef<{ reset: () => void; enabled: string }>("captchaRef")
+  const captchaMissing = computed(() => Boolean(captchaRef.value?.enabled) && !captchaToken.value)
+
   const onSubmit = async (event: FormSubmitEvent) => {
     const { valid, values } = event as FormSubmitEvent<{ email: string; password: string }>
     if (!valid) return
     try {
       isLoading.value = true
-      await signIn(values.email, values.password)
+      await signIn(values.email, values.password, captchaToken.value || undefined)
 
       const redirectTo = getSafeRedirectPath(route.query.redirect)
       if (redirectTo) {
@@ -58,6 +63,7 @@
         await router.push(localePath("/dashboard"))
       }
     } catch (err: unknown) {
+      captchaRef.value?.reset()
       if (err instanceof Error) {
         error.value = err.message
       } else {
@@ -113,9 +119,13 @@
             />
           </template>
         </FormField>
+        <AuthTurnstile
+          ref="captchaRef"
+          v-model="captchaToken"
+        />
         <Button
           type="submit"
-          :disabled="isLoading"
+          :disabled="isLoading || captchaMissing"
           class="w-full"
           data-testid="login-submit"
         >

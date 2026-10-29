@@ -183,7 +183,9 @@
       "nameRequired": "Name is required",
       "passwordsDontMatch": "Passwords don't match",
       "weakPassword": "Password must be at least 8 characters long",
-      "invalidEmail": "Please enter a valid email address"
+      "invalidEmail": "Please enter a valid email address",
+      "tooManyAttempts": "Too many attempts. Wait a minute and try again.",
+      "captcha": "We could not verify that you are not a robot. Please try again."
     },
     "success": {
       "signInSuccess": "Successfully signed in",

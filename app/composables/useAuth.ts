@@ -18,11 +18,28 @@ export const useAuth = () => {
   const isLoading = computed(() => session.value.isPending)
   const error = ref<string | null>(null)
 
-  const signIn = async (email: string, password: string) => {
+  // Errores del limite de intentos (429) y del captcha, traducidos
+  const authErrorMessage = (authError: { status?: number; code?: string; message?: string }, fallback: string) => {
+    const { $i18n } = useNuxtApp()
+    if (authError.status === 429) return $i18n.t("auth.errors.tooManyAttempts")
+    if (authError.code === "MISSING_RESPONSE" || authError.code === "VERIFICATION_FAILED") {
+      return $i18n.t("auth.errors.captcha")
+    }
+    return authError.message ?? fallback
+  }
+
+  const captchaFetchOptions = (captchaToken?: string) =>
+    captchaToken ? { fetchOptions: { headers: { "x-captcha-response": captchaToken } } } : {}
+
+  const signIn = async (email: string, password: string, captchaToken?: string) => {
     error.value = null
-    const { data, error: signInError } = await authClient.signIn.email({ email, password })
+    const { data, error: signInError } = await authClient.signIn.email({
+      email,
+      password,
+      ...captchaFetchOptions(captchaToken),
+    })
     if (signInError) {
-      error.value = signInError.message ?? "Error al iniciar sesión"
+      error.value = authErrorMessage(signInError, "Error al iniciar sesión")
       throw new Error(error.value)
     }
     // Sin esto, isLoggedIn puede seguir en false justo después de resolver esta
@@ -38,6 +55,7 @@ export const useAuth = () => {
     firstName: string,
     lastName: string,
     dateOfBirth: string,
+    captchaToken?: string,
   ) => {
     error.value = null
     const { data, error: signUpError } = await authClient.signUp.email({
@@ -47,9 +65,10 @@ export const useAuth = () => {
       first_name: firstName,
       last_name: lastName,
       date_of_birth: dateOfBirth,
+      ...captchaFetchOptions(captchaToken),
     } as never)
     if (signUpError) {
-      error.value = signUpError.message ?? "Error al registrarse"
+      error.value = authErrorMessage(signUpError, "Error al registrarse")
       throw new Error(error.value)
     }
     await session.value.refetch()
