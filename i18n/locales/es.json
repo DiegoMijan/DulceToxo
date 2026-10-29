@@ -239,7 +239,8 @@
         "slugConflict": "Este slug ya está en uso",
         "loadFailed": "Error al cargar la receta",
         "saveFailed": "Error al guardar la receta",
-        "generic": "Ha ocurrido un error inesperado"
+        "generic": "Ha ocurrido un error inesperado",
+        "notesTooLong": "Las notas no pueden superar los 10.000 caracteres"
       },
       "translate": {
         "button": "Traducir a gallego e inglés",
@@ -266,7 +267,9 @@
         "order": "Orden",
         "heading": "Título",
         "id": "ID (para mostrar en la URL)",
-        "slug": "Slug (URL)"
+        "slug": "Slug (URL)",
+        "notes": "Notas",
+        "notesPlaceholder": "Consejos, variantes, cómo conservarla… (opcional)"
       },
       "actions": "Acciones",
       "unsaved": {

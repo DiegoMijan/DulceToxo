@@ -31,6 +31,7 @@
     slug: string
     title: string
     description: string
+    notes: string
     ingredients: IngredientFormRow[]
     instructions: { id: string; order: number; description: string }[]
   }
@@ -144,6 +145,7 @@
     slug: "",
     title: "",
     description: "",
+    notes: "",
     ingredients: [],
     instructions: [],
   })
@@ -184,6 +186,7 @@
     slug: data.locales[localeKey]?.slug || "",
     title: data.locales[localeKey]?.title || "",
     description: data.locales[localeKey]?.description || "",
+    notes: data.locales[localeKey]?.notes || "",
     ingredients:
       data.ingredients[localeKey]?.map((item) => ({
         id: item.id,
@@ -312,6 +315,7 @@
       slug: values.locales[loc].slug,
       title: values.locales[loc].title,
       description: values.locales[loc].description,
+      notes: values.locales[loc].notes?.trim() ?? "",
     }))
 
     const ingredients: RecipeIngredientInput[] = (["es", "en", "gl"] as const).flatMap((loc) =>

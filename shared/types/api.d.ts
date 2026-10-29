@@ -1389,6 +1389,8 @@ export interface components {
       slug: string
       title: string
       description: string
+      /** @description Recipe notes for this locale. Empty string when there are none. */
+      notes: string
     }
     RecipeIngredientContent: {
       id: string
@@ -1493,6 +1495,8 @@ export interface components {
       slug: string
       title: string
       description: string
+      /** @description Optional recipe notes for this locale (max 10000 chars). Defaults to an empty string. */
+      notes?: string
     }
     RecipeIngredientInput: {
       /** @enum {string} */

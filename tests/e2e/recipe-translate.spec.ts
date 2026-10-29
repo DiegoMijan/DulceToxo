@@ -250,6 +250,8 @@ test.describe("recipe auto translate", () => {
 
     await page.getByTestId("recipe-add-instruction").click()
 
+    await page.locator('textarea[name="locales.es.notes"]').fill("Se conserva 3 días en la nevera")
+
     await page.getByTestId("recipe-translate-button").click()
     await expect(page.getByText(OVERWRITE_MESSAGE.gl)).toBeVisible()
     await acceptTranslateConfirm(page, "Traducir")
@@ -271,6 +273,7 @@ test.describe("recipe auto translate", () => {
     expect(texts).toContain("3 huevos")
     expect(texts).toContain("Mezclar todo")
     expect(texts).toContain("")
+    expect(texts.at(-1)).toBe("Se conserva 3 días en la nevera")
 
     await expectLocaleFields(page, "gl", {
       title: "GL:Bizcocho de naranja",
@@ -284,6 +287,9 @@ test.describe("recipe auto translate", () => {
     await expect(tableRows(page, "ingredients").nth(1)).toContainText("GL:3 huevos")
     await expect(tableRows(page, "ingredients").nth(2)).not.toContainText("GL:")
     await expect(tableRows(page, "instructions").nth(0)).toContainText("GL:Mezclar todo")
+    await expect(page.locator('textarea[name="locales.gl.notes"]')).toHaveValue(
+      "GL:Se conserva 3 días en la nevera",
+    )
 
     await expectLocaleFields(page, "en", {
       title: "EN:Bizcocho de naranja",
@@ -333,6 +339,7 @@ test.describe("recipe auto translate", () => {
       "200 g de queso",
       "",
       "Mezclar los ingredientes",
+      "",
       "",
     ])
 

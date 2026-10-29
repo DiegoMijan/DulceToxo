@@ -37,6 +37,7 @@ const readLocale = (locale: RecipeLocaleForm | undefined): TranslateLocaleConten
   slug: locale?.slug?.value ?? "",
   title: locale?.title?.value ?? "",
   description: locale?.description?.value ?? "",
+  notes: locale?.notes?.value ?? "",
   ingredients: locale?.ingredients?.value ?? [],
   instructions: locale?.instructions?.value ?? [],
 })
@@ -52,6 +53,7 @@ const writeLocale = (locale: RecipeLocaleForm | undefined, next: TranslateLocale
   if (!locale) return
   setFieldValue(locale.title, next.title)
   setFieldValue(locale.description, next.description)
+  setFieldValue(locale.notes, next.notes)
   setFieldValue(locale.slug, next.slug)
   setFieldValue(locale.ingredients, next.ingredients as RecipeLocaleForm["ingredients"]["value"])
   setFieldValue(locale.instructions, next.instructions as RecipeLocaleForm["instructions"]["value"])

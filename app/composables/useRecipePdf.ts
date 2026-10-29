@@ -40,6 +40,7 @@ export interface PdfLabels {
   difficulty: string
   ingredients: string
   instructions: string
+  notes?: string
 }
 
 export interface CookbookPdfLabels {
@@ -340,6 +341,7 @@ export const recipeDetailToPdfRecipe = (
     id: recipe.id,
     title: localeData?.title || "",
     description: localeData?.description || "",
+    notes: localeData?.notes || "",
     ingredients: ingredients.map((ingredient) => ({
       id: ingredient.id,
       description: ingredient.description,
@@ -475,7 +477,7 @@ const drawRecipeContent = (
   const contentStartY = y + 9
   const firstPage = doc.getCurrentPageInfo().pageNumber
 
-  drawColumn(
+  const ingredientsEnd = drawColumn(
     doc,
     recipe.ingredients.map((ingredient) => ({
       description: ingredient.description,
@@ -489,7 +491,7 @@ const drawRecipeContent = (
     drawIngredientMarker,
     true,
   )
-  drawColumn(
+  const instructionsEnd = drawColumn(
     doc,
     recipe.instructions.map((instruction) => ({
       description: instruction.description,
@@ -501,6 +503,38 @@ const drawRecipeContent = (
     8,
     drawInstructionMarker,
   )
+
+  drawNotes(doc, recipe.notes ?? "", labels.notes ?? "", lowestCursor(ingredientsEnd, instructionsEnd))
+}
+
+// El cursor que va mas abajo en el documento (pagina posterior o mas abajo en la misma)
+const lowestCursor = (a: ColumnCursor, b: ColumnCursor): ColumnCursor =>
+  a.page !== b.page ? (a.page > b.page ? a : b) : a.y >= b.y ? a : b
+
+// Notas a todo el ancho, debajo de la columna mas larga; solo si hay texto
+const drawNotes = (doc: jsPDF, notes: string, title: string, after: ColumnCursor) => {
+  const trimmed = notes.trim()
+  if (!trimmed) return
+
+  const cursor: ColumnCursor = { page: after.page, y: after.y + 6 }
+  ensureSpace(doc, cursor, 20)
+  drawColumnTitle(doc, PAGE.margin, cursor.y, title)
+  cursor.y += 9
+
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(10.5)
+  const lineHeight = 5
+  for (const paragraph of trimmed.split(/\n/)) {
+    const lines: string[] = paragraph.trim() ? doc.splitTextToSize(paragraph, CONTENT_WIDTH) : [""]
+    for (const line of lines) {
+      ensureSpace(doc, cursor, lineHeight)
+      doc.setTextColor(...BRAND.text)
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(10.5)
+      doc.text(line, PAGE.margin, cursor.y)
+      cursor.y += lineHeight
+    }
+  }
 }
 
 // Separado de la descarga para poder probar la paginación (doc.output(...)) sin DOM.

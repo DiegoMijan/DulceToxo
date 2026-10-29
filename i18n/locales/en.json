@@ -239,7 +239,8 @@
         "slugConflict": "This slug is already in use",
         "loadFailed": "Error loading recipe",
         "saveFailed": "Error saving recipe",
-        "generic": "An unexpected error occurred"
+        "generic": "An unexpected error occurred",
+        "notesTooLong": "Notes cannot be longer than 10,000 characters"
       },
       "translate": {
         "button": "Translate to Galician and English",
@@ -266,7 +267,9 @@
         "order": "Order",
         "heading": "Heading",
         "id": "ID (to show in the URL)",
-        "slug": "Slug (URL)"
+        "slug": "Slug (URL)",
+        "notes": "Notes",
+        "notesPlaceholder": "Tips, variations, how to store it… (optional)"
       },
       "actions": "Actions",
       "unsaved": {
