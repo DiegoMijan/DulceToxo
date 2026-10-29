@@ -313,12 +313,17 @@
       Object.values(c.locale).some((l) => l?.url_name === values.category),
     )?.id
 
+    // Campos opcionales vaciados en el idioma origen: se vacian tambien en las traducciones
+    const source = values.locales[RECIPE_SOURCE_LOCALE]
+    const sourceHasDescription = Boolean(source.description?.trim())
+    const sourceHasNotes = Boolean(source.notes?.trim())
+
     const locales = (["es", "en", "gl"] as const).map((loc) => ({
       locale: loc,
       slug: values.locales[loc].slug,
       title: values.locales[loc].title,
-      description: values.locales[loc].description,
-      notes: values.locales[loc].notes?.trim() ?? "",
+      description: sourceHasDescription ? values.locales[loc].description : "",
+      notes: sourceHasNotes ? (values.locales[loc].notes?.trim() ?? "") : "",
     }))
 
     const ingredients: RecipeIngredientInput[] = (["es", "en", "gl"] as const).flatMap((loc) =>
