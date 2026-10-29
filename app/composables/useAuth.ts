@@ -22,6 +22,7 @@ export const useAuth = () => {
   const authErrorMessage = (authError: { status?: number; code?: string; message?: string }, fallback: string) => {
     const { $i18n } = useNuxtApp()
     if (authError.status === 429) return $i18n.t("auth.errors.tooManyAttempts")
+    if (authError.code === "INVALID_EMAIL_OR_PASSWORD") return $i18n.t("auth.errors.invalidCredentials")
     if (authError.code === "MISSING_RESPONSE" || authError.code === "VERIFICATION_FAILED") {
       return $i18n.t("auth.errors.captcha")
     }

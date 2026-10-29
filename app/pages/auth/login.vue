@@ -53,6 +53,7 @@
     const { valid, values } = event as FormSubmitEvent<{ email: string; password: string }>
     if (!valid) return
     try {
+      error.value = ""
       isLoading.value = true
       await signIn(values.email, values.password, captchaToken.value || undefined)
 
@@ -93,6 +94,14 @@
         class="mt-8 space-y-6 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg"
         @submit="onSubmit"
       >
+        <div
+          v-if="error"
+          role="alert"
+          class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg"
+          data-testid="login-error"
+        >
+          {{ error }}
+        </div>
         <FormField
           fieldName="email"
           :form="$form"
