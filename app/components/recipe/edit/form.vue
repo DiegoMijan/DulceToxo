@@ -911,7 +911,7 @@
               <InputNumber
                 name="cookTime"
                 class="w-full"
-                :min="1"
+                :min="0"
                 :max="10000"
                 fluid
                 :useGrouping="false"
