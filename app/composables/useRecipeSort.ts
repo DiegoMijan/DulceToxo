@@ -8,11 +8,11 @@ type SortableRecipe = RecipeListItem & { favorited_at?: number }
 
 export const RECIPE_SORT_CODES = [
   "name",
+  "ratingAvg",
   "createdAt",
   "updatedAt",
   "difficulty",
   "totalTime",
-  "ratingAvg",
 ] as const
 
 export const FAVORITE_SORT_CODES = [...RECIPE_SORT_CODES, "favoritedAt"] as const
