@@ -80,7 +80,7 @@
   <div class="w-full h-full lg:pl-10 lg:pr-10 overflow-auto text-center">
     <section class="flex flex-col gap-4 mb-10 text-center">
       <h1
-        class="title text-3xl sm:text-4xl lg:text-5xl font-bold flex flex-row gap-2 items-center justify-center"
+        class="font-pacifico text-3xl sm:text-4xl lg:text-5xl leading-tight text-french-lilac-700 dark:text-french-lilac-300 flex flex-row gap-2 items-center justify-center"
         data-testid="recipe-title"
       >
         {{ localeData?.title }}
