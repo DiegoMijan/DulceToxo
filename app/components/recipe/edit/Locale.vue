@@ -101,10 +101,29 @@
   const onRowReorder = (event: DataTableRowReorderEvent, type: "ingredients" | "instructions") => {
     if (disabled) return
     if (!form.value[locale]?.[type]?.value) return
+    // Orden antiguo de cada fila en su nueva posicion: las traducciones se alinean por orden
+    const previousOrders = (event.value ?? []).map((item: Ingredient | Step) => item.order)
     form.value[locale][type].value = event.value?.map((item: Ingredient | Step, index: number) => ({
       ...item,
       order: index + 1,
     }))
+
+    if (!isSourceLocale.value) return
+    RECIPE_TARGET_LOCALES.forEach((otherLocale) => {
+      const items = form.value[otherLocale]?.[type]?.value as (Ingredient | Step)[] | undefined
+      if (!items) return
+      const byOrder = new Map(items.map((item) => [item.order, item]))
+      const reordered = previousOrders
+        .map((order: number) => byOrder.get(order))
+        .filter((item): item is Ingredient | Step => Boolean(item))
+      // Filas sin pareja en el idioma origen se quedan al final
+      const placed = new Set(reordered)
+      reordered.push(...items.filter((item) => !placed.has(item)))
+      form.value[otherLocale][type].value = reordered.map((item, index) => ({
+        ...item,
+        order: index + 1,
+      }))
+    })
   }
 
   const onCellEditComplete = (
