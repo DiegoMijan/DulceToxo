@@ -4,7 +4,7 @@
     myRating: number | null
   }>()
 
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const toast = useToast()
   const recipesStore = useRecipes()
 
@@ -13,7 +13,11 @@
 
   const voteAriaLabel = computed(() => {
     if (myRating == null) return t("recipe.rating.yoursEmptyAria")
-    return t("recipe.rating.yoursAria", { value: myRating })
+    // 4 -> "4", 3.5 -> "3,5" (o "3.5" en ingles)
+    const value = Number.isInteger(myRating)
+      ? String(myRating)
+      : formatRatingAverage(myRating, locale.value)
+    return t("recipe.rating.yoursAria", { value })
   })
 
   const handleVoteChange = async (value: number | null) => {
@@ -27,8 +31,9 @@
         return
       }
 
-      const nextValue = Math.round(value)
-      if (nextValue < 1 || nextValue > 5) return
+      // De media en media estrella (0.5 ... 5), como acepta el backend
+      const nextValue = Math.round(value * 2) / 2
+      if (nextValue < 0.5 || nextValue > 5) return
       await recipesStore.upsertRating(recipeId, nextValue)
     } catch (error) {
       // Sesión caducada: el store ya redirige al login, sin toast de error.
@@ -67,6 +72,7 @@
       <RecipeRatingStars
         :key="`${recipeId}-${ratingKey}`"
         :model-value="myRating"
+        allow-half
         :disabled="saving"
         :aria-label="voteAriaLabel"
         @change="handleVoteChange"
