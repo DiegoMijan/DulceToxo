@@ -58,6 +58,18 @@
 
   const recipePath = (slug: string) => localePath(`/${categoryUrlName.value}/${slug}`)
 
+  // En escritorio la categoria sin receta abre la primera de la lista segun la ordenacion
+  // del usuario. En movil se mantiene la lista en linea para elegir.
+  const isDesktop = useMediaQuery("(min-width: 1024px)")
+  const openFirstRecipe = async (): Promise<boolean> => {
+    if (!isDesktop.value || recipeSlugParam.value || !categoryId.value) return false
+    const [first] = sortRecipeList(recipesStore.recipesByCategory.get(categoryId.value) ?? [])
+    const slug = first?.locale[locale.value as LocaleKey]?.slug
+    if (!slug) return false
+    await navigateTo(recipePath(slug), { replace: true })
+    return true
+  }
+
   const loadRecipeBySlug = async (slug: string | undefined) => {
     const generation = ++recipeLoadGeneration
     recipeNotFound.value = false
@@ -121,6 +133,10 @@
     }
 
     await recipesStore.getRecipesByCategory(catId)
+    if (await openFirstRecipe()) {
+      loading.value = false
+      return
+    }
     await loadRecipeBySlug(recipeSlugParam.value)
 
     loading.value = false
@@ -157,7 +173,8 @@
 
   watch(
     () => recipeSlugParam.value,
-    (recipeSlug) => {
+    async (recipeSlug) => {
+      if (!recipeSlug && !loading.value && (await openFirstRecipe())) return
       if (recipeSlug === selectedSlug.value) return
       selectedSlug.value = recipeSlug
     },
