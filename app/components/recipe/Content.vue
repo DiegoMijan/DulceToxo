@@ -148,7 +148,7 @@
         </p>
         <ol
           v-else
-          class="flex list-none flex-col gap-5"
+          class="flex list-none flex-col gap-[14px]"
         >
           <li
             v-for="(step, index) in steps"
