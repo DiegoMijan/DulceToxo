@@ -39,6 +39,11 @@
     return passwordValue.states && passwordValue.states.password.value === check
   }
 
+  // Captcha (solo si hay clave de Turnstile configurada)
+  const captchaToken = ref("")
+  const captchaRef = useTemplateRef<{ reset: () => void; enabled: string }>("captchaRef")
+  const captchaMissing = computed(() => Boolean(captchaRef.value?.enabled) && !captchaToken.value)
+
   const onSubmit = async (event: FormSubmitEvent) => {
     const { valid, values } = event as FormSubmitEvent<{
       firstName: string
@@ -58,9 +63,17 @@
       // locales del Date tal cual los eligió el calendario.
       const birthDate = values.dateOfBirth
       const dateOfBirth = `${birthDate.getFullYear()}-${String(birthDate.getMonth() + 1).padStart(2, "0")}-${String(birthDate.getDate()).padStart(2, "0")}`
-      await signUp(values.email, values.password, values.firstName, values.lastName, dateOfBirth)
+      await signUp(
+        values.email,
+        values.password,
+        values.firstName,
+        values.lastName,
+        dateOfBirth,
+        captchaToken.value || undefined,
+      )
       await router.push(localePath("/dashboard"))
     } catch (err: unknown) {
+      captchaRef.value?.reset()
       error.value = err instanceof Error ? err.message : t("auth.errors.invalidCredentials")
     } finally {
       isLoading.value = false
@@ -175,9 +188,13 @@
           </FormField>
         </div>
 
+        <AuthTurnstile
+          ref="captchaRef"
+          v-model="captchaToken"
+        />
         <Button
           type="submit"
-          :disabled="isLoading"
+          :disabled="isLoading || captchaMissing"
           class="w-full"
         >
           {{ $t('auth.register.button') }}

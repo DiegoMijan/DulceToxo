@@ -223,6 +223,9 @@ export default defineNuxtConfig({
       // Clave de la Community License de PrimeUI (PrimeVue 5).
       // Se define en .env como NUXT_PUBLIC_PRIMEUI_LICENSE
       PRIMEUI_LICENSE: "",
+      // Clave de sitio de Cloudflare Turnstile (captcha de login y registro). Vacia = sin captcha.
+      // Se define en Vercel como NUXT_PUBLIC_TURNSTILE_SITE_KEY
+      turnstileSiteKey: "",
     },
   },
   primevue: {
