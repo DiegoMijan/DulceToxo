@@ -6,7 +6,7 @@
     // Clave fija: ni cambiar de receta, ni de categoria, ni de idioma (que traduce la categoria
     // en la URL) remonta la pagina; los watch de la ruta recargan los datos.
     key: () => "recipes",
-    middleware: "auth",
+    middleware: "approved",
   })
 
   const route = useRoute()

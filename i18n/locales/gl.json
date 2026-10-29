@@ -371,5 +371,32 @@
     "reload": "Recargar",
     "dismiss": "Pechar",
     "offline": "Sen conexión: podes ver as receitas que xa abriches"
+  },
+  "admin": {
+    "users": {
+      "title": "Usuarios",
+      "subtitle": "{total} usuarios · {pending} pendentes de aprobar",
+      "search": "Buscar por nome, email ou país",
+      "approved": "Aprobado",
+      "approveAria": "Aprobar a {name}",
+      "name": "Nome",
+      "email": "Email",
+      "birthDate": "Nacemento",
+      "signupDate": "Alta",
+      "location": "Localización",
+      "admin": "Admin",
+      "empty": "Non hai usuarios",
+      "loadError": "Non se puideron cargar os usuarios",
+      "unsaved": "1 cambio sen gardar | {n} cambios sen gardar",
+      "saved": "Actualizouse 1 usuario | Actualizáronse {n} usuarios",
+      "saveError": "Non se puideron gardar os cambios, téntao de novo"
+    }
+  },
+  "pending": {
+    "title": "Conta pendente de aprobación",
+    "message": "Grazas por rexistrarte, {name}. Un administrador ten que aprobar a túa conta antes de que poidas ver as receitas.",
+    "check": "Comprobar de novo",
+    "approved": "A túa conta xa está aprobada!",
+    "stillPending": "A túa conta segue pendente de aprobación"
   }
 }

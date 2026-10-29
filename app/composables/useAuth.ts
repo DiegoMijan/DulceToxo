@@ -10,6 +10,11 @@ export const useAuth = () => {
   const isAdmin = computed(
     () => (session.value.data?.user as { type?: number } | undefined)?.type === 1,
   )
+  // Puede ver el contenido: aprobado por un admin, o admin
+  const isApproved = computed(() => {
+    const current = session.value.data?.user as { type?: number; approved?: boolean } | undefined
+    return current?.type === 1 || current?.approved === true
+  })
   const isLoading = computed(() => session.value.isPending)
   const error = ref<string | null>(null)
 
@@ -76,6 +81,20 @@ export const useAuth = () => {
     return !!data?.user
   }
 
+  // Para los middlewares de contenido. fresh = saltarse la cache de 5 minutos de la cookie de
+  // sesion (al comprobar si un admin acaba de aprobar la cuenta).
+  const ensureApprovedSession = async (
+    fresh = false,
+  ): Promise<{ isLoggedIn: boolean; isApproved: boolean }> => {
+    const { data } = await authClient.getSession(
+      fresh ? { query: { disableCookieCache: true } } : undefined,
+    )
+    if (fresh) await session.value.refetch()
+    if (!data?.user) return { isLoggedIn: false, isApproved: false }
+    const current = data.user as { type?: number; approved?: boolean }
+    return { isLoggedIn: true, isApproved: current.type === 1 || current.approved === true }
+  }
+
   const ensureAdminSession = async (): Promise<{
     isLoggedIn: boolean
     isAdmin: boolean
@@ -111,6 +130,7 @@ export const useAuth = () => {
     user,
     isLoggedIn,
     isAdmin,
+    isApproved,
     isLoading,
     error,
     signIn,
@@ -118,6 +138,7 @@ export const useAuth = () => {
     signOut,
     updatePassword,
     ensureSessionLoaded,
+    ensureApprovedSession,
     ensureAdminSession,
   }
 }

@@ -189,6 +189,8 @@ export const prepareE2eUsers = async () => {
   await signUp(USER_EMAIL, "User")
   await signUp(ADMIN_EMAIL, "Admin")
   promoteAdmin(dbPath, ADMIN_EMAIL)
+  // Los usuarios nuevos necesitan la aprobacion de un admin para ver el contenido
+  runSql(dbPath, `UPDATE users SET approved = 1 WHERE email IN ('${USER_EMAIL}', '${ADMIN_EMAIL}');`)
   return dbPath
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  const { isLoggedIn } = useAuth()
+  const { isApproved } = useAuth()
   const { open } = useCommandPalette()
   const { t } = useI18n()
 
@@ -19,7 +19,7 @@
 </script>
 
 <template>
-  <template v-if="isLoggedIn">
+  <template v-if="isApproved">
     <NuxtIcon
       v-tooltip.bottom="tooltip"
       name="material-symbols:search-rounded"

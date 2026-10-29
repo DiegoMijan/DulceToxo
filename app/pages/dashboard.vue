@@ -3,7 +3,7 @@ definePageMeta({
   middleware: "auth",
 })
 
-const { user, signOut } = useAuth()
+const { user, isAdmin, signOut } = useAuth()
 const { favoritesIndexPath } = useFavoritesPath()
 const isSigningOut = ref(false)
 
@@ -111,6 +111,10 @@ const handleSignOut = async () => {
             </div>
           </div>
         </div>
+        <AdminUsersApproval
+          v-if="isAdmin"
+          class="mt-6"
+        />
       </div>
     </main>
   </div>
