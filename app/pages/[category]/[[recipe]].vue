@@ -67,6 +67,9 @@
     const slug = first?.locale[locale.value as LocaleKey]?.slug
     if (!slug) return false
     await navigateTo(recipePath(slug), { replace: true })
+    // En la carga inicial los watch de la ruta aun no existen: se carga aqui directamente
+    selectedSlug.value = slug
+    await loadRecipeBySlug(slug)
     return true
   }
 
