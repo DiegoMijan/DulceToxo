@@ -230,7 +230,6 @@
       },
       "error": {
         "titleRequired": "Title is required",
-        "descriptionRequired": "Description is required",
         "ingredientsRequired": "Ingredients are required",
         "instructionsRequired": "Instructions are required",
         "difficultyRequired": "Difficulty is required",

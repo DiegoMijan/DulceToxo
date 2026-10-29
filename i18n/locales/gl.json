@@ -230,7 +230,6 @@
       },
       "error": {
         "titleRequired": "O título é obrigatorio",
-        "descriptionRequired": "A descripción é obrigatoria",
         "ingredientsRequired": "Os ingredientes son obrigatorios",
         "instructionsRequired": "As instruccions son obrigatorias",
         "difficultyRequired": "A dificultade é obrigatoria",
