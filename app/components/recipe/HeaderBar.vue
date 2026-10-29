@@ -11,6 +11,7 @@
   }>()
 
   const { t } = useI18n()
+  const toast = useToast()
   const difficultyDrawerVisible = ref(false)
 
   const prepLabel = computed(() => t("recipe.prepTime", { time: recipe.prep_time }))
@@ -18,6 +19,18 @@
 
   const handleOpenDifficulty = () => {
     difficultyDrawerVisible.value = true
+  }
+
+  const sourceUrl = computed(() => recipe.source_url || null)
+  const sourceUrlLabel = computed(() =>
+    sourceUrl.value ? t("recipe.sourceUrl") : t("recipe.noSourceUrl"),
+  )
+
+  // Sin enlace el boton se ve deshabilitado pero sigue siendo clicable para avisar
+  const handleSourceUrlClick = (event: MouseEvent) => {
+    if (sourceUrl.value) return
+    event.preventDefault()
+    toast.add({ severity: "info", summary: t("recipe.noSourceUrl"), life: 3000 })
   }
 
   const handleDownloadPdf = () => {
@@ -109,6 +122,26 @@
         :recipe-id="recipe.id"
         :is-favorite="recipe.is_favorite"
       />
+      <a
+        v-tooltip.top="sourceUrlLabel"
+        :href="sourceUrl ?? undefined"
+        target="_blank"
+        rel="noopener noreferrer"
+        role="link"
+        :aria-label="sourceUrlLabel"
+        :aria-disabled="sourceUrl ? undefined : 'true'"
+        :tabindex="0"
+        class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-stone-500 transition-colors hover:bg-french-lilac-100 hover:text-french-lilac-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-french-lilac-500 dark:text-stone-300 dark:hover:bg-french-lilac-900/50 dark:hover:text-french-lilac-300"
+        :class="{ 'cursor-not-allowed! opacity-40 hover:bg-transparent! hover:text-stone-500! dark:hover:text-stone-300!': !sourceUrl }"
+        data-testid="recipe-source-url"
+        @click="handleSourceUrlClick"
+        @keydown.enter="!sourceUrl && handleSourceUrlClick($event as unknown as MouseEvent)"
+      >
+        <i
+          class="pi pi-link text-lg"
+          aria-hidden="true"
+        />
+      </a>
       <button
         v-tooltip.top="t('recipe.downloadPdf')"
         type="button"

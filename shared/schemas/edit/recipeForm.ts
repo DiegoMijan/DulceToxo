@@ -1,3 +1,12 @@
+const isHttpUrl = (value: string): boolean => {
+  try {
+    const url = new URL(value)
+    return url.protocol === "http:" || url.protocol === "https:"
+  } catch {
+    return false
+  }
+}
+
 const localeFormSchema = (t: (key: string) => string) =>
   v.object({
     slug: v.pipe(v.string(), v.minLength(1, t("recipe.edit.error.idRequired"))),
@@ -15,6 +24,16 @@ export const recipeFormSchema = (t: (key: string) => string) =>
     difficulty: v.number(),
     prepTime: v.pipe(v.number(t("recipe.edit.error.prepTimeRequired"))),
     cookTime: v.pipe(v.number(t("recipe.edit.error.cookTimeRequired"))),
+    // Opcional y comun a todos los idiomas
+    sourceUrl: v.optional(
+      v.pipe(
+        v.string(),
+        v.trim(),
+        v.maxLength(2048, t("recipe.edit.error.sourceUrlInvalid")),
+        v.check((value) => value === "" || isHttpUrl(value), t("recipe.edit.error.sourceUrlInvalid")),
+      ),
+      "",
+    ),
     images: v.array(v.string()),
     category: v.pipe(
       v.any(),

@@ -241,7 +241,8 @@
         "loadFailed": "Erro ao cargar a receita",
         "saveFailed": "Erro ao gardar a receita",
         "generic": "Ocorreu un erro inesperado",
-        "notesTooLong": "As notas non poden superar os 10.000 caracteres"
+        "notesTooLong": "As notas non poden superar os 10.000 caracteres",
+        "sourceUrlInvalid": "Introduce unha ligazón válida que comece por http:// ou https://"
       },
       "translate": {
         "button": "Traducir a galego e inglés",
@@ -270,7 +271,8 @@
         "id": "ID (para mostrar na URL)",
         "slug": "Slug (URL)",
         "notes": "Notas",
-        "notesPlaceholder": "Consellos, variantes, como conservala… (opcional)"
+        "notesPlaceholder": "Consellos, variantes, como conservala… (opcional)",
+        "sourceUrl": "Ligazón"
       },
       "actions": "Accións",
       "unsaved": {
@@ -346,7 +348,9 @@
     "offline": {
       "title": "Sen conexión",
       "description": "Esta receita aínda non está gardada neste dispositivo. Ábrea cando teñas conexión e despois poderás vela sen ela."
-    }
+    },
+    "sourceUrl": "Abrir ligazón",
+    "noSourceUrl": "Esta receita non ten ningunha ligazón asociada"
   },
   "upload": {
     "title": "Imaxes",
