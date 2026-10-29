@@ -241,7 +241,8 @@
         "loadFailed": "Error loading recipe",
         "saveFailed": "Error saving recipe",
         "generic": "An unexpected error occurred",
-        "notesTooLong": "Notes cannot be longer than 10,000 characters"
+        "notesTooLong": "Notes cannot be longer than 10,000 characters",
+        "sourceUrlInvalid": "Enter a valid link starting with http:// or https://"
       },
       "translate": {
         "button": "Translate to Galician and English",
@@ -270,7 +271,8 @@
         "id": "ID (to show in the URL)",
         "slug": "Slug (URL)",
         "notes": "Notes",
-        "notesPlaceholder": "Tips, variations, how to store it… (optional)"
+        "notesPlaceholder": "Tips, variations, how to store it… (optional)",
+        "sourceUrl": "Link"
       },
       "actions": "Actions",
       "unsaved": {
@@ -346,7 +348,9 @@
     "offline": {
       "title": "You are offline",
       "description": "This recipe is not saved on this device yet. Open it while online and you will be able to view it offline later."
-    }
+    },
+    "sourceUrl": "Open link",
+    "noSourceUrl": "This recipe has no link"
   },
   "upload": {
     "title": "Images",

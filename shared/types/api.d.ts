@@ -1416,6 +1416,8 @@ export interface components {
       prep_time: number
       /** @description Cooking time in minutes */
       cook_time: number
+      /** @description Optional external link */
+      source_url: string | null
       author_id: string | null
       /** @description Unix timestamp in ms */
       created_at: number
@@ -1454,6 +1456,7 @@ export interface components {
       difficulty?: number
       prep_time?: number
       cook_time?: number
+      source_url?: string | null
       /** @description Replaces all existing locales. Each locale can only appear once. Empty array deletes every locale. */
       locales?: components["schemas"]["RecipeLocaleInput"][]
       /** @description Replaces all existing ingredients. Empty array deletes every ingredient. */
@@ -1526,6 +1529,7 @@ export interface components {
       prep_time: number
       /** @description Minutes */
       cook_time: number
+      source_url?: string | null
       /** @description Each locale can only appear once in locales */
       locales: components["schemas"]["RecipeLocaleInput"][]
       /** @description Optional. Defaults to an empty array when omitted. */

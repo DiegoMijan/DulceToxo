@@ -241,7 +241,8 @@
         "loadFailed": "Error al cargar la receta",
         "saveFailed": "Error al guardar la receta",
         "generic": "Ha ocurrido un error inesperado",
-        "notesTooLong": "Las notas no pueden superar los 10.000 caracteres"
+        "notesTooLong": "Las notas no pueden superar los 10.000 caracteres",
+        "sourceUrlInvalid": "Introduce un enlace válido que empiece por http:// o https://"
       },
       "translate": {
         "button": "Traducir a gallego e inglés",
@@ -270,7 +271,8 @@
         "id": "ID (para mostrar en la URL)",
         "slug": "Slug (URL)",
         "notes": "Notas",
-        "notesPlaceholder": "Consejos, variantes, cómo conservarla… (opcional)"
+        "notesPlaceholder": "Consejos, variantes, cómo conservarla… (opcional)",
+        "sourceUrl": "Enlace"
       },
       "actions": "Acciones",
       "unsaved": {
@@ -346,7 +348,9 @@
     "offline": {
       "title": "Sin conexión",
       "description": "Esta receta aún no está guardada en este dispositivo. Ábrela cuando tengas conexión y luego podrás verla sin ella."
-    }
+    },
+    "sourceUrl": "Abrir enlace",
+    "noSourceUrl": "Esta receta no tiene ningún enlace asociado"
   },
   "upload": {
     "title": "Imágenes",

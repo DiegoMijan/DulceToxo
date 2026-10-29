@@ -42,6 +42,7 @@
     difficulty: 1 | 2 | 3 | 4 | 5
     prepTime: number
     cookTime: number
+    sourceUrl: string
     images: string[]
     locales: Record<LocaleKey, LocaleData>
   }
@@ -174,6 +175,7 @@
     difficulty: 2,
     prepTime: 1,
     cookTime: 1,
+    sourceUrl: "",
     images: [],
     locales: {
       es: createEmptyLocaleData(),
@@ -210,6 +212,7 @@
     difficulty: data.difficulty as RecipeFormValues["difficulty"],
     prepTime: data.prep_time,
     cookTime: data.cook_time,
+    sourceUrl: data.source_url ?? "",
     images: data.images.map((img) => img.public_id),
     locales: {
       es: mapLocaleFormData(data, "es"),
@@ -345,6 +348,7 @@
       difficulty: values.difficulty,
       prep_time: values.prepTime,
       cook_time: values.cookTime,
+      source_url: values.sourceUrl?.trim() || null,
       locales,
       ingredients,
       steps,
@@ -925,6 +929,24 @@
                 fluid
                 :useGrouping="false"
                 :disabled="formLocked"
+              />
+            </template>
+          </FormField>
+          <FormField
+            fieldName="sourceUrl"
+            :label="t('recipe.edit.form.sourceUrl')"
+            :form="$form"
+            class="basis-full"
+          >
+            <template #field>
+              <InputText
+                name="sourceUrl"
+                type="url"
+                inputmode="url"
+                class="w-full"
+                placeholder="https://"
+                :disabled="formLocked"
+                data-testid="recipe-edit-source-url"
               />
             </template>
           </FormField>
