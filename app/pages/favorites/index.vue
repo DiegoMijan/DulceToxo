@@ -8,7 +8,7 @@
   })
 
   definePageMeta({
-    middleware: "auth",
+    middleware: "approved",
   })
 
   const { favoritesIndexPath } = useFavoritesPath()

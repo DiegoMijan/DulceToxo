@@ -371,5 +371,32 @@
     "reload": "Reload",
     "dismiss": "Close",
     "offline": "Offline: you can view the recipes you have already opened"
+  },
+  "admin": {
+    "users": {
+      "title": "Users",
+      "subtitle": "{total} users · {pending} awaiting approval",
+      "search": "Search by name, email or country",
+      "approved": "Approved",
+      "approveAria": "Approve {name}",
+      "name": "Name",
+      "email": "Email",
+      "birthDate": "Date of birth",
+      "signupDate": "Signed up",
+      "location": "Location",
+      "admin": "Admin",
+      "empty": "No users",
+      "loadError": "Users could not be loaded",
+      "unsaved": "1 unsaved change | {n} unsaved changes",
+      "saved": "1 user updated | {n} users updated",
+      "saveError": "Changes could not be saved, please try again"
+    }
+  },
+  "pending": {
+    "title": "Account awaiting approval",
+    "message": "Thanks for signing up, {name}. An administrator has to approve your account before you can see the recipes.",
+    "check": "Check again",
+    "approved": "Your account has been approved!",
+    "stillPending": "Your account is still awaiting approval"
   }
 }

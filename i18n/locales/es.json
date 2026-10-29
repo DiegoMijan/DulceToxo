@@ -371,5 +371,32 @@
     "reload": "Recargar",
     "dismiss": "Cerrar",
     "offline": "Sin conexión: puedes ver las recetas que ya abriste"
+  },
+  "admin": {
+    "users": {
+      "title": "Usuarios",
+      "subtitle": "{total} usuarios · {pending} pendientes de aprobar",
+      "search": "Buscar por nombre, email o país",
+      "approved": "Aprobado",
+      "approveAria": "Aprobar a {name}",
+      "name": "Nombre",
+      "email": "Email",
+      "birthDate": "Nacimiento",
+      "signupDate": "Alta",
+      "location": "Ubicación",
+      "admin": "Admin",
+      "empty": "No hay usuarios",
+      "loadError": "No se pudieron cargar los usuarios",
+      "unsaved": "1 cambio sin guardar | {n} cambios sin guardar",
+      "saved": "Se ha actualizado 1 usuario | Se han actualizado {n} usuarios",
+      "saveError": "No se pudieron guardar los cambios, inténtalo de nuevo"
+    }
+  },
+  "pending": {
+    "title": "Cuenta pendiente de aprobación",
+    "message": "Gracias por registrarte, {name}. Un administrador tiene que aprobar tu cuenta antes de que puedas ver las recetas.",
+    "check": "Comprobar de nuevo",
+    "approved": "¡Tu cuenta ya está aprobada!",
+    "stillPending": "Tu cuenta sigue pendiente de aprobación"
   }
 }

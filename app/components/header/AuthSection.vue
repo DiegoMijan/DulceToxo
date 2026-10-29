@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { useAuth } from "~/composables/useAuth"
 
-  const { user, isLoggedIn, isAdmin, signOut } = useAuth()
+  const { user, isLoggedIn, isAdmin, isApproved, signOut } = useAuth()
   const localePath = useLocalePath()
   const { favoritesIndexPath } = useFavoritesPath()
 
@@ -95,6 +95,7 @@
             </NuxtLink>
 
             <NuxtLink
+              v-if="isApproved"
               :to="favoritesIndexPath()"
               class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
               data-testid="header-favorites-link"

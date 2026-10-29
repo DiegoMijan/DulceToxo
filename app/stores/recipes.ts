@@ -68,6 +68,13 @@ export const useRecipes = defineStore("recipes", () => {
   }
 
   const handleUnauthorized = async (error: unknown): Promise<boolean> => {
+    // Cuenta sin aprobar (p. ej. un admin le retiro el acceso): a la pagina de pendiente
+    if (isPendingApprovalError(error)) {
+      clearCache()
+      const localePath = useLocalePath()
+      await navigateTo(localePath(PENDING_APPROVAL_ROUTE))
+      return true
+    }
     if (!isUnauthorizedError(error)) return false
     clearCache()
     await redirectToLogin()
