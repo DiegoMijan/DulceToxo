@@ -82,6 +82,15 @@
     await deleteUpload(publicId)
   }
 
+  // La principal es la primera: se mueve al principio y el resto mantiene su orden
+  const handleSetMain = (index: number) => {
+    if (disabled || index <= 0) return
+    const publicId = publicIds.value[index]
+    if (!publicId) return
+    publicIds.value = [publicId, ...publicIds.value.filter((_, i) => i !== index)]
+    emit("change")
+  }
+
   const handleRemove = (index: number, event: Event) => {
     if (disabled) return
 
@@ -187,8 +196,10 @@
     <RecipeImageCarousel
       :images="carouselImages"
       show-remove
+      show-main
       :disabled="disabled"
       @remove="handleRemove"
+      @set-main="handleSetMain"
     />
   </div>
 </template>

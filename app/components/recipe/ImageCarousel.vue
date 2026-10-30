@@ -1,14 +1,17 @@
 <script setup lang="ts">
   import type { RecipeCarouselImage } from "./GallerySlide.vue"
 
-  const { images, showRemove = false, disabled = false } = defineProps<{
+  const { images, showRemove = false, showMain = false, disabled = false } = defineProps<{
     images: RecipeCarouselImage[]
     showRemove?: boolean
+    // Edicion: estrella para elegir la foto principal (la primera del orden)
+    showMain?: boolean
     disabled?: boolean
   }>()
 
   const emit = defineEmits<{
     remove: [index: number, event: Event]
+    setMain: [index: number]
   }>()
 
   const { t } = useI18n()
@@ -19,6 +22,18 @@
   const handleRemove = (event: Event, index: number) => {
     if (disabled) return
     emit("remove", index, event)
+  }
+
+  const currentSlide = ref<number | null>(null)
+
+  const handleSetMain = async (index: number) => {
+    if (disabled || index === 0) return
+    emit("setMain", index)
+    // Vuelve a la foto marcada, que ahora es la primera. La navegacion con flechas no siempre
+    // actualiza el v-model, asi que se fuerza el cambio null -> 0 para que el carrusel se mueva.
+    currentSlide.value = null
+    await nextTick()
+    currentSlide.value = 0
   }
 
   const handleRemovePointerDown = (event: PointerEvent) => {
@@ -48,6 +63,7 @@
   </div>
   <Carousel
     v-else-if="images.length > 0"
+    v-model:page="currentSlide"
     :slides-per-page="1"
     :loop="showNavigators"
     class="w-full"
@@ -59,6 +75,29 @@
       >
         <div class="relative h-80 w-full overflow-hidden rounded shadow-md">
           <RecipeGallerySlide :image="image" />
+          <span
+            v-if="showMain && index === 0"
+            class="absolute z-10 top-2 left-2 rounded-full bg-french-lilac-600 px-3 py-1 text-xs font-semibold text-white shadow"
+            data-testid="upload-main-badge"
+          >
+            {{ t('upload.mainImage') }}
+          </span>
+          <Button
+            v-if="showMain"
+            v-tooltip.top="index === 0 ? t('upload.mainImage') : t('upload.setMainImage')"
+            rounded
+            type="button"
+            :severity="index === 0 ? undefined : 'secondary'"
+            class="absolute! z-10 bottom-2 left-2"
+            :aria-label="index === 0 ? t('upload.mainImage') : t('upload.setMainImage')"
+            :aria-pressed="index === 0"
+            :disabled="disabled"
+            data-testid="upload-set-main"
+            @pointerdown="handleRemovePointerDown"
+            @click="handleSetMain(index)"
+          >
+            <i :class="index === 0 ? 'pi pi-star-fill' : 'pi pi-star'" />
+          </Button>
           <Button
             v-if="showRemove"
             v-tooltip.top="t('upload.removeImage')"

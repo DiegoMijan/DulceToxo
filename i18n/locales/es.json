@@ -369,7 +369,9 @@
     "previousImage": "Imagen anterior",
     "nextImage": "Imagen siguiente",
     "expandImage": "Ampliar imagen",
-    "collapseImage": "Cerrar imagen"
+    "collapseImage": "Cerrar imagen",
+    "mainImage": "Principal",
+    "setMainImage": "Marcar como principal"
   },
   "pwa": {
     "updateAvailable": "Hay una nueva versión de Dulce Toxo",
