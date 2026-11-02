@@ -396,7 +396,12 @@
       "loadError": "Non se puideron cargar os usuarios",
       "unsaved": "1 cambio sen gardar | {n} cambios sen gardar",
       "saved": "Actualizouse 1 usuario | Actualizáronse {n} usuarios",
-      "saveError": "Non se puideron gardar os cambios, téntao de novo"
+      "saveError": "Non se puideron gardar os cambios, téntao de novo",
+      "deleteAria": "Eliminar a {name}",
+      "deleteHeader": "Eliminar usuario",
+      "deleteMessage": "Seguro que queres eliminar a {name} ({email})? Borraranse a súa conta, os seus favoritos e as súas valoracións. Esta acción non se pode desfacer.",
+      "deleted": "{name} eliminouse",
+      "deleteError": "Non se puido eliminar o usuario, téntao de novo"
     }
   },
   "pending": {
