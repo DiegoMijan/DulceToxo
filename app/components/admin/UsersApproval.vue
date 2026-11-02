@@ -19,11 +19,13 @@
 
   const { t, locale } = useI18n()
   const toast = useToast()
+  const confirm = useConfirm()
 
   const users = ref<AdminUser[]>([])
   const loading = ref(true)
   const loadError = ref(false)
   const saving = ref(false)
+  const deletingId = ref<string | null>(null)
   const search = ref("")
   // id -> valor nuevo de "aprobado" (solo los que difieren del guardado)
   const pending = ref<Record<string, boolean>>({})
@@ -86,6 +88,36 @@
     } finally {
       saving.value = false
     }
+  }
+
+  const deleteUser = async (user: AdminUser) => {
+    deletingId.value = user.id
+    try {
+      await $fetch(`/api/admin/users/${encodeURIComponent(user.id)}`, { method: "DELETE" })
+      users.value = users.value.filter((u) => u.id !== user.id)
+      pending.value = Object.fromEntries(Object.entries(pending.value).filter(([id]) => id !== user.id))
+      toast.add({ severity: "success", summary: t("admin.users.deleted", { name: fullName(user) }), life: 4000 })
+    } catch (error) {
+      toast.add({ severity: "error", summary: t("admin.users.deleteError"), life: 6000 })
+      console.error("Failed to delete user:", error)
+    } finally {
+      deletingId.value = null
+    }
+  }
+
+  const handleDeleteClick = (user: AdminUser) => {
+    confirm.require({
+      group: "user-delete",
+      header: t("admin.users.deleteHeader"),
+      message: t("admin.users.deleteMessage", { name: fullName(user), email: user.email }),
+      icon: "pi pi-exclamation-triangle text-red-500!",
+      defaultFocus: "reject",
+      rejectProps: { label: t("common.cancel"), severity: "secondary", outlined: true },
+      acceptProps: { label: t("common.delete"), severity: "danger" },
+      accept: () => {
+        void deleteUser(user)
+      },
+    })
   }
 
   // Busqueda en nombre, email y ubicacion, sin tildes
@@ -199,7 +231,34 @@
           <span class="whitespace-nowrap">{{ location(data) }}</span>
         </template>
       </Column>
+      <Column
+        header-class="w-14"
+        body-class="text-center"
+      >
+        <template #body="{ data }">
+          <Button
+            v-if="!isAdminRow(data)"
+            v-tooltip.top="t('admin.users.deleteAria', { name: fullName(data) })"
+            type="button"
+            icon="pi pi-trash"
+            severity="danger"
+            text
+            rounded
+            size="small"
+            :aria-label="t('admin.users.deleteAria', { name: fullName(data) })"
+            :loading="deletingId === data.id"
+            :disabled="saving || deletingId !== null"
+            :data-testid="`admin-users-delete-${data.email}`"
+            @click="handleDeleteClick(data)"
+          />
+        </template>
+      </Column>
     </DataTable>
+    <ConfirmDialog
+      group="user-delete"
+      :style="{ width: '30rem' }"
+      :breakpoints="{ '575px': '92vw' }"
+    />
 
     <div class="flex flex-wrap items-center justify-end gap-3 border-t border-french-lilac-100 bg-french-lilac-50 px-4 py-4 sm:px-6 dark:border-gray-700 dark:bg-gray-900/40">
       <span
